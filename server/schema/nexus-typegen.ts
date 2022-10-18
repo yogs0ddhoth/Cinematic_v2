@@ -28,7 +28,31 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
+  Genre: { // root type
+    key: string; // String!
+    value?: string | null; // String
+  }
+  Movie: { // root type
+    contentRating?: string | null; // String
+    description?: string | null; // String
+    genreList?: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
+    genres?: string | null; // String
+    id: string; // String!
+    imDbRating?: number | null; // Float
+    imDbRatingVotes?: number | null; // Int
+    image?: string | null; // String
+    metacriticRating?: number | null; // Int
+    plot?: string | null; // String
+    runtimeStr: string; // String!
+    starList?: Array<NexusGenRootTypes['Star'] | null> | null; // [Star]
+    stars?: string | null; // String
+    title: string; // String!
+  }
   Query: {};
+  Star: { // root type
+    id: string; // String!
+    name?: string | null; // String
+  }
 }
 
 export interface NexusGenInterfaces {
@@ -42,14 +66,62 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
+  Genre: { // field return type
+    key: string; // String!
+    value: string | null; // String
+  }
+  Movie: { // field return type
+    contentRating: string | null; // String
+    description: string | null; // String
+    genreList: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
+    genres: string | null; // String
+    id: string; // String!
+    imDbRating: number | null; // Float
+    imDbRatingVotes: number | null; // Int
+    image: string | null; // String
+    metacriticRating: number | null; // Int
+    plot: string | null; // String
+    runtimeStr: string; // String!
+    starList: Array<NexusGenRootTypes['Star'] | null> | null; // [Star]
+    stars: string | null; // String
+    title: string; // String!
+  }
   Query: { // field return type
-    ok: boolean; // Boolean!
+    movies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
+  }
+  Star: { // field return type
+    id: string; // String!
+    name: string | null; // String
   }
 }
 
 export interface NexusGenFieldTypeNames {
+  Genre: { // field return type name
+    key: 'String'
+    value: 'String'
+  }
+  Movie: { // field return type name
+    contentRating: 'String'
+    description: 'String'
+    genreList: 'Genre'
+    genres: 'String'
+    id: 'String'
+    imDbRating: 'Float'
+    imDbRatingVotes: 'Int'
+    image: 'String'
+    metacriticRating: 'Int'
+    plot: 'String'
+    runtimeStr: 'String'
+    starList: 'Star'
+    stars: 'String'
+    title: 'String'
+  }
   Query: { // field return type name
-    ok: 'Boolean'
+    movies: 'Movie'
+  }
+  Star: { // field return type name
+    id: 'String'
+    name: 'String'
   }
 }
 
