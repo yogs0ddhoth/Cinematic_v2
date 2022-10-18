@@ -1,4 +1,4 @@
-import { objectType } from 'nexus';
+import { arg, objectType } from 'nexus';
 import { testMovie } from '../movie';
 
 export const Genre = objectType({
@@ -7,7 +7,14 @@ export const Genre = objectType({
     t.nonNull.string("key")
     t.string("value")
   }
-})
+});
+export const Star = objectType({
+  name: "Star",
+  definition(t) {
+    t.nonNull.string("id")
+    t.string("name")
+  }
+});
 export const Movie = objectType({
   name: "Movie",
   definition(t) {
@@ -26,23 +33,31 @@ export const Movie = objectType({
     t.string("stars")
     t.list.field("starList", { type: Star })
   }
-})
-export const Star = objectType({
-  name: "Star",
-  definition(t) {
-    t.nonNull.string("id")
-    t.string("name")
-  }
-})
+});
 
-export const MovieQuery = objectType({
-    name: "Query",
-    definition(t) {
-      t.nonNull.list.field("movies", { 
-        type: Movie,
-        resolve(_, args, context, info) {
-          return [testMovie]
-        }
-      })
-    }
-  })
+export const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.nonNull.list.field("movies", { 
+      type: Movie,
+      resolve(_, args, context, info) {
+        return [testMovie];
+      }
+    })
+  }
+});
+
+const Mutation = objectType({
+  name: "Mutation",
+  definition(t) {
+    t.field("saveMovie", {
+      type: Movie,
+      args: {
+        movie: arg({ type: 'Movie' }),
+      },
+      resolve(_, args, context) {
+        return testMovie;
+      }
+    })
+  }
+});
