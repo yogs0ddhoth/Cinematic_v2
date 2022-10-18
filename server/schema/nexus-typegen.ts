@@ -14,6 +14,30 @@ declare global {
 }
 
 export interface NexusGenInputs {
+  GenreInput: { // input type
+    key: string; // String!
+    value?: string | null; // String
+  }
+  MovieInput: { // input type
+    contentRating?: string | null; // String
+    description?: string | null; // String
+    genreList?: Array<NexusGenInputs['GenreInput'] | null> | null; // [GenreInput]
+    genres?: string | null; // String
+    id: string; // String!
+    imDbRating?: number | null; // Float
+    imDbRatingVotes?: number | null; // Int
+    image?: string | null; // String
+    metacriticRating?: number | null; // Int
+    plot?: string | null; // String
+    runtimeStr: string; // String!
+    starList?: Array<NexusGenInputs['StarInput'] | null> | null; // [StarInput]
+    stars?: string | null; // String
+    title: string; // String!
+  }
+  StarInput: { // input type
+    id: string; // String!
+    name?: string | null; // String
+  }
 }
 
 export interface NexusGenEnums {
@@ -48,6 +72,7 @@ export interface NexusGenObjects {
     stars?: string | null; // String
     title: string; // String!
   }
+  Mutation: {};
   Query: {};
   Star: { // root type
     id: string; // String!
@@ -86,8 +111,11 @@ export interface NexusGenFieldTypes {
     stars: string | null; // String
     title: string; // String!
   }
+  Mutation: { // field return type
+    addMovie: NexusGenRootTypes['Movie'] | null; // Movie
+  }
   Query: { // field return type
-    movies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
+    movie: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
   }
   Star: { // field return type
     id: string; // String!
@@ -116,8 +144,11 @@ export interface NexusGenFieldTypeNames {
     stars: 'String'
     title: 'String'
   }
+  Mutation: { // field return type name
+    addMovie: 'Movie'
+  }
   Query: { // field return type name
-    movies: 'Movie'
+    movie: 'Movie'
   }
   Star: { // field return type name
     id: 'String'
@@ -126,6 +157,11 @@ export interface NexusGenFieldTypeNames {
 }
 
 export interface NexusGenArgTypes {
+  Mutation: {
+    addMovie: { // args
+      movie?: NexusGenInputs['MovieInput'] | null; // MovieInput
+    }
+  }
 }
 
 export interface NexusGenAbstractTypeMembers {
@@ -136,7 +172,7 @@ export interface NexusGenTypeInterfaces {
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
-export type NexusGenInputNames = never;
+export type NexusGenInputNames = keyof NexusGenInputs;
 
 export type NexusGenEnumNames = never;
 

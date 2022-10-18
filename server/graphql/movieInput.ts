@@ -1,18 +1,18 @@
-import { objectType } from 'nexus';
+import { inputObjectType } from 'nexus';
 
-export const Genre = objectType({
-  name: "Genre",
+export const GenreInput = inputObjectType({
+  name: "GenreInput",
   definition(t) {
     t.nonNull.string("key")
     t.string("value")
   }
-})
-export const Movie = objectType({
-  name: "Movie",
+});
+export const MovieInput = inputObjectType({
+  name: "MovieInput",
   definition(t) {
     t.string("contentRating")
     t.string("description")
-    t.list.field("genreList", { type: Genre })
+    t.list.field("genreList", { type: GenreInput })
     t.string("genres")
     t.nonNull.string("id")
     t.float("imDbRating")
@@ -21,15 +21,15 @@ export const Movie = objectType({
     t.int("metacriticRating")
     t.string("plot")
     t.nonNull.string("runtimeStr")
-    t.list.field("starList", { type: Star })
+    t.list.field("starList", { type: StarInput })
     t.string("stars")
     t.nonNull.string("title")
   }
-})
-export const Star = objectType({
-  name: "Star",
+});
+export  const StarInput = inputObjectType({
+  name: "StarInput",
   definition(t) {
     t.nonNull.string("id")
     t.string("name")
   }
-})
+});

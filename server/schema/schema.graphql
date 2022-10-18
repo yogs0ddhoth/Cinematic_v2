@@ -7,6 +7,11 @@ type Genre {
   value: String
 }
 
+input GenreInput {
+  key: String!
+  value: String
+}
+
 type Movie {
   contentRating: String
   description: String
@@ -24,11 +29,37 @@ type Movie {
   title: String!
 }
 
+input MovieInput {
+  contentRating: String
+  description: String
+  genreList: [GenreInput]
+  genres: String
+  id: String!
+  imDbRating: Float
+  imDbRatingVotes: Int
+  image: String
+  metacriticRating: Int
+  plot: String
+  runtimeStr: String!
+  starList: [StarInput]
+  stars: String
+  title: String!
+}
+
+type Mutation {
+  addMovie(movie: MovieInput): Movie
+}
+
 type Query {
-  movies: [Movie]!
+  movie: [Movie]!
 }
 
 type Star {
+  id: String!
+  name: String
+}
+
+input StarInput {
   id: String!
   name: String
 }
