@@ -17,7 +17,8 @@ type Movie {
   description: String
   genreList: [Genre]
   genres: String
-  id: String!
+  id: ID!
+  imDbId: String!
   imDbRating: Float
   imDbRatingVotes: Int
   image: String
@@ -47,7 +48,7 @@ input MovieInput {
 }
 
 type Mutation {
-  addMovie(movie: MovieInput): Movie
+  addMovie(movie: MovieInput!): Movie
 }
 
 type Query {

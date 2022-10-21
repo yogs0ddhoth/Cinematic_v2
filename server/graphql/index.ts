@@ -13,7 +13,8 @@ export const Mutation = objectType({
         movie: arg({ type: nonNull(MovieInput) }),
       },
       resolve(_, {movie}) {
-        return testMovie;
+        console.log({...movie});
+        return {...movie, imDbId: movie.id, id:"lol",};
       }
     })
   }

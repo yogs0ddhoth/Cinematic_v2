@@ -1,7 +1,8 @@
 import { NexusGenObjects } from "./schema/nexus-typegen";
 
 export const testMovie: NexusGenObjects["Movie"] = {
-    id:"tt1375666",
+    imDbId:"tt1375666",
+    id: "lol",
     image:"https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_Ratio0.6837_AL_.jpg",
     title:"Inception",
     description:"(2010)",

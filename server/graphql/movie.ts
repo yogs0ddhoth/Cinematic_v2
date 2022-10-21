@@ -10,11 +10,12 @@ export const Genre = objectType({
 export const Movie = objectType({
   name: "Movie",
   definition(t) {
+    t.nonNull.id("id")
     t.string("contentRating")
     t.string("description")
     t.list.field("genreList", { type: Genre })
     t.string("genres")
-    t.nonNull.string("id")
+    t.nonNull.string("imDbId")
     t.float("imDbRating")
     t.int("imDbRatingVotes")
     t.string("image")

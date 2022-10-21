@@ -19,9 +19,9 @@ class App {
     }
 
     #routes(): void {
-        this.express.use("/", (req, res, next) => {
-            res.send("Make sure url is correct!!!");
-        });
+        // this.express.use("/", (req, res, next) => {
+        //     res.send("Make sure url is correct!!!");
+        // });
     }
 }
 export default new App().express;

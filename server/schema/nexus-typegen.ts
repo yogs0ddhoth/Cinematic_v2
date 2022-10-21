@@ -61,7 +61,8 @@ export interface NexusGenObjects {
     description?: string | null; // String
     genreList?: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
     genres?: string | null; // String
-    id: string; // String!
+    id: string; // ID!
+    imDbId: string; // String!
     imDbRating?: number | null; // Float
     imDbRatingVotes?: number | null; // Int
     image?: string | null; // String
@@ -100,7 +101,8 @@ export interface NexusGenFieldTypes {
     description: string | null; // String
     genreList: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
     genres: string | null; // String
-    id: string; // String!
+    id: string; // ID!
+    imDbId: string; // String!
     imDbRating: number | null; // Float
     imDbRatingVotes: number | null; // Int
     image: string | null; // String
@@ -133,7 +135,8 @@ export interface NexusGenFieldTypeNames {
     description: 'String'
     genreList: 'Genre'
     genres: 'String'
-    id: 'String'
+    id: 'ID'
+    imDbId: 'String'
     imDbRating: 'Float'
     imDbRatingVotes: 'Int'
     image: 'String'
@@ -159,7 +162,7 @@ export interface NexusGenFieldTypeNames {
 export interface NexusGenArgTypes {
   Mutation: {
     addMovie: { // args
-      movie?: NexusGenInputs['MovieInput'] | null; // MovieInput
+      movie: NexusGenInputs['MovieInput']; // MovieInput!
     }
   }
 }
