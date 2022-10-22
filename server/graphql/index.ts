@@ -4,6 +4,11 @@ import { Movie } from './movie';
 import { MovieInput } from './movieInput';
 export * from './movie';
 
+import { PrismaClient } from "@prisma/client";
+import { testMovieInput } from "../movie";
+
+const prisma = new PrismaClient();
+
 export const Mutation = objectType({
   name: "Mutation",
   definition(t) {
@@ -12,9 +17,27 @@ export const Mutation = objectType({
       args: {
         movie: arg({ type: nonNull(MovieInput) }),
       },
-      resolve(_, {movie}) {
-        console.log({...movie});
-        return {...movie, imDbId: movie.id, id:"lol",};
+      async resolve(_, {movie}, {prisma}) {
+        const {id, genreList, starList, ...data} = movie;
+        const newMovie = await prisma.movie.create({
+          data: {
+            ...data,
+            imDbId: id,
+            genreList: {
+              createMany: {
+                data: genreList
+              }
+            },
+            starList: {
+              createMany: {
+                data: starList
+              }
+            }
+          }
+        });
+
+        console.log(newMovie);
+        return testMovie;
       }
     })
   }
@@ -24,8 +47,13 @@ export const Query = objectType({
   definition(t) {
     t.nonNull.list.field("movie", { 
         type: Movie,
-        resolve() {
-            return [testMovie];
+        async resolve(_, __, {prisma}) {
+            return await prisma.movie.findMany({
+              include: {
+                genreList: true,
+                starList: true
+              }
+            })
         }
     })
     

@@ -1,11 +1,13 @@
 import { ApolloServer } from "apollo-server-express";
 import app from "./app";
+import { context } from "./context";
 import { schema } from "./schema";
 
 async function startServer() {
     const PORT = 3001;
     const server = new ApolloServer({
         schema,
+        context,
     });
 
     await server.start();

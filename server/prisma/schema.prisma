@@ -11,19 +11,26 @@ datasource db {
 }
 
 model Genre {
-  key   String @id @map("_id)
-  value String
+  key     String  @id @map("_id")
+  value   String
+  Movie   Movie?  @relation(fields: [movieId], references: [id])
+  movieId String? @db.ObjectId
 }
+
 model Star {
-  id   String @id @map("_id)
-  name String
+  id      String
+  name    String  @id @map("_id")
+  Movie   Movie?  @relation(fields: [movieId], references: [id])
+  movieId String? @db.ObjectId
 }
+
 model Movie {
-  id               String @id @default(auto()) @map("_id") @db.ObjectId
+  id               String  @id @default(auto()) @map("_id") @db.ObjectId
   contentRating    String
   description      String
   genreList        Genre[]
   genres           String
+  imDbId           String
   imDbRating       Float
   imDbRatingVotes  Int
   image            String
@@ -32,4 +39,5 @@ model Movie {
   runtimeStr       String
   starList         Star[]
   stars            String
+  title            String
 }
