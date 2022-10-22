@@ -13,7 +13,7 @@ export const Movie = objectType({
     t.nonNull.id("id")
     t.string("contentRating")
     t.string("description")
-    t.list.field("genreList", { type: Genre })
+    t.nonNull.list.field("genreList", { type: Genre })
     t.string("genres")
     t.nonNull.string("imDbId")
     t.float("imDbRating")
@@ -22,7 +22,7 @@ export const Movie = objectType({
     t.int("metacriticRating")
     t.string("plot")
     t.nonNull.string("runtimeStr")
-    t.list.field("starList", { type: Star })
+    t.nonNull.list.field("starList", { type: Star })
     t.string("stars")
     t.nonNull.string("title")
   }
