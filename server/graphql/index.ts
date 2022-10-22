@@ -19,7 +19,7 @@ export const Mutation = objectType({
       },
       async resolve(_, {movie}, {prisma}) {
         const {id, genreList, starList, ...data} = movie;
-        const newMovie = await prisma.movie.create({
+        return await prisma.movie.create({
           data: {
             ...data,
             imDbId: id,
@@ -39,9 +39,6 @@ export const Mutation = objectType({
             starList: true
           }
         });
-
-        console.log(newMovie);
-        return newMovie;
       }
     })
   }
