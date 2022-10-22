@@ -33,11 +33,15 @@ export const Mutation = objectType({
                 data: starList
               }
             }
+          },
+          include: {
+            genreList: true,
+            starList: true
           }
         });
 
         console.log(newMovie);
-        return testMovie;
+        return newMovie;
       }
     })
   }
