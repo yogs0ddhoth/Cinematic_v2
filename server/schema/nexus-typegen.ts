@@ -117,7 +117,8 @@ export interface NexusGenFieldTypes {
     addMovie: NexusGenRootTypes['Movie'] | null; // Movie
   }
   Query: { // field return type
-    movie: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
+    getMovies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
+    searchMovies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
   }
   Star: { // field return type
     id: string; // String!
@@ -151,7 +152,8 @@ export interface NexusGenFieldTypeNames {
     addMovie: 'Movie'
   }
   Query: { // field return type name
-    movie: 'Movie'
+    getMovies: 'Movie'
+    searchMovies: 'Movie'
   }
   Star: { // field return type name
     id: 'String'
@@ -163,6 +165,16 @@ export interface NexusGenArgTypes {
   Mutation: {
     addMovie: { // args
       movie: NexusGenInputs['MovieInput']; // MovieInput!
+    }
+  }
+  Query: {
+    searchMovies: { // args
+      certificates?: string | null; // String
+      genres?: string | null; // String
+      release_date?: number | null; // Int
+      title?: string | null; // String
+      title_type?: string | null; // String
+      user_rating?: number | null; // Int
     }
   }
 }

@@ -52,7 +52,8 @@ type Mutation {
 }
 
 type Query {
-  movie: [Movie]!
+  getMovies: [Movie]!
+  searchMovies(certificates: String, genres: String, release_date: Int, title: String, title_type: String, user_rating: Int): [Movie]!
 }
 
 type Star {
