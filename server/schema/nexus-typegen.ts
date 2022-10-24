@@ -21,7 +21,7 @@ export interface NexusGenInputs {
   MovieInput: { // input type
     contentRating?: string | null; // String
     description?: string | null; // String
-    genreList: Array<NexusGenInputs['GenreInput'] | null>; // [GenreInput]!
+    genreList: NexusGenInputs['GenreInput'][]; // [GenreInput!]!
     genres?: string | null; // String
     id: string; // String!
     imDbRating?: number | null; // Float
@@ -30,7 +30,7 @@ export interface NexusGenInputs {
     metacriticRating?: number | null; // Int
     plot?: string | null; // String
     runtimeStr: string; // String!
-    starList: Array<NexusGenInputs['StarInput'] | null>; // [StarInput]!
+    starList: NexusGenInputs['StarInput'][]; // [StarInput!]!
     stars?: string | null; // String
     title: string; // String!
   }

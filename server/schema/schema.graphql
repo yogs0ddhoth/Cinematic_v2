@@ -33,7 +33,7 @@ type Movie {
 input MovieInput {
   contentRating: String
   description: String
-  genreList: [GenreInput]!
+  genreList: [GenreInput!]!
   genres: String
   id: String!
   imDbRating: Float
@@ -42,7 +42,7 @@ input MovieInput {
   metacriticRating: Int
   plot: String
   runtimeStr: String!
-  starList: [StarInput]!
+  starList: [StarInput!]!
   stars: String
   title: String!
 }

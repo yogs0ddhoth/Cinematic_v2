@@ -26,18 +26,18 @@ model Star {
 
 model Movie {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  contentRating    String
-  description      String
+  contentRating    String?
+  description      String?
   genreList        Genre[]
-  genres           String
+  genres           String?
   imDbId           String
-  imDbRating       Float
-  imDbRatingVotes  Int
-  image            String
-  metacriticRating Int
-  plot             String
+  imDbRating       Float?
+  imDbRatingVotes  Int?
+  image            String?
+  metacriticRating Int?
+  plot             String?
   runtimeStr       String
   starList         Star[]
-  stars            String
+  stars            String?
   title            String
 }

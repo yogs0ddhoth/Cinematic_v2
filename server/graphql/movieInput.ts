@@ -10,18 +10,18 @@ export const GenreInput = inputObjectType({
 export const MovieInput = inputObjectType({
   name: "MovieInput",
   definition(t) {
+    t.nonNull.string("id")
     t.string("contentRating")
     t.string("description")
-    t.nonNull.list.field("genreList", { type: GenreInput })
+    t.nonNull.list.nonNull.field("genreList", { type: GenreInput })
     t.string("genres")
-    t.nonNull.string("id")
     t.float("imDbRating")
     t.int("imDbRatingVotes")
     t.string("image")
     t.int("metacriticRating")
     t.string("plot")
     t.nonNull.string("runtimeStr")
-    t.nonNull.list.field("starList", { type: StarInput })
+    t.nonNull.list.nonNull.field("starList", { type: StarInput })
     t.string("stars")
     t.nonNull.string("title")
   }

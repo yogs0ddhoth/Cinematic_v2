@@ -17,12 +17,12 @@ export const Mutation = objectType({
       async resolve(_, {movie}, {prisma}) {
         const {
           id, 
-          genreList, starList, 
-          ...data
+          genreList, starList,
+          ...movieData
         } = movie;
         return await prisma.movie.create({
           data: {
-            ...data,
+            ...movieData,
             imDbId: id,
             genreList: {
               createMany: {
@@ -55,7 +55,7 @@ export const Query = objectType({
             genreList: true,
             starList: true
           }
-        })
+        });
       }
     })
     t.nonNull.list.field("searchMovies", { 
