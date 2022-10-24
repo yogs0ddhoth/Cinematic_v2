@@ -1,36 +1,35 @@
 import { objectType } from 'nexus';
 
 export const Genre = objectType({
-  name: "Genre",
+  name: 'Genre',
   definition(t) {
-    t.nonNull.string("key")
-    t.string("value")
-  }
-})
+    t.nonNull.string('key');
+    t.string('value');
+  },
+});
 export const Movie = objectType({
-  name: "Movie",
+  name: 'Movie',
   definition(t) {
-    t.nonNull.id("id")
-    t.string("contentRating")
-    t.string("description")
-    t.nonNull.list.field("genreList", { type: Genre })
-    t.string("genres")
-    t.nonNull.string("imDbId")
-    t.float("imDbRating")
-    t.int("imDbRatingVotes")
-    t.string("image")
-    t.int("metacriticRating")
-    t.string("plot")
-    t.nonNull.string("runtimeStr")
-    t.nonNull.list.field("starList", { type: Star })
-    t.string("stars")
-    t.nonNull.string("title")
-  }
-})
+    t.nonNull.id('id');
+    t.string('contentRating');
+    t.string('description');
+    t.list.field('genreList', { type: Genre });
+    t.string('genres');
+    t.float('imDbRating');
+    t.int('imDbRatingVotes');
+    t.string('image');
+    t.int('metacriticRating');
+    t.string('plot');
+    t.string('runtimeStr');
+    t.list.field('starList', { type: Star });
+    t.string('stars');
+    t.string('title');
+  },
+});
 export const Star = objectType({
-  name: "Star",
+  name: 'Star',
   definition(t) {
-    t.nonNull.string("id")
-    t.string("name")
-  }
-})
+    t.nonNull.string('id');
+    t.string('name');
+  },
+});

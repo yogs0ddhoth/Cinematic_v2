@@ -3,22 +3,20 @@
  * Do not make changes to this file directly
  */
 
-
-import type { Context } from "./../context"
-
-
-
+import type { Context } from './../context';
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {
-  GenreInput: { // input type
+  GenreInput: {
+    // input type
     key: string; // String!
     value: string; // String!
-  }
-  MovieInput: { // input type
+  };
+  MovieInput: {
+    // input type
     contentRating?: string | null; // String
     description?: string | null; // String
     genreList: NexusGenInputs['GenreInput'][]; // [GenreInput!]!
@@ -33,157 +31,165 @@ export interface NexusGenInputs {
     starList: NexusGenInputs['StarInput'][]; // [StarInput!]!
     stars?: string | null; // String
     title: string; // String!
-  }
-  StarInput: { // input type
+  };
+  StarInput: {
+    // input type
     id: string; // String!
     name: string; // String!
-  }
+  };
 }
 
-export interface NexusGenEnums {
-}
+export interface NexusGenEnums {}
 
 export interface NexusGenScalars {
-  String: string
-  Int: number
-  Float: number
-  Boolean: boolean
-  ID: string
+  String: string;
+  Int: number;
+  Float: number;
+  Boolean: boolean;
+  ID: string;
 }
 
 export interface NexusGenObjects {
-  Genre: { // root type
+  Genre: {
+    // root type
     key: string; // String!
     value?: string | null; // String
-  }
-  Movie: { // root type
+  };
+  Movie: {
+    // root type
     contentRating?: string | null; // String
     description?: string | null; // String
-    genreList: Array<NexusGenRootTypes['Genre'] | null>; // [Genre]!
+    genreList?: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
     genres?: string | null; // String
     id: string; // ID!
-    imDbId: string; // String!
     imDbRating?: number | null; // Float
     imDbRatingVotes?: number | null; // Int
     image?: string | null; // String
     metacriticRating?: number | null; // Int
     plot?: string | null; // String
-    runtimeStr: string; // String!
-    starList: Array<NexusGenRootTypes['Star'] | null>; // [Star]!
+    runtimeStr?: string | null; // String
+    starList?: Array<NexusGenRootTypes['Star'] | null> | null; // [Star]
     stars?: string | null; // String
-    title: string; // String!
-  }
+    title?: string | null; // String
+  };
   Mutation: {};
   Query: {};
-  Star: { // root type
+  Star: {
+    // root type
     id: string; // String!
     name?: string | null; // String
-  }
+  };
 }
 
-export interface NexusGenInterfaces {
-}
+export interface NexusGenInterfaces {}
 
-export interface NexusGenUnions {
-}
+export interface NexusGenUnions {}
 
-export type NexusGenRootTypes = NexusGenObjects
+export type NexusGenRootTypes = NexusGenObjects;
 
-export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
+export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars;
 
 export interface NexusGenFieldTypes {
-  Genre: { // field return type
+  Genre: {
+    // field return type
     key: string; // String!
     value: string | null; // String
-  }
-  Movie: { // field return type
+  };
+  Movie: {
+    // field return type
     contentRating: string | null; // String
     description: string | null; // String
-    genreList: Array<NexusGenRootTypes['Genre'] | null>; // [Genre]!
+    genreList: Array<NexusGenRootTypes['Genre'] | null> | null; // [Genre]
     genres: string | null; // String
     id: string; // ID!
-    imDbId: string; // String!
     imDbRating: number | null; // Float
     imDbRatingVotes: number | null; // Int
     image: string | null; // String
     metacriticRating: number | null; // Int
     plot: string | null; // String
-    runtimeStr: string; // String!
-    starList: Array<NexusGenRootTypes['Star'] | null>; // [Star]!
+    runtimeStr: string | null; // String
+    starList: Array<NexusGenRootTypes['Star'] | null> | null; // [Star]
     stars: string | null; // String
-    title: string; // String!
-  }
-  Mutation: { // field return type
+    title: string | null; // String
+  };
+  Mutation: {
+    // field return type
     addMovie: NexusGenRootTypes['Movie'] | null; // Movie
-  }
-  Query: { // field return type
+  };
+  Query: {
+    // field return type
     getMovies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
     searchMovies: Array<NexusGenRootTypes['Movie'] | null>; // [Movie]!
-  }
-  Star: { // field return type
+  };
+  Star: {
+    // field return type
     id: string; // String!
     name: string | null; // String
-  }
+  };
 }
 
 export interface NexusGenFieldTypeNames {
-  Genre: { // field return type name
-    key: 'String'
-    value: 'String'
-  }
-  Movie: { // field return type name
-    contentRating: 'String'
-    description: 'String'
-    genreList: 'Genre'
-    genres: 'String'
-    id: 'ID'
-    imDbId: 'String'
-    imDbRating: 'Float'
-    imDbRatingVotes: 'Int'
-    image: 'String'
-    metacriticRating: 'Int'
-    plot: 'String'
-    runtimeStr: 'String'
-    starList: 'Star'
-    stars: 'String'
-    title: 'String'
-  }
-  Mutation: { // field return type name
-    addMovie: 'Movie'
-  }
-  Query: { // field return type name
-    getMovies: 'Movie'
-    searchMovies: 'Movie'
-  }
-  Star: { // field return type name
-    id: 'String'
-    name: 'String'
-  }
+  Genre: {
+    // field return type name
+    key: 'String';
+    value: 'String';
+  };
+  Movie: {
+    // field return type name
+    contentRating: 'String';
+    description: 'String';
+    genreList: 'Genre';
+    genres: 'String';
+    id: 'ID';
+    imDbRating: 'Float';
+    imDbRatingVotes: 'Int';
+    image: 'String';
+    metacriticRating: 'Int';
+    plot: 'String';
+    runtimeStr: 'String';
+    starList: 'Star';
+    stars: 'String';
+    title: 'String';
+  };
+  Mutation: {
+    // field return type name
+    addMovie: 'Movie';
+  };
+  Query: {
+    // field return type name
+    getMovies: 'Movie';
+    searchMovies: 'Movie';
+  };
+  Star: {
+    // field return type name
+    id: 'String';
+    name: 'String';
+  };
 }
 
 export interface NexusGenArgTypes {
   Mutation: {
-    addMovie: { // args
+    addMovie: {
+      // args
       movie: NexusGenInputs['MovieInput']; // MovieInput!
-    }
-  }
+    };
+  };
   Query: {
-    searchMovies: { // args
+    searchMovies: {
+      // args
       certificates?: string | null; // String
       genres?: string | null; // String
       release_date?: number | null; // Int
       title?: string | null; // String
       title_type?: string | null; // String
       user_rating?: number | null; // Int
-    }
-  }
+    };
+  };
 }
 
-export interface NexusGenAbstractTypeMembers {
-}
+export interface NexusGenAbstractTypeMembers {}
 
-export interface NexusGenTypeInterfaces {
-}
+export interface NexusGenTypeInterfaces {}
 
 export type NexusGenObjectNames = keyof NexusGenObjects;
 
@@ -203,11 +209,11 @@ export type NexusGenAbstractsUsingStrategyResolveType = never;
 
 export type NexusGenFeaturesConfig = {
   abstractTypeStrategies: {
-    isTypeOf: false
-    resolveType: true
-    __typename: false
-  }
-}
+    isTypeOf: false;
+    resolveType: true;
+    __typename: false;
+  };
+};
 
 export interface NexusGenTypes {
   context: Context;
@@ -225,9 +231,19 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
+  allInputTypes:
+    | NexusGenTypes['inputNames']
+    | NexusGenTypes['enumNames']
+    | NexusGenTypes['scalarNames'];
+  allOutputTypes:
+    | NexusGenTypes['objectNames']
+    | NexusGenTypes['enumNames']
+    | NexusGenTypes['unionNames']
+    | NexusGenTypes['interfaceNames']
+    | NexusGenTypes['scalarNames'];
+  allNamedTypes:
+    | NexusGenTypes['allInputTypes']
+    | NexusGenTypes['allOutputTypes'];
   abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
   abstractTypeMembers: NexusGenAbstractTypeMembers;
   objectsUsingAbstractStrategyIsTypeOf: NexusGenObjectsUsingAbstractStrategyIsTypeOf;
@@ -235,18 +251,17 @@ export interface NexusGenTypes {
   features: NexusGenFeaturesConfig;
 }
 
-
 declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {
-  }
-  interface NexusGenPluginInputTypeConfig<TypeName extends string> {
-  }
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginInputFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginSchemaConfig {
-  }
-  interface NexusGenPluginArgConfig {
-  }
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginInputTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
+  interface NexusGenPluginInputFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
+  interface NexusGenPluginSchemaConfig {}
+  interface NexusGenPluginArgConfig {}
 }

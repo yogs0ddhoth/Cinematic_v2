@@ -5,60 +5,54 @@ import { MovieInput } from './movieInput';
 export * from './movie';
 
 export const Mutation = objectType({
-  name: "Mutation",
+  name: 'Mutation',
   definition(t) {
-    t.field("addMovie", {
+    t.field('addMovie', {
       type: Movie,
       args: {
-        movie: arg(
-          { type: nonNull(MovieInput) }
-        ),
+        movie: arg({ type: nonNull(MovieInput) }),
       },
-      async resolve(_, {movie}, {prisma}) {
-        const {
-          id, 
-          genreList, starList,
-          ...movieData
-        } = movie;
+      async resolve(_, { movie }, { prisma }) {
+        const { id, genreList, starList, ...movieData } = movie;
         return await prisma.movie.create({
           data: {
             ...movieData,
             imDbId: id,
             genreList: {
               createMany: {
-                data: genreList
-              }
+                data: genreList,
+              },
             },
             starList: {
               createMany: {
-                data: starList
-              }
-            }
+                data: starList,
+              },
+            },
           },
           include: {
             genreList: true,
-            starList: true
+            starList: true,
           },
         });
-      }
-    })
-  }
+      },
+    });
+  },
 });
 export const Query = objectType({
-  name: "Query",
+  name: 'Query',
   definition(t) {
-    t.nonNull.list.field("getMovies", { 
+    t.nonNull.list.field('getMovies', {
       type: Movie,
-      async resolve(_, __, {prisma}) {
+      async resolve(_, __, { prisma }) {
         return await prisma.movie.findMany({
           include: {
             genreList: true,
-            starList: true
-          }
+            starList: true,
+          },
         });
-      }
-    })
-    t.nonNull.list.field("searchMovies", { 
+      },
+    });
+    t.nonNull.list.field('searchMovies', {
       type: Movie,
       args: {
         title: stringArg(),
@@ -68,10 +62,23 @@ export const Query = objectType({
         genres: stringArg(),
         certificates: stringArg(),
       },
-      resolve(_, args, {axios}) {
-        
-        return [testMovie]
-      }
-    })
-  }
+      async resolve(
+        _,
+        { title, title_type, release_date, user_rating, genres, certificates },
+        { imdb }
+      ) {
+        const { data } = await imdb.get('/', {
+          params: {
+            title,
+            title_type,
+            release_date,
+            user_rating,
+            genres,
+            certificates,
+          },
+        });
+        return data.results;
+      },
+    });
+  },
 });
