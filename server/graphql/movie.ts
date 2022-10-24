@@ -15,6 +15,7 @@ export const Movie = objectType({
     t.string('description');
     t.list.field('genreList', { type: Genre });
     t.string('genres');
+    t.string('imDbId');
     t.float('imDbRating');
     t.int('imDbRatingVotes');
     t.string('image');
@@ -23,7 +24,7 @@ export const Movie = objectType({
     t.string('runtimeStr');
     t.list.field('starList', { type: Star });
     t.string('stars');
-    t.string('title');
+    t.nonNull.string('title');
   },
 });
 export const Star = objectType({

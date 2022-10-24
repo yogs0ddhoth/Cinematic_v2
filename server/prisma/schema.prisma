@@ -36,7 +36,7 @@ model Movie {
   image            String?
   metacriticRating Int?
   plot             String?
-  runtimeStr       String
+  runtimeStr       String?
   starList         Star[]
   stars            String?
   title            String

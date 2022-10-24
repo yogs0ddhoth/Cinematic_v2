@@ -1,43 +1,54 @@
-import { arg, intArg, nonNull, objectType, stringArg } from 'nexus';
+import { arg, intArg, list, nonNull, objectType, stringArg } from 'nexus';
 import { testMovie } from '../movie';
 import { Movie } from './movie';
 import { MovieInput } from './movieInput';
 export * from './movie';
 
+import { NexusGenInputs } from '../schema/nexus-typegen';
+function serializeMovieData({ id, genreList, starList, ...movieData }: NexusGenInputs['MovieInput']) {
+  return {
+    ...movieData,
+    imDbId: id,
+    genreList: {
+      createMany: {
+        data: genreList,
+      },
+    },
+    starList: {
+      createMany: {
+        data: starList,
+      },
+    },
+  };
+}
+
 export const Mutation = objectType({
   name: 'Mutation',
   definition(t) {
-    t.field('addMovie', {
+    t.list.field("addMovies", {
       type: Movie,
       args: {
-        movie: arg({ type: nonNull(MovieInput) }),
+        movies: arg({ type: nonNull(list(nonNull(MovieInput))) }),
       },
-      async resolve(_, { movie }, { prisma }) {
-        const { id, genreList, starList, ...movieData } = movie;
-        return await prisma.movie.create({
-          data: {
-            ...movieData,
-            imDbId: id,
-            genreList: {
-              createMany: {
-                data: genreList,
-              },
-            },
-            starList: {
-              createMany: {
-                data: starList,
-              },
-            },
-          },
-          include: {
-            genreList: true,
-            starList: true,
-          },
-        });
+      async resolve(_, { movies }, { prisma }) {
+        return await Promise.all(
+          movies.map(
+            async (movie) => {
+              return await prisma.movie.create({
+                data: serializeMovieData(movie),
+                include: {
+                  genreList: true,
+                  starList: true,
+                },
+              });
+            }
+          )
+        );
       },
     });
   },
 });
+
 export const Query = objectType({
   name: 'Query',
   definition(t) {
@@ -52,33 +63,27 @@ export const Query = objectType({
         });
       },
     });
+
     t.nonNull.list.field('searchMovies', {
       type: Movie,
-      args: {
+      args: { // IMDb Advanced Search Params - optional
         title: stringArg(),
         title_type: stringArg(),
         release_date: intArg(),
-        user_rating: intArg(),
+        user_rating: intArg(), // corresponds to 'imDbRating'
         genres: stringArg(),
-        certificates: stringArg(),
+        certificates: stringArg(), // corresponds to 'contentRating' 
       },
-      async resolve(
-        _,
-        { title, title_type, release_date, user_rating, genres, certificates },
-        { imdb }
-      ) {
+      async resolve(_, args, { imdb }) {
         const { data } = await imdb.get('/', {
           params: {
-            title,
-            title_type,
-            release_date,
-            user_rating,
-            genres,
-            certificates,
+            ...args
           },
         });
         return data.results;
       },
     });
+
+    
   },
 });

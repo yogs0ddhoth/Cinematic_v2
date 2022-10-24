@@ -20,7 +20,7 @@ export const MovieInput = inputObjectType({
     t.string('image');
     t.int('metacriticRating');
     t.string('plot');
-    t.nonNull.string('runtimeStr');
+    t.string('runtimeStr');
     t.nonNull.list.nonNull.field('starList', { type: StarInput });
     t.string('stars');
     t.nonNull.string('title');
