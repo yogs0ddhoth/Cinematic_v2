@@ -1,78 +1,53 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
-import { Subscription } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ApiService, TEST } from '../api.service';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Apollo } from 'apollo-angular';
+// import { ApolloQueryResult } from '@apollo/client';
 
-type Movie = {
-  contentRating?: string | null; // String
-  description?: string | null; // String
-  genreList?: {
-    key: string; // String!
-    value?: string | null; // String
-  }[];
-  genres?: string | null; // String
-  id: string; // ID!
-  imDbId?: string | null; // String
-  imDbRating?: number | null; // Float
-  imDbRatingVotes?: number | null; // Int
-  image?: string | null; // String
-  metacriticRating?: number | null; // Int
-  plot?: string | null; // String
-  runtimeStr?: string | null; // String
-  starList?: {
-    id: string; // String!
-    name?: string | null; // String
-  }[];
-  stars?: string | null; // String
-  title: string; // String!
-}
-type Response = {
-  getMovies: Array<Movie|null>
-}
-const TEST = gql<Response, null>`
-  query GetMovies {
-    getMovies {
-      id
-      contentRating
-      description
-      genreList {
-        value
-      }
-      genres
-      imDbRating
-      imDbRatingVotes
-      image
-      metacriticRating
-      plot
-      runtimeStr
-      starList {
-        name
-      }
-      stars
-      title
-      imDbId
-    }
-  }
-`
 @Component({
   selector: 'app-apollo-test',
   templateUrl: './apollo-test.component.html',
   styleUrls: ['./apollo-test.component.css']
 })
 export class ApolloTestComponent implements OnInit, OnDestroy {
+  loading = false;
+  movies: any;
+ 
+  private querySubscription: Subscription
 
-  constructor(private apollo: Apollo) {
-    apollo.watchQuery({
-      query: TEST,
-    }).valueChanges
-      .subscribe(result => {
-        console.log(result.data.getMovies)
+  constructor(private apollo: Apollo, private api: ApiService) {
+
+    this.querySubscription = this.api.getMovies()
+    // .watchQuery({
+    //   query: TEST,
+    // })
+      .valueChanges
+      .subscribe(({ data, loading }) => {
+        this.loading = loading
+        this.movies = data.getMovies
       })
+
+    
+  }
+  test() {
+    // this.querySubscription = this.api.getMovies()
+    // // .watchQuery({
+    // //   query: TEST,
+    // // })
+    //   .valueChanges
+    //   .subscribe(({ data, loading }) => {
+    //     this.loading = loading
+    //     this.movies = data.getMovies
+    //   })
+      console.log(this.movies);
+    // this.querySubscription.unsubscribe();
   }
 
   ngOnInit(): void {
-      
+    
   }
-  ngOnDestroy(): void {
-      
+  ngOnDestroy() {
+    this.querySubscription.unsubscribe()
   }
 }
