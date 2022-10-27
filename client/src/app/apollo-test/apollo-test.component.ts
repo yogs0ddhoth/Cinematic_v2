@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { ApiService, TEST } from '../api.service';
+import { ApiService } from '../api.service';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Apollo } from 'apollo-angular';
@@ -16,37 +16,19 @@ export class ApolloTestComponent implements OnInit, OnDestroy {
  
   private querySubscription: Subscription
 
-  constructor(private apollo: Apollo, private api: ApiService) {
-
+  constructor(private api: ApiService) {
     this.querySubscription = this.api.getMovies()
-    // .watchQuery({
-    //   query: TEST,
-    // })
-      .valueChanges
-      .subscribe(({ data, loading }) => {
+      .valueChanges.subscribe(({ data, loading }) => {
         this.loading = loading
         this.movies = data.getMovies
-      })
-
-    
+      });
   }
+
   test() {
-    // this.querySubscription = this.api.getMovies()
-    // // .watchQuery({
-    // //   query: TEST,
-    // // })
-    //   .valueChanges
-    //   .subscribe(({ data, loading }) => {
-    //     this.loading = loading
-    //     this.movies = data.getMovies
-    //   })
-      console.log(this.movies);
-    // this.querySubscription.unsubscribe();
+    console.log(this.movies);
   }
 
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void { }
   ngOnDestroy() {
     this.querySubscription.unsubscribe()
   }

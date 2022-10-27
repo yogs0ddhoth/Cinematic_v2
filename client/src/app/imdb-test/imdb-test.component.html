@@ -1,0 +1,8 @@
+<p *ngIf="loading == true">Loading!</p>
+<ul>
+  <li *ngFor="let movie of movies">
+    {{ movie.title }}
+  </li>
+</ul>
+<button (click)="test()">imdb-test works!</button>
+<button (click)="test2()">test</button>

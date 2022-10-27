@@ -6,11 +6,13 @@ import { AppComponent } from './app.component';
 import { GraphQLModule } from './graphql.module';
 import { HttpClientModule } from '@angular/common/http';
 import { ApolloTestComponent } from './apollo-test/apollo-test.component';
+import { ImdbTestComponent } from './imdb-test/imdb-test.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ApolloTestComponent
+    ApolloTestComponent,
+    ImdbTestComponent
   ],
   imports: [
     BrowserModule,

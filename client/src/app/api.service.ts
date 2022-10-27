@@ -28,31 +28,71 @@ export interface Movie { // root type
 export interface Response {
   getMovies: (Movie|null)[]
 }
-export const TEST = gql<Response, null>`
-query GetMovies {
-  getMovies {
-    id
-    contentRating
-    description
-    genreList {
-      value
+
+const GET_MOVIES = gql<Response, null>`
+  query GetMovies {
+    getMovies {
+      id
+      contentRating
+      description
+      genreList {
+        value
+      }
+      genres
+      imDbRating
+      imDbRatingVotes
+      image
+      metacriticRating
+      plot
+      runtimeStr
+      starList {
+        name
+      }
+      stars
+      title
+      imDbId
     }
-    genres
-    imDbRating
-    imDbRatingVotes
-    image
-    metacriticRating
-    plot
-    runtimeStr
-    starList {
-      name
-    }
-    stars
-    title
-    imDbId
   }
+`;
+
+interface ImDbResponse { searchMovies: (Movie|null)[] }
+const SEARCH_MOVIES = gql<ImDbResponse, null>`
+  mutation SearchMovies($certificates: String, $genres: String, $releaseDate: Int, $title: String, $titleType: String, $userRating: Int) {
+    searchMovies(certificates: $certificates, genres: $genres, release_date: $releaseDate, title: $title, title_type: $titleType, user_rating: $userRating) {
+      id
+      contentRating
+      description
+      genreList {
+        value
+        key
+      }
+      genres
+      imDbRating
+      imDbRatingVotes
+      image
+      metacriticRating
+      plot
+      runtimeStr
+      starList {
+        name
+        id
+      }
+      stars
+      title
+      imDbId
+    }
+  }
+`;
+
+interface imDbParams {
+  certificates?: String, 
+  genres?: String, 
+  releaseDate?: number, 
+  title?: String, 
+  titleType?: String, 
+  userRating?: number
 }
-`
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,7 +105,19 @@ export class ApiService {
 
   getMovies() {
     return this.apolloProvider.watchQuery<Response>({
-      query: TEST
+      query: GET_MOVIES
+    });
+  }
+
+  /**
+   * 
+   * @param config: imDbParams { certificates?: String, genres?: String, releaseDate?: number, title?: String, titleType?: String, userRating?: number}
+   * @returns 
+   */
+  searchMovies(config: imDbParams) {
+    return this.apolloProvider.mutate<ImDbResponse>({
+      mutation: SEARCH_MOVIES,
+      variables: config
     })
   }
 }
