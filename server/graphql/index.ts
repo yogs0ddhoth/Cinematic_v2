@@ -46,23 +46,6 @@ export const Mutation = objectType({
         );
       },
     });
-  },
-});
-
-export const Query = objectType({
-  name: 'Query',
-  definition(t) {
-    t.nonNull.list.field('getMovies', {
-      type: Movie,
-      async resolve(_, __, { prisma }) {
-        return await prisma.movie.findMany({
-          include: {
-            genreList: true,
-            starList: true,
-          },
-        });
-      },
-    });
 
     t.nonNull.list.field('searchMovies', {
       type: Movie,
@@ -75,6 +58,7 @@ export const Query = objectType({
         certificates: stringArg(), // corresponds to 'contentRating' 
       },
       async resolve(_, args, { imdb }) {
+        console.log("IMDB CALL")
         const { data } = await imdb.get('/', {
           params: {
             ...args
@@ -83,7 +67,44 @@ export const Query = objectType({
         return data.results;
       },
     });
+  },
+});
 
-    
+export const Query = objectType({
+  name: 'Query',
+  definition(t) {
+    t.nonNull.list.field('getMovies', {
+      type: Movie,
+      async resolve(_, __, { prisma }) {
+        console.log('API CALL');
+        return await prisma.movie.findMany({
+          include: {
+            genreList: true,
+            starList: true,
+          },
+        });
+      },
+    });
+
+    // t.nonNull.list.field('searchMovies', {
+    //   type: Movie,
+    //   args: { // IMDb Advanced Search Params - optional
+    //     title: stringArg(),
+    //     title_type: stringArg(),
+    //     release_date: intArg(),
+    //     user_rating: intArg(), // corresponds to 'imDbRating'
+    //     genres: stringArg(),
+    //     certificates: stringArg(), // corresponds to 'contentRating' 
+    //   },
+    //   async resolve(_, args, { imdb }) {
+    //     console.log("IMDB CALL")
+    //     const { data } = await imdb.get('/', {
+    //       params: {
+    //         ...args
+    //       },
+    //     });
+    //     return data.results;
+    //   },
+    // });
   },
 });
