@@ -56,7 +56,7 @@ const GET_MOVIES = gql<Response, null>`
 `;
 
 interface ImDbResponse { searchMovies: (Movie|null)[] }
-const SEARCH_MOVIES = gql<ImDbResponse, null>`
+const SEARCH_MOVIES = gql`
   mutation SearchMovies($certificates: String, $genres: String, $releaseDate: Int, $title: String, $titleType: String, $userRating: Int) {
     searchMovies(certificates: $certificates, genres: $genres, release_date: $releaseDate, title: $title, title_type: $titleType, user_rating: $userRating) {
       id

@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ApiService } from '../api.service';
+import { ApiService, Movie } from '../api.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -9,7 +9,8 @@ import { Observable, Subscription } from 'rxjs';
 })
 export class ImdbTestComponent implements OnInit, OnDestroy {
   loading?: boolean;
-  movies: any;
+  movies?: (Movie|null)[];
+  error: any
   private querySubscription?: Subscription
   constructor(private api: ApiService) { }
 
@@ -21,9 +22,15 @@ export class ImdbTestComponent implements OnInit, OnDestroy {
     this.api.searchMovies({
       title: "Inception", releaseDate: 2010
     })
-      .subscribe(({ data, loading }) => {
-        this.loading = loading
-        this.movies = data && data.searchMovies
+      .subscribe({
+        next: ({ data, loading }) => {
+          this.loading = loading
+          this.movies =  data?.searchMovies
+        },
+        error: error => {
+          this.error = error;
+          console.log("error:", error);
+        }
       })
       // .unsubscribe()
       ;

@@ -1,7 +1,7 @@
 <p *ngIf="loading == true">Loading!</p>
 <ul>
-  <li *ngFor="let movie of movies">
-    {{ movie.title }}
+  <li *ngFor="let movie of movies" >
+    <span *ngIf="movie !== null">{{ movie.title }}</span>
   </li>
 </ul>
 <button (click)="test()">imdb-test works!</button>
