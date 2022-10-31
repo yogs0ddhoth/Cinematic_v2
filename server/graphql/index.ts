@@ -1,5 +1,4 @@
 import { arg, intArg, list, nonNull, objectType, stringArg } from 'nexus';
-import { testMovie } from '../movie';
 import { Movie } from './movie';
 import { MovieInput } from './movieInput';
 export * from './movie';
