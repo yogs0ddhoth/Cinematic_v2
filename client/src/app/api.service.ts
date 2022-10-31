@@ -2,34 +2,34 @@ import { Injectable } from '@angular/core';
 import {Apollo, ApolloBase, gql} from 'apollo-angular';
 import { Observable } from 'rxjs';
 
-export interface Movie { // root type
-  contentRating?: string | null; // String
-  description?: string | null; // String
-  genreList?: { // root type
-    key: string; // String!
-    value?: string | null; // String
+export interface Movie {
+  contentRating?: string | null;
+  description?: string | null;
+  genreList?: {
+    key: string;
+    value?: string | null;
   }[]
-  genres?: string | null; // String
-  id: string; // ID!
-  imDbId?: string | null; // String
-  imDbRating?: number | null; // Float
-  imDbRatingVotes?: number | null; // Int
-  image?: string | null; // String
-  metacriticRating?: number | null; // Int
-  plot?: string | null; // String
-  runtimeStr?: string | null; // String
-  starList?: { // root type
-    id: string; // String!
-    name?: string | null; // String
+  genres?: string | null;
+  id: string;
+  imDbId?: string | null;
+  imDbRating?: number | null;
+  imDbRatingVotes?: number | null;
+  image?: string | null;
+  metacriticRating?: number | null;
+  plot?: string | null;
+  runtimeStr?: string | null;
+  starList?: {
+    id: string;
+    name?: string | null;
   }[]
-  stars?: string | null; // String
-  title: string; // String!
+  stars?: string | null;
+  title: string;
 }
-export interface Response {
+interface Response {
   getMovies: (Movie|null)[]
 }
 
-const GET_MOVIES = gql<Response, null>`
+const GET_MOVIES = gql`
   query GetMovies {
     getMovies {
       id
@@ -57,7 +57,7 @@ const GET_MOVIES = gql<Response, null>`
 
 interface ImDbResponse { searchMovies: (Movie|null)[] }
 const SEARCH_MOVIES = gql`
-  mutation SearchMovies($certificates: String, $genres: String, $releaseDate: Int, $title: String, $titleType: String, $userRating: Int) {
+  query SearchMovies($certificates: String, $genres: String, $releaseDate: Int, $title: String, $titleType: String, $userRating: Int) {
     searchMovies(certificates: $certificates, genres: $genres, release_date: $releaseDate, title: $title, title_type: $titleType, user_rating: $userRating) {
       id
       contentRating
@@ -97,27 +97,51 @@ interface imDbParams {
   providedIn: 'root'
 })
 export class ApiService {
-  // apollo: ApolloBase;
+  // apollo: ApolloClient;
 
   constructor(private apolloProvider: Apollo) {
-    // this.apollo = this.apolloProvider.use('Apollo');
+    // this.apollo = this.apolloProvider.client;
   }
 
+  /**
+   * Get all movies saved on the server
+   * @returns Observable containing the Apollo QueryRef
+   */
   getMovies() {
     return this.apolloProvider.watchQuery<Response>({
       query: GET_MOVIES
     });
   }
+  /**
+   *  return cached Movie searches
+   * @returns (getMovies: (Movie|null)[] ) | null
+   */
+  readMovieCache() {
+    return this.apolloProvider.client.readQuery<Response>({
+      query: GET_MOVIES
+    })
+  }
 
   /**
-   * 
-   * @param config: imDbParams { certificates?: String, genres?: String, releaseDate?: number, title?: String, titleType?: String, userRating?: number}
-   * @returns 
+   * Call the ImDb API from the server
+   * @param config: imDbParams { certificates?: String, genres?: String, releaseDate?: number, title?: String, titleType?: String, userRating?: number }
+   * @returns Observable containing the Apollo MutationResult
    */
-  searchMovies(config: imDbParams) {
-    return this.apolloProvider.mutate<ImDbResponse>({
-      mutation: SEARCH_MOVIES,
+  searchImDb(config: imDbParams) {
+    return this.apolloProvider.query<ImDbResponse>({
+      query: SEARCH_MOVIES,
       variables: config
-    })
+    });
+  }
+    /**
+   * return cached imDb searches
+   * @param config: variables { certificates?: String, genres?: String, releaseDate?: number, title?: String, titleType?: String, userRating?: number }
+   * @returns (searchMovies: (Movie|null)[]) | null
+   */
+  readImDbCache(config: imDbParams) {
+    return this.apolloProvider.client.readQuery({
+      query: SEARCH_MOVIES,
+      variables: config
+    });
   }
 }

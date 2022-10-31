@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ApiService, Movie } from '../api.service';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-imdb-test',
@@ -18,8 +18,7 @@ export class ImdbTestComponent implements OnInit, OnDestroy {
   }
 
   test() {
-    // this.querySubscription = 
-    this.api.searchMovies({
+    this.querySubscription = this.api.searchImDb({
       title: "Inception", releaseDate: 2010
     })
       .subscribe({
@@ -31,16 +30,19 @@ export class ImdbTestComponent implements OnInit, OnDestroy {
           this.error = error;
           console.log("error:", error);
         }
-      })
-      // .unsubscribe()
-      ;
+      });
   }
 
   test2() {
     console.log(this.loading, this.movies);
   }
+  test3() {
+    console.log(this.api.readImDbCache({
+      title: "Inception", releaseDate: 2010
+    }));
+  }
 
   ngOnDestroy() {
-    this.querySubscription?.unsubscribe()
+    this.querySubscription?.unsubscribe();
   }
 }

@@ -25,7 +25,7 @@ export class ApolloTestComponent implements OnInit, OnDestroy {
   }
 
   test() {
-    console.log(this.movies);
+    console.log(this.movies, this.api.readMovieCache());
   }
 
   ngOnInit(): void { }
