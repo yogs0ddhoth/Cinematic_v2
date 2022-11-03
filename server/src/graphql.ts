@@ -8,17 +8,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export class GenreInput {
+export interface GenreInput {
     key: string;
     value: string;
 }
 
-export class StarInput {
+export interface StarInput {
     id: string;
     name: string;
 }
 
-export class CreateMovieInput {
+export interface CreateMovieInput {
     contentRating?: Nullable<string>;
     description?: Nullable<string>;
     genreList: GenreInput[];
@@ -35,7 +35,7 @@ export class CreateMovieInput {
     title: string;
 }
 
-export class UpdateMovieInput {
+export interface UpdateMovieInput {
     contentRating?: Nullable<string>;
     description?: Nullable<string>;
     genreList?: Nullable<Nullable<GenreInput>[]>;
@@ -53,17 +53,17 @@ export class UpdateMovieInput {
     title?: Nullable<string>;
 }
 
-export class Genre {
+export interface Genre {
     key: string;
     value?: Nullable<string>;
 }
 
-export class Star {
+export interface Star {
     id: string;
     name?: Nullable<string>;
 }
 
-export class Movie {
+export interface Movie {
     contentRating?: Nullable<string>;
     description?: Nullable<string>;
     genreList?: Nullable<Nullable<Genre>[]>;
@@ -81,20 +81,16 @@ export class Movie {
     title: string;
 }
 
-export abstract class IQuery {
-    abstract movies(): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
-
-    abstract movie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
+export interface IQuery {
+    movies(): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
+    movie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
 }
 
-export abstract class IMutation {
-    abstract addMovies(movies: CreateMovieInput[]): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
-
-    abstract createMovie(createMovieInput: CreateMovieInput): Movie | Promise<Movie>;
-
-    abstract updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
-
-    abstract removeMovie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
+export interface IMutation {
+    addMovies(movies: CreateMovieInput[]): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
+    createMovie(createMovieInput: CreateMovieInput): Movie | Promise<Movie>;
+    updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
+    removeMovie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
 }
 
 type Nullable<T> = T | null;

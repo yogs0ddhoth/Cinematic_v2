@@ -5,7 +5,7 @@ import { PrismaService } from './prisma/prisma.service';
 @Injectable()
 export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
-  
+
   create(createMovieInput: CreateMovieInput) {
     return 'This action adds a new movie';
   }
