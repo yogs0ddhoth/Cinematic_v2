@@ -1,0 +1,79 @@
+type Genre {
+  key: String!
+  value: String
+}
+type Star {
+  id: String!
+  name: String
+}
+type Movie {
+  contentRating: String
+  description: String
+  genreList: [Genre]
+  genres: String
+  id: String!
+  imDbId: String
+  imDbRating: Float
+  imDbRatingVotes: Int
+  image: String
+  metacriticRating: Int
+  plot: String
+  runtimeStr: String
+  starList: [Star]
+  stars: String
+  title: String!
+}
+
+input GenreInput {
+  key: String!
+  value: String!
+}
+input StarInput {
+  id: String!
+  name: String!
+}
+input CreateMovieInput {
+  contentRating: String
+  description: String
+  genreList: [GenreInput!]!
+  genres: String
+  id: String!
+  imDbRating: Float
+  imDbRatingVotes: Int
+  image: String
+  metacriticRating: Int
+  plot: String
+  runtimeStr: String
+  starList: [StarInput!]!
+  stars: String
+  title: String!
+}
+input UpdateMovieInput {
+  contentRating: String
+  description: String
+  genreList: [GenreInput]
+  genres: String
+  id: String!
+  imDbId: String
+  imDbRating: Float
+  imDbRatingVotes: Int
+  image: String
+  metacriticRating: Int
+  plot: String
+  runtimeStr: String
+  starList: [StarInput]
+  stars: String
+  title: String
+}
+
+type Query {
+  movies: [Movie]!
+  movie(id: String!): Movie
+}
+
+type Mutation {
+  addMovies(movies: [CreateMovieInput!]!): [Movie]!
+  createMovie(createMovieInput: CreateMovieInput!): Movie!
+  updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
+  removeMovie(id: String!): Movie
+}
