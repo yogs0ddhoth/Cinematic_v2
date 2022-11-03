@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "generate": "ts-node generate-typings",
+    "generate": "ts-node --transpile-only generate-typings && cd ./src/movies && prisma generate && prisma db push",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -29,6 +29,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/microservices": "^9.1.6",
     "@nestjs/platform-express": "^9.0.0",
+    "@prisma/client": "^4.5.0",
     "apollo-server-express": "^3.11.1",
     "graphql": "^16.6.0",
     "reflect-metadata": "^0.1.13",
