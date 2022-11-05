@@ -14,7 +14,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 @Module({
   imports: [
     ClientsModule.register([
-      { name: 'IMDB_SERVICE', transport: Transport.TCP },
+      { name: 'IMDB_API', transport: Transport.TCP },
     ]),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
