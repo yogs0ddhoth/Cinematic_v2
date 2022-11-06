@@ -7,7 +7,7 @@ async function bootstrap() {
     ImDbModule,
     {
       transport: Transport.TCP,
-    }
+    },
   );
   await app.listen();
 }
