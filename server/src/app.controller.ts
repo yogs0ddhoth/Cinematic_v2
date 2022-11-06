@@ -12,6 +12,6 @@ export class AppController {
 
   @Get('/api/')
   queryAPI(@Body() query) {
-    return this.appService.queryAPI(query);
+    return this.appService.queryAPI();
   }
 }

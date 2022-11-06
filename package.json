@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "concurrently \"cd ./server && npm run start:dev\" \"cd ./imdb-api && npm run start:dev\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -16,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/yogs0ddhoth/Cinematic_v2/issues"
   },
-  "homepage": "https://github.com/yogs0ddhoth/Cinematic_v2#readme"
+  "homepage": "https://github.com/yogs0ddhoth/Cinematic_v2#readme",
+  "dependencies": {
+    "concurrently": "^7.5.0"
+  }
 }
