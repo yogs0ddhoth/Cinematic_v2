@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"cd ./server && npm run start:dev\" \"cd ./imdb-api && npm run start:dev\"",
+    "format": "concurrently \"cd ./server && npm run format\" \"cd ./imdb-api && npm run format\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
