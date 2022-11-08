@@ -10,7 +10,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get('/api/')
+  @Get('/api')
   queryAPI(@Body() query) {
     return this.appService.queryAPI();
   }

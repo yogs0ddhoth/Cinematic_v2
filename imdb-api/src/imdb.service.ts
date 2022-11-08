@@ -1,31 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
+import * as dotenv from 'dotenv';
+import axios, { AxiosInstance } from 'axios';
 import { ImDbParams } from './types';
 
 // const instance = axios.create({
 //   baseURL: 'https://imdb-api.com/API/AdvancedSearch/',
 // });
+dotenv.config();
 
 @Injectable()
 export class ImDbService {
-  #imdb;
-  #baseURL;
+  #imdb: AxiosInstance;
+  // #baseURL;
 
   constructor() {
-    this.#imdb = axios;
-    this.#baseURL =
-      'https://imdb-api.com/API/AdvancedSearch/' + process.env.IMDB_KEY1;
+    this.#imdb = axios.create({
+      baseURL:
+        'https://imdb-api.com/API/AdvancedSearch/' + process.env.IMDB_KEY1,
+    });
+    // this.#baseURL =
+    //   'https://imdb-api.com/API/AdvancedSearch/' + process.env.IMDB_KEY1;
   }
   getHello() {
     return 'Itz Johhn';
   }
 
   async axiosGet(params: ImDbParams, url?: string) {
-    return await this.#imdb.get(
-      this.#baseURL +
-        '?title=' +
-        params.title +
-        '&title_type=feature,tv_movie,documentary',
-    );
+    const imdbGet = await this.#imdb.get('/', {
+      params: {
+        ...params,
+      },
+    });
+    console.log(imdbGet);
   }
 }
