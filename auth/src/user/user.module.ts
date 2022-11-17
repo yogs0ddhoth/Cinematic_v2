@@ -7,6 +7,7 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { PrismaService } from './prisma.service';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PrismaService } from './prisma.service';
       driver: ApolloFederationDriver,
       typePaths: ['**/*.graphql'],
     }),
+    AuthModule,
   ],
   providers: [PrismaService, UserService, UserResolver],
 })

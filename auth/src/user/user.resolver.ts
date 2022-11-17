@@ -1,15 +1,45 @@
-import { Query, Resolver, ResolveReference } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Query,
+  Resolver,
+  ResolveReference,
+} from '@nestjs/graphql';
+import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Query()
-  getUser() {
-    return this.userService.user({ id: 1 });
+  async login(
+    @Args('email') email: string,
+    @Args('password') password: string,
+  ) {
+    const { password: hash, ...user } = await this.userService.user({ email });
+    console.log(await this.authService.verifyUser(password, hash));
+    return user;
+  }
+
+  @Mutation()
+  async signup(
+    @Args('email') email: string,
+    @Args('password') password: string,
+  ) {
+    const hash = await this.authService.validatePassword(password);
+    const user = await this.userService.createUser({
+      email,
+      password: hash,
+    });
+    return user;
   }
 
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: number }) {}
+  resolveReference({ id }: { __typename: string; id: number }) {
+    return this.userService.user({ id });
+  }
 }
