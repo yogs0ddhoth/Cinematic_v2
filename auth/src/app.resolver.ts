@@ -6,10 +6,10 @@ import {
   ResolveReference,
 } from '@nestjs/graphql';
 import { AuthService } from 'src/auth/auth.service';
-import { UserService } from './user.service';
+import { UserService } from './user/user.service';
 
 @Resolver('User')
-export class UserResolver {
+export class AppResolver {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
