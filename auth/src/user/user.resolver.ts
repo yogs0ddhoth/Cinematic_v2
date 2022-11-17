@@ -3,14 +3,13 @@ import { UserService } from './user.service';
 
 @Resolver('User')
 export class UserResolver {
-  constructor(private usersService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Query()
   getUser() {
-
+    return this.userService.user({ id: 1 });
   }
 
   @ResolveReference()
-  resolveReference(reference: { __typename: string; id: number }) {
-  }
+  resolveReference(reference: { __typename: string; id: number }) {}
 }
