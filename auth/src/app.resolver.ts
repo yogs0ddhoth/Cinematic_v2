@@ -1,3 +1,4 @@
+import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -5,6 +6,7 @@ import {
   Resolver,
   ResolveReference,
 } from '@nestjs/graphql';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user/user.service';
 
@@ -20,9 +22,8 @@ export class AppResolver {
     @Args('email') email: string,
     @Args('password') password: string,
   ) {
-    const { password: hash, ...user } = await this.userService.user({ email });
-    console.log(await this.authService.verifyUser(password, hash));
-    return user;
+    const user = await this.authService.validateUser(email, password);
+    return this.authService.login(user);
   }
 
   @Mutation()
