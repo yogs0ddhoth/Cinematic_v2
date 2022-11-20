@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+// import { UseGuards } from '@nestjs/common';
 import {
   Args,
   Mutation,
@@ -6,7 +6,7 @@ import {
   Resolver,
   ResolveReference,
 } from '@nestjs/graphql';
-import { JwtAuthGuard } from './auth/jwt-auth.guard';
+// import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user/user.service';
 
@@ -17,7 +17,7 @@ export class AppResolver {
     private readonly authService: AuthService,
   ) {}
 
-  @Query()
+  @Mutation()
   async login(
     @Args('email') email: string,
     @Args('password') password: string,
@@ -32,11 +32,11 @@ export class AppResolver {
     @Args('password') password: string,
   ) {
     const hash = await this.authService.validatePassword(password);
-    const user = await this.userService.createUser({
+    const { password:_, ...user } = await this.userService.createUser({
       email,
       password: hash,
     });
-    return user;
+    return this.authService.login(user);
   }
 
   @ResolveReference()
