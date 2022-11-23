@@ -4,9 +4,8 @@ import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
 
 @Injectable()
 export class MoviesService {
-  constructor(
-      // private readonly prisma: PrismaService
-    ) {}
+  constructor() // private readonly prisma: PrismaService
+  {}
 
   create(createMovieInput: CreateMovieInput) {
     return 'This action adds a new movie';

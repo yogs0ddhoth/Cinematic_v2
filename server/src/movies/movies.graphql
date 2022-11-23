@@ -6,7 +6,7 @@ type Star {
   id: String!
   name: String
 }
-type Movie {
+type Movie { # as stored in DB and queried by client
   contentRating: String
   description: String
   genreList: [Genre]
@@ -32,7 +32,7 @@ input StarInput {
   id: String!
   name: String!
 }
-input CreateMovieInput {
+input CreateMovieInput { # output of ImDB service && input to DB service
   contentRating: String
   description: String
   genreList: [GenreInput!]!
@@ -48,7 +48,8 @@ input CreateMovieInput {
   stars: String
   title: String!
 }
-input UpdateMovieInput {
+
+input UpdateMovieInput { # unlikely to use
   contentRating: String
   description: String
   genreList: [GenreInput]
