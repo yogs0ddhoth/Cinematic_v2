@@ -1,0 +1,11 @@
+.banner {
+  background-image: var(--banner);
+  background-repeat: repeat;
+  background-size: auto 100%;
+}
+
+.title {
+  font-weight: 800;
+  letter-spacing: 3px;
+  -webkit-text-stroke: 2px black; 
+}
