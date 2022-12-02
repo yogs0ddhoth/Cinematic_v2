@@ -14,6 +14,18 @@ pub struct AdvancedSearchData {
 }
 
 #[derive(Deserialize, Debug, SimpleObject)]
+pub struct Genre {
+    pub key: String,
+    pub value: String
+}
+
+#[derive(Deserialize, Debug, SimpleObject)]
+pub struct Star {
+    pub id: String,
+    pub name: String
+}
+
+#[derive(Deserialize, Debug, SimpleObject)]
 pub struct Movie {
     pub id: Option<String>,
     pub image: Option<String>,
@@ -21,21 +33,23 @@ pub struct Movie {
     pub description: Option<String>,
     pub runtimeStr: Option<String>,
     pub genres: Option<String>,
-    pub genreList: Option<Vec<HashMap<String, String>>>,
+    // pub genreList: Option<Vec<HashMap<String, String>>>,
+    pub genreList: Option<Vec<Genre>>,
     pub contentRating: Option<String>,
     pub imDbRating: Option<String>,
     pub imDbRatingVotes: Option<String>,
     pub metacriticRating: Option<String>,
     pub plot: Option<String>,
     pub stars: Option<String>,
-    pub starList: Option<Vec<HashMap<String, String>>>,
+    // pub starList: Option<Vec<HashMap<String, String>>>,
+    pub starList: Option<Vec<Star>>,
 }
 
 #[tokio::main]
 pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error> {
     dotenv().ok();
     let env_imdb_key = env::var("IMDB_KEY");
-    let mut imdb_key = match env_imdb_key {
+    let imdb_key = match env_imdb_key {
         Ok(data) => data,
         Err(data) => {
             println!("Error getting Imdb Key: {:#?}", data);
@@ -52,7 +66,7 @@ pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error
 
     let response = reqwest::get(url).await?;
 
-    let mut movies = response.json::<AdvancedSearchData>().await?;
+    let movies = response.json::<AdvancedSearchData>().await?;
 
     Ok(movies)
 }
