@@ -1,17 +1,20 @@
 use std::{collections::HashMap, env};
+
 use dotenvy::dotenv;
 use reqwest;
 use serde::{Deserialize, Serialize};
 
+use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
+
 #[derive(Deserialize, Debug)]
 pub struct AdvancedSearchData {
     pub queryString: Option<String>,
-    pub results: Option<Vec<AdvancedSearchResult>>,
+    pub results: Option<Vec<Movie>>,
     pub errorMessage: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
-pub struct AdvancedSearchResult {
+#[derive(Deserialize, Debug, SimpleObject)]
+pub struct Movie {
     pub id: Option<String>,
     pub image: Option<String>,
     pub title: Option<String>,
@@ -49,7 +52,7 @@ pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error
 
     let response = reqwest::get(url).await?;
 
-    let movies = response.json::<AdvancedSearchData>().await?;
+    let mut movies = response.json::<AdvancedSearchData>().await?;
 
     Ok(movies)
 }
