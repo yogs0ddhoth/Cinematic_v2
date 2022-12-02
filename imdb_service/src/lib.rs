@@ -1,19 +1,29 @@
 mod imdb;
 // mod schema;
 
-use imdb::{call_imdb, AdvancedSearchData, Movie};
+use imdb::{
+    call_imdb, 
+    // AdvancedSearchData, 
+    Movie
+};
 // use schema::{};
 
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
-use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+// use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use async_graphql::{
+    // EmptyMutation, EmptySubscription, 
+    Object, 
+    // Schema, SimpleObject, ID
+};
+// use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
 use std::{
-    clone,
+    // clone,
     // collections::HashMap,
     // env,
-    error::Error,
-    process::Termination,
+    sync::mpsc,
+    // error::Error,
+    // process::Termination, 
+    thread,
 };
 
 pub struct Query;
@@ -21,21 +31,22 @@ pub struct Query;
 #[Object]
 impl Query {
     async fn search(&self) -> Vec<Movie> {
-        let mut results: Vec<Movie> = Vec::new();
-        let response = call_imdb("inception");
-        match response {
-            Ok(data) => match data.results {
-                Some(mut data) => {
-                    results.append(&mut data);
-                    results
+        
+        let (tx, rx) = mpsc::channel();
+        let handle = thread::spawn(move || {
+            let mut results: Vec<Movie> = Vec::new();
+            let response = call_imdb("inception");
+            match response {
+                Ok(data) => match data.results {
+                    Some(mut data) => results.append(&mut data),
+                    None => ()
                 }
-                None => results,
-            },
-            Err(data) => {
-                println!("Error getting Imdb data: {:#?}", data);
-                results
+                Err(data) => println!("Error getting Imdb data: {:#?}", data)
             }
-        }
+            tx.send(results).unwrap();
+        });
+        let received = rx.recv().unwrap();
+        received
     }
 }
 
