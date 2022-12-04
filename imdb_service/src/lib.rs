@@ -7,19 +7,18 @@ use imdb::{
 use async_graphql::Object;
 
 use std::env;
-use reqwest;
+use reqwest::{self, Error};
 
 pub struct Query;
 
 #[Object]
 impl Query {
-    async fn search(&self, ) -> Vec<Movie> {
-        let env_imdb_key = env::var("IMDB_KEY");
-        let imdb_key = match env_imdb_key {
+    async fn search(&self, ) -> Result<Vec<Movie>, Error> {
+        let imdb_key = match env::var("IMDB_KEY") {
             Ok(data) => data,
             Err(data) => {
                 println!("Error getting Imdb Key: {:#?}", data);
-                data.to_string()
+                String::from("no-key-initialized")
             }
         };
         let url = format!(
@@ -28,34 +27,11 @@ impl Query {
             title = "inception"
         );
         println!("{:#?} Fetching data...", url);
-
-        match reqwest::get(url).await {
-            Ok(response) => {
-                println!("Data fetched! Serializing JSON...");
-
-                match response.json::<AdvancedSearchData>().await {
-                    Ok(json) => {
-                        println!("JSON Serialized! Sending data...");
-
-                        match json.results {
-                            Some(data) => data,
-                            None => {
-                                println!("No Results!");
-                                return Vec::<Movie>::new();
-                            }
-                        }
-                    }
-                    Err(data) => {
-                        println!("Error getting Imdb data: {:#?}", data);
-                        return Vec::<Movie>::new();
-                    }
-                }
-            }
-            Err(data) => {
-                println!("Error getting Imdb data: {:#?}", data);
-                return Vec::<Movie>::new();
-            }
-        }
+        let response = reqwest::get(url).await?
+            .json::<AdvancedSearchData>().await?;
+        
+        println!("Response Serialized. Sending data...");
+        Ok(response.results)
     }
 }
 
