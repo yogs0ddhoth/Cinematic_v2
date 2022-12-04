@@ -1,6 +1,7 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::{playground_source, GraphQLPlaygroundConfig}};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use dotenvy::dotenv;
 
 use imdb_service::Query;
 
@@ -19,6 +20,7 @@ async fn graphql_playground() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();
 
     println!("Listening at: http://localhost:4001");
