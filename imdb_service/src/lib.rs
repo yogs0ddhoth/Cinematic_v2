@@ -1,6 +1,7 @@
 pub mod imdb;
+pub mod schema;
 
-use imdb::{
+use schema::{
     AdvancedSearchData,
     Movie
 };
