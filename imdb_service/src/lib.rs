@@ -3,36 +3,32 @@ pub mod schema;
 
 use schema::{
     AdvancedSearchData,
-    Movie
+    Movie,
+    SearchInput
 };
 use async_graphql::Object;
-
-use std::env;
 use reqwest::{self, Error};
 
 pub struct Query;
 
 #[Object]
 impl Query {
-    async fn search(&self, ) -> Result<Vec<Movie>, Error> {
-        let imdb_key = match env::var("IMDB_KEY") {
-            Ok(data) => data,
-            Err(data) => {
-                println!("Error getting Imdb Key: {:#?}", data);
-                String::from("no-key-initialized")
-            }
-        };
-        let url = format!(
-            "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&sort=moviemeter,asc",
-            key = imdb_key,
-            title = "inception"
-        );
+    async fn search(&self, searchInput: SearchInput) -> Result<Vec<Movie>, Error> {
+        let url = imdb::fmt_imdb_url(searchInput);
         println!("{:#?} Fetching data...", url);
-        let response = reqwest::get(url).await?
-            .json::<AdvancedSearchData>().await?;
+
+        let response = match reqwest::get(url).await {
+            Ok(data) => data,
+            Err(e) => return Err(e.without_url())
+        };
+            
+        let results = match response.json::<AdvancedSearchData>().await {
+            Ok(data) => data.results,
+            Err(e) => return Err(e.without_url())
+        };
         
         println!("Response Serialized. Sending data...");
-        Ok(response.results)
+        Ok(results)
     }
 }
 
