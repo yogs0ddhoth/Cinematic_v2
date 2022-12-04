@@ -1,5 +1,5 @@
 use serde::Deserialize;
-use async_graphql::SimpleObject;
+use async_graphql::{SimpleObject, InputObject};
 
 #[derive(Deserialize, Debug)]
 pub struct AdvancedSearchData {
@@ -38,4 +38,13 @@ pub struct Movie {
     pub stars: Option<String>,
     // pub starList: Option<Vec<HashMap<String, String>>>,
     pub starList: Option<Vec<Star>>,
+}
+
+#[derive(InputObject)]
+pub struct SearchInput {
+    pub certificates: Option<String>,
+    // pub genres: Option<String>,
+    pub releaseDate: Option<i32>,
+    // pub userRating: Option<i32>,
+    pub title: Option<String>
 }
