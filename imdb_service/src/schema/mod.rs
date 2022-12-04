@@ -28,7 +28,6 @@ pub struct Movie {
     pub description: Option<String>,
     pub runtimeStr: Option<String>,
     pub genres: Option<String>,
-    // pub genreList: Option<Vec<HashMap<String, String>>>,
     pub genreList: Option<Vec<Genre>>,
     pub contentRating: Option<String>,
     pub imDbRating: Option<String>,
@@ -36,15 +35,23 @@ pub struct Movie {
     pub metacriticRating: Option<String>,
     pub plot: Option<String>,
     pub stars: Option<String>,
-    // pub starList: Option<Vec<HashMap<String, String>>>,
     pub starList: Option<Vec<Star>>,
 }
 
 #[derive(InputObject)]
 pub struct SearchInput {
-    pub certificates: Option<String>,
-    // pub genres: Option<String>,
-    pub releaseDate: Option<i32>,
-    // pub userRating: Option<i32>,
-    pub title: Option<String>
+    #[graphql(default)]
+    pub certificates: String,
+
+    #[graphql(default)]
+    pub genres: String,
+
+    #[graphql(default)]
+    pub releaseDate: String,
+
+    #[graphql(default)]
+    pub userRating: String,
+
+    #[graphql(default)]
+    pub title: String
 }

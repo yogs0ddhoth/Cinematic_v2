@@ -25,10 +25,11 @@ type Movie {
 }
 
 input SearchMovieInput {
+  # input params will be formatted by the client
   certificates: String
   genres: String
-  releaseDate: Int
-  userRating: Int
+  releaseDate: String
+  userRating: String
   title: String
 }
 
