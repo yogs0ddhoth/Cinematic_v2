@@ -1,10 +1,5 @@
-use std::{collections::HashMap, env};
-
-use dotenvy::dotenv;
-use reqwest;
-use serde::{Deserialize, Serialize};
-
-use async_graphql::{EmptyMutation, EmptySubscription, Object, Schema, SimpleObject, ID};
+use serde::Deserialize;
+use async_graphql::SimpleObject;
 
 #[derive(Deserialize, Debug)]
 pub struct AdvancedSearchData {
@@ -45,9 +40,12 @@ pub struct Movie {
     pub starList: Option<Vec<Star>>,
 }
 
+/* external api call for unit testing */
 #[tokio::main]
 pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error> {
-    dotenv().ok();
+    use std::env;
+    use reqwest;
+
     let env_imdb_key = env::var("IMDB_KEY");
     let imdb_key = match env_imdb_key {
         Ok(data) => data,
@@ -62,7 +60,7 @@ pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error
         key = imdb_key,
         title = title
     );
-    println!("{:#?}", url);
+    println!("{:#?} Fetching data...", url);
 
     let response = reqwest::get(url).await?;
 
