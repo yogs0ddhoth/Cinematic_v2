@@ -1,62 +1,73 @@
-mod imdb;
-// mod schema;
+pub mod imdb;
 
 use imdb::{
-    call_imdb, 
-    // AdvancedSearchData, 
+    AdvancedSearchData,
     Movie
 };
-// use schema::{};
+use async_graphql::Object;
 
-// use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use async_graphql::{
-    // EmptyMutation, EmptySubscription, 
-    Object, 
-    // Schema, SimpleObject, ID
-};
-// use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-
-use std::{
-    // clone,
-    // collections::HashMap,
-    // env,
-    sync::mpsc,
-    // error::Error,
-    // process::Termination, 
-    thread,
-};
+use std::env;
+use reqwest;
 
 pub struct Query;
 
 #[Object]
 impl Query {
-    async fn search(&self) -> Vec<Movie> {
-        
-        let (tx, rx) = mpsc::channel();
-        let handle = thread::spawn(move || {
-            let mut results: Vec<Movie> = Vec::new();
-            let response = call_imdb("inception");
-            match response {
-                Ok(data) => match data.results {
-                    Some(mut data) => results.append(&mut data),
-                    None => ()
-                }
-                Err(data) => println!("Error getting Imdb data: {:#?}", data)
+    async fn search(&self, ) -> Vec<Movie> {
+        let env_imdb_key = env::var("IMDB_KEY");
+        let imdb_key = match env_imdb_key {
+            Ok(data) => data,
+            Err(data) => {
+                println!("Error getting Imdb Key: {:#?}", data);
+                data.to_string()
             }
-            tx.send(results).unwrap();
-        });
-        let received = rx.recv().unwrap();
-        received
+        };
+        let url = format!(
+            "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&sort=moviemeter,asc",
+            key = imdb_key,
+            title = "inception"
+        );
+        println!("{:#?} Fetching data...", url);
+
+        match reqwest::get(url).await {
+            Ok(response) => {
+                println!("Data fetched! Serializing JSON...");
+
+                match response.json::<AdvancedSearchData>().await {
+                    Ok(json) => {
+                        println!("JSON Serialized! Sending data...");
+
+                        match json.results {
+                            Some(data) => data,
+                            None => {
+                                println!("No Results!");
+                                return Vec::<Movie>::new();
+                            }
+                        }
+                    }
+                    Err(data) => {
+                        println!("Error getting Imdb data: {:#?}", data);
+                        return Vec::<Movie>::new();
+                    }
+                }
+            }
+            Err(data) => {
+                println!("Error getting Imdb data: {:#?}", data);
+                return Vec::<Movie>::new();
+            }
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use dotenvy::dotenv;
 
     #[test]
-    fn call_api_works() {
-        let movies = call_imdb("inception");
+    fn call_imdb_works() {
+        dotenv().ok();
+        let movies = imdb::call_imdb("inception");
 
         match movies {
             Ok(data) => println!("{:#?}", data),
