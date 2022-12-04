@@ -4,7 +4,7 @@ use async_graphql::SimpleObject;
 #[derive(Deserialize, Debug)]
 pub struct AdvancedSearchData {
     pub queryString: Option<String>,
-    pub results: Option<Vec<Movie>>,
+    pub results: Vec<Movie>,
     pub errorMessage: Option<String>,
 }
 
