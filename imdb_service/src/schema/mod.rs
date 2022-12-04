@@ -9,33 +9,33 @@ pub struct AdvancedSearchData {
 }
 
 #[derive(Deserialize, Debug, SimpleObject)]
-pub struct Genre {
-    pub key: String,
-    pub value: String
+struct Genre {
+    key: String,
+    value: String
 }
 
 #[derive(Deserialize, Debug, SimpleObject)]
-pub struct Star {
-    pub id: String,
-    pub name: String
+struct Star {
+    id: String,
+    name: String
 }
 
 #[derive(Deserialize, Debug, SimpleObject)]
 pub struct Movie {
-    pub id: Option<String>,
-    pub image: Option<String>,
-    pub title: Option<String>,
-    pub description: Option<String>,
-    pub runtimeStr: Option<String>,
-    pub genres: Option<String>,
-    pub genreList: Option<Vec<Genre>>,
-    pub contentRating: Option<String>,
-    pub imDbRating: Option<String>,
-    pub imDbRatingVotes: Option<String>,
-    pub metacriticRating: Option<String>,
-    pub plot: Option<String>,
-    pub stars: Option<String>,
-    pub starList: Option<Vec<Star>>,
+    id: Option<String>,
+    image: Option<String>,
+    title: Option<String>,
+    description: Option<String>,
+    runtimeStr: Option<String>,
+    genres: Option<String>,
+    genreList: Option<Vec<Genre>>,
+    contentRating: Option<String>,
+    imDbRating: Option<String>,
+    imDbRatingVotes: Option<String>,
+    metacriticRating: Option<String>,
+    plot: Option<String>,
+    stars: Option<String>,
+    starList: Option<Vec<Star>>,
 }
 
 #[derive(InputObject)]
