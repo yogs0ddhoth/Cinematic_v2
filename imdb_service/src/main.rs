@@ -24,7 +24,9 @@ async fn graphql_playground() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();
+    let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
+        .enable_federation()    
+        .finish();
 
     println!("Listening at: http://localhost:4001");
 
