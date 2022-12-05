@@ -1,5 +1,8 @@
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
-use async_graphql::{EmptyMutation, EmptySubscription, Schema, http::{playground_source, GraphQLPlaygroundConfig}};
+use async_graphql::{
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use dotenvy::dotenv;
 
@@ -26,16 +29,14 @@ async fn main() -> std::io::Result<()> {
     println!("Listening at: http://localhost:4001");
 
     HttpServer::new(move || {
-        App::new().app_data(web::Data::new(schema.clone()))
+        App::new()
+            .app_data(web::Data::new(schema.clone()))
             .service(
                 web::resource("/")
-                .guard(guard::Get())
-                .to(graphql_playground))
-            .service(
-                web::resource("/")
-                    .guard(guard::Post())
-                    .to(index),
+                    .guard(guard::Get())
+                    .to(graphql_playground),
             )
+            .service(web::resource("/").guard(guard::Post()).to(index))
     })
     .bind("127.0.0.1:4001")?
     .run()

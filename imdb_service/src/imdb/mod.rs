@@ -1,8 +1,8 @@
-use crate::schema::{AdvancedSearchData, SearchInput};
-use std::env;
+use crate::schema::{AdvancedSearchData, Movie, SearchMovieInput};
 use reqwest;
+use std::env;
 
-pub fn fmt_url(search_input: SearchInput) -> String {
+pub fn fmt_url(search_input: SearchMovieInput) -> String {
     let imdb_key = match env::var("IMDB_KEY") {
         Ok(data) => data,
         Err(data) => {
@@ -21,31 +21,21 @@ pub fn fmt_url(search_input: SearchInput) -> String {
     )
 }
 
-/* external api call for unit testing */
-#[tokio::main]
-pub async fn call_imdb(title: &str) -> Result<AdvancedSearchData, reqwest::Error> {
-    let env_imdb_key = env::var("IMDB_KEY");
-    let imdb_key = match env_imdb_key {
+pub async fn call_imdb(searchMovieInput: SearchMovieInput) -> Result<Vec<Movie>, reqwest::Error> {
+    let url = fmt_url(searchMovieInput);
+
+    println!("{:#?} Fetching...", url);
+    let response = match reqwest::get(url).await {
         Ok(data) => data,
-        Err(data) => {
-            println!("Error getting Imdb Key: {:#?}", data);
-            data.to_string()
-        }
+        Err(e) => return Err(e.without_url()),
     };
 
-    let url = format!(
-        "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&release_date={release_date}&genres={genres}&certificates={certificates}&sort=moviemeter,desc",
-        key = imdb_key,
-        title = "inception",
-        release_date = "",
-        genres = "",
-        certificates = ""
-    );
-    println!("{:#?} Fetching data...", url);
+    println!("Fetched! Serializing response...");
+    let results = match response.json::<AdvancedSearchData>().await {
+        Ok(data) => data.results,
+        Err(e) => return Err(e.without_url()),
+    };
 
-    let response = reqwest::get(url).await?;
-
-    let movies = response.json::<AdvancedSearchData>().await?;
-
-    Ok(movies)
+    println!("Response Serialized. Sending data...");
+    Ok(results)
 }
