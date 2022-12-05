@@ -1,15 +1,10 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
 import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
 import { MoviesService } from './movies.service';
 
 @Resolver('Movie')
 export class MoviesResolver {
   constructor(private readonly moviesService: MoviesService) {}
-
-  @Mutation('createMovie')
-  create(@Args('createMovieInput') createMovieInput: CreateMovieInput) {
-    return this.moviesService.create(createMovieInput);
-  }
 
   @Mutation('addMovies')
   createMany(@Args('movies') addMoviesInput: CreateMovieInput[]) {
@@ -35,4 +30,6 @@ export class MoviesResolver {
   remove(@Args('id') id: string) {
     return this.moviesService.remove(id);
   }
+
+  // @ResolveField('')
 }

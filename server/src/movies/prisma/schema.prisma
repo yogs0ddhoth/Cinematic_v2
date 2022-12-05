@@ -24,20 +24,28 @@ model Star {
   movieId String? @db.ObjectId
 }
 
+model User {
+  id Int @id @map("_id")
+  movieIDs String[] @db.ObjectId
+  movies Movie[] @relation(fields: [movieIDs], references: [id])
+}
+
 model Movie {
   id               String  @id @default(auto()) @map("_id") @db.ObjectId
-  contentRating    String?
-  description      String?
-  genreList        Genre[]
-  genres           String?
   imDbId           String
-  imDbRating       Float?
-  imDbRatingVotes  Int?
   image            String?
-  metacriticRating Int?
-  plot             String?
-  runtimeStr       String?
-  starList         Star[]
-  stars            String?
   title            String
+  description      String?
+  runtimeStr       String?
+  genres           String?
+  genreList        Genre[]
+  contentRating    String?
+  imDbRating       String?
+  imDbRatingVotes  String?
+  metacriticRating String?
+  plot             String?
+  stars            String?
+  starList         Star[]
+  userIDs Int[]
+  users            User[] @relation(fields: [userIDs], references: [id])
 }

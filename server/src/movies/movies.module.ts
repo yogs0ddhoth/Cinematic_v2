@@ -4,10 +4,6 @@ import { MoviesResolver } from './movies.resolver';
 import { PrismaService } from './prisma/prisma.service';
 
 @Module({
-  providers: [
-    MoviesResolver,
-    MoviesService,
-    // PrismaService
-  ],
+  providers: [MoviesResolver, MoviesService, PrismaService],
 })
 export class MoviesModule {}

@@ -9,48 +9,48 @@
 /* eslint-disable */
 
 export interface GenreInput {
-    key: string;
-    value: string;
+    key?: Nullable<string>;
+    value?: Nullable<string>;
 }
 
 export interface StarInput {
-    id: string;
-    name: string;
+    id?: Nullable<string>;
+    name?: Nullable<string>;
 }
 
 export interface CreateMovieInput {
-    contentRating?: Nullable<string>;
-    description?: Nullable<string>;
-    genreList: GenreInput[];
-    genres?: Nullable<string>;
-    id: string;
-    imDbRating?: Nullable<number>;
-    imDbRatingVotes?: Nullable<number>;
+    imDbId?: Nullable<string>;
     image?: Nullable<string>;
-    metacriticRating?: Nullable<number>;
-    plot?: Nullable<string>;
-    runtimeStr?: Nullable<string>;
-    starList: StarInput[];
-    stars?: Nullable<string>;
     title: string;
+    description?: Nullable<string>;
+    runtimeStr?: Nullable<string>;
+    genres?: Nullable<string>;
+    genreList?: Nullable<Nullable<GenreInput>[]>;
+    contentRating?: Nullable<string>;
+    imDbRating?: Nullable<string>;
+    imDbRatingVotes?: Nullable<string>;
+    metacriticRating?: Nullable<string>;
+    plot?: Nullable<string>;
+    stars?: Nullable<string>;
+    starList?: Nullable<Nullable<StarInput>[]>;
 }
 
 export interface UpdateMovieInput {
-    contentRating?: Nullable<string>;
-    description?: Nullable<string>;
-    genreList?: Nullable<Nullable<GenreInput>[]>;
-    genres?: Nullable<string>;
     id: string;
-    imDbId?: Nullable<string>;
-    imDbRating?: Nullable<number>;
-    imDbRatingVotes?: Nullable<number>;
+    imDbId: string;
     image?: Nullable<string>;
-    metacriticRating?: Nullable<number>;
-    plot?: Nullable<string>;
+    title: string;
+    description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    starList?: Nullable<Nullable<StarInput>[]>;
+    genres?: Nullable<string>;
+    genreList?: Nullable<Nullable<GenreInput>[]>;
+    contentRating?: Nullable<string>;
+    imDbRating?: Nullable<string>;
+    imDbRatingVotes?: Nullable<string>;
+    metacriticRating?: Nullable<string>;
+    plot?: Nullable<string>;
     stars?: Nullable<string>;
-    title?: Nullable<string>;
+    starList?: Nullable<Nullable<StarInput>[]>;
 }
 
 export interface Genre {
@@ -64,21 +64,21 @@ export interface Star {
 }
 
 export interface Movie {
-    contentRating?: Nullable<string>;
-    description?: Nullable<string>;
-    genreList?: Nullable<Nullable<Genre>[]>;
-    genres?: Nullable<string>;
     id: string;
-    imDbId?: Nullable<string>;
-    imDbRating?: Nullable<number>;
-    imDbRatingVotes?: Nullable<number>;
+    imDbId: string;
     image?: Nullable<string>;
-    metacriticRating?: Nullable<number>;
-    plot?: Nullable<string>;
-    runtimeStr?: Nullable<string>;
-    starList?: Nullable<Nullable<Star>[]>;
-    stars?: Nullable<string>;
     title: string;
+    description?: Nullable<string>;
+    runtimeStr?: Nullable<string>;
+    genres?: Nullable<string>;
+    genreList?: Nullable<Nullable<Genre>[]>;
+    contentRating?: Nullable<string>;
+    imDbRating?: Nullable<string>;
+    imDbRatingVotes?: Nullable<string>;
+    metacriticRating?: Nullable<string>;
+    plot?: Nullable<string>;
+    stars?: Nullable<string>;
+    starList?: Nullable<Nullable<Star>[]>;
 }
 
 export interface IQuery {
@@ -87,10 +87,14 @@ export interface IQuery {
 }
 
 export interface IMutation {
-    addMovies(movies: CreateMovieInput[]): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
-    createMovie(createMovieInput: CreateMovieInput): Movie | Promise<Movie>;
+    addMovies(movies?: Nullable<CreateMovieInput[]>): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
     updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
     removeMovie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
+}
+
+export interface User {
+    id: string;
+    movies?: Nullable<Nullable<Movie>[]>;
 }
 
 type Nullable<T> = T | null;

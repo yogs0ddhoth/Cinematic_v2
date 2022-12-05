@@ -7,64 +7,26 @@ type Star {
   name: String
 }
 type Movie { # as stored in DB and queried by client
-  contentRating: String
+  id: String!
+  imDbId: String!
+  image: String
+  title: String!
   description: String
+  runtimeStr: String
+  genres: String
   genreList: [Genre]
-  genres: String
-  id: String!
-  imDbId: String
-  imDbRating: Float
-  imDbRatingVotes: Int
-  image: String
-  metacriticRating: Int
+  contentRating: String
+  imDbRating: String
+  imDbRatingVotes: String
+  metacriticRating: String
   plot: String
-  runtimeStr: String
+  stars: String
   starList: [Star]
-  stars: String
-  title: String!
 }
 
-input GenreInput {
-  key: String!
-  value: String!
-}
-input StarInput {
-  id: String!
-  name: String!
-}
-input CreateMovieInput { # output of ImDB service && input to DB service
-  contentRating: String
-  description: String
-  genreList: [GenreInput!]!
-  genres: String
-  id: String!
-  imDbRating: Float
-  imDbRatingVotes: Int
-  image: String
-  metacriticRating: Int
-  plot: String
-  runtimeStr: String
-  starList: [StarInput!]!
-  stars: String
-  title: String!
-}
-
-input UpdateMovieInput { # unlikely to use
-  contentRating: String
-  description: String
-  genreList: [GenreInput]
-  genres: String
-  id: String!
-  imDbId: String
-  imDbRating: Float
-  imDbRatingVotes: Int
-  image: String
-  metacriticRating: Int
-  plot: String
-  runtimeStr: String
-  starList: [StarInput]
-  stars: String
-  title: String
+extend type User @key(fields: "id") {
+  id: ID! @external
+  movies: [Movie]
 }
 
 type Query {
@@ -73,8 +35,50 @@ type Query {
 }
 
 type Mutation {
-  addMovies(movies: [CreateMovieInput!]!): [Movie]!
-  createMovie(createMovieInput: CreateMovieInput!): Movie!
+  addMovies(movies: [CreateMovieInput!]): [Movie]!
   updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
   removeMovie(id: String!): Movie
+}
+
+input GenreInput {
+  key: String
+  value: String
+}
+input StarInput {
+  id: String
+  name: String
+}
+input CreateMovieInput { # output of ImDB service && input to DB service
+  imDbId: String
+  image: String
+  title: String!
+  description: String
+  runtimeStr: String
+  genres: String
+  genreList: [GenreInput]
+  contentRating: String
+  imDbRating: String
+  imDbRatingVotes: String
+  metacriticRating: String
+  plot: String
+  stars: String
+  starList: [StarInput]
+}
+
+input UpdateMovieInput { # unlikely to use
+  id: String!
+  imDbId: String!
+  image: String
+  title: String!
+  description: String
+  runtimeStr: String
+  genres: String
+  genreList: [GenreInput]
+  contentRating: String
+  imDbRating: String
+  imDbRatingVotes: String
+  metacriticRating: String
+  plot: String
+  stars: String
+  starList: [StarInput]
 }
