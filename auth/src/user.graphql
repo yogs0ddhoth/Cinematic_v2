@@ -1,12 +1,14 @@
 type User @key(fields: "id") {
-  id: ID!
+  id: String!
   email: String!
 }
 type Auth {
   access_token: String!
 }
 
-extend type Query {}
+extend type Query {
+  getUser(id: String!): User
+}
 
 type Mutation {
   signup(email: String!, password: String!): Auth

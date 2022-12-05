@@ -17,6 +17,15 @@ export class AppResolver {
     private readonly authService: AuthService,
   ) {}
 
+  @Query()
+  getUser(
+    @Args('id') id: string,
+    // @Args('email') email: string
+  ) {
+    return this.userService.user({ id });
+    // return this.userService.user({ email });
+  }
+
   @Mutation()
   async login(
     @Args('email') email: string,
@@ -32,7 +41,8 @@ export class AppResolver {
     @Args('password') password: string,
   ) {
     const hash = await this.authService.validatePassword(password);
-    const { password:_, ...user } = await this.userService.createUser({
+    const { password: _, ...user } = await this.userService.createUser({
+      id: this.authService.generateUserId(email),
       email,
       password: hash,
     });
@@ -40,7 +50,7 @@ export class AppResolver {
   }
 
   @ResolveReference()
-  resolveReference({ id }: { __typename: string; id: number }) {
-    return this.userService.user({ id });
+  resolveReference({ email }: { __typename: string; email: string }) {
+    return this.userService.user({ email });
   }
 }
