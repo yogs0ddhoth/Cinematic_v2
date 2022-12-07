@@ -24,11 +24,20 @@ async fn graphql_playground() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
+    /* Build Schema */
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .enable_federation()    
         .finish();
-
-    println!("Listening at: http://localhost:4001");
+    /* Configure URL */
+    let port = 4003;
+    let address = match std::env::var("PROCESS") {
+        Ok(process) => match process.as_str() {
+            "PRODUCTION" => "0.0.0.0",
+            _ => "127.0.0.1"
+        }
+        _ => "127.0.0.1"
+    };
+    println!("Listening at: http://{address}:{port}");
 
     HttpServer::new(move || {
         App::new()
@@ -40,7 +49,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(web::resource("/").guard(guard::Post()).to(index))
     })
-    .bind("127.0.0.1:4001")?
+    .bind((address, port))?
     .run()
     .await
 }
