@@ -26,6 +26,7 @@ export class AppResolver {
     // return this.userService.user({ email });
   }
 
+  /** Login endpoint */
   @Mutation()
   async login(
     @Args('email') email: string,
@@ -35,6 +36,7 @@ export class AppResolver {
     return this.authService.login(user);
   }
 
+  /** Signup endpoint */
   @Mutation()
   async signup(
     @Args('email') email: string,
@@ -49,6 +51,7 @@ export class AppResolver {
     return this.authService.login(user);
   }
 
+  // TODO: protect route with passport jwt
   @ResolveReference()
   resolveReference({ email }: { __typename: string; email: string }) {
     return this.userService.user({ email });

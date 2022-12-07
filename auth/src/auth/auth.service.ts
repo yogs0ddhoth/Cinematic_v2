@@ -16,13 +16,19 @@ export class AuthService {
   ) {}
 
   async validatePassword(password: string): Promise<string> {
+    /** TODO: create cryptographically strong password requirements
+     *   - length, characters
+     *   - regex verification
+     */
     return this.#bcrypt.hash(password, 12);
   }
 
+  /** generate a unique id string for each new user */
   generateUserId(email: string): string {
     return this.#uuidv5(email, namespace);
   }
 
+  /** validate authentication */
   async validateUser(email: string, password: string) {
     const { password: hash, ...user } = await this.userService.user({ email });
 
@@ -33,6 +39,7 @@ export class AuthService {
     return null;
   }
 
+  /** issue a jwt for logged in user */
   async login({ id, email }: { id: string; email: string }) {
     const payload = { username: email, sub: id };
     return {
@@ -40,6 +47,7 @@ export class AuthService {
     };
   }
 
+  /** verify password matches encrypted record */
   async verifyUser(password: string, userHash: string): Promise<boolean> {
     return this.#bcrypt.compare(password, userHash);
   }
