@@ -18,16 +18,16 @@ model Genre {
 }
 
 model Star {
-  id      String
-  name    String  @id @map("_id")
+  id      String  @id @map("_id") @db.ObjectId
+  name    String  
   Movie   Movie?  @relation(fields: [movieId], references: [id])
   movieId String? @db.ObjectId
 }
 
 model User {
-  id Int @id @map("_id")
+  id       String   @id @map("_id") 
   movieIDs String[] @db.ObjectId
-  movies Movie[] @relation(fields: [movieIDs], references: [id])
+  movies   Movie[]  @relation(fields: [movieIDs], references: [id])
 }
 
 model Movie {
@@ -46,6 +46,6 @@ model Movie {
   plot             String?
   stars            String?
   starList         Star[]
-  userIDs Int[]
-  users            User[] @relation(fields: [userIDs], references: [id])
+  userIDs          String[]
+  users            User[]   @relation(fields: [userIDs], references: [id])
 }
