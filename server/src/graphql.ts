@@ -19,7 +19,7 @@ export interface StarInput {
 }
 
 export interface CreateMovieInput {
-    imDbId?: Nullable<string>;
+    imDbId: string;
     image?: Nullable<string>;
     title: string;
     description?: Nullable<string>;
