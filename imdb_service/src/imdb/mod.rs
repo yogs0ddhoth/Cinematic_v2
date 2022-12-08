@@ -11,7 +11,7 @@ pub fn fmt_url(search_input: SearchMovieInput) -> String {
         }
     };
     format!(
-        "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&release_date={release_date}&genres={genres}&certificates={certificates}&user_rating={user_rating}&sort=moviemeter,desc",
+        "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&title_type=feature,tv_movie,tv_special,documentary,short,tv_short&release_date={release_date}&genres={genres}&certificates={certificates}&user_rating={user_rating}&sort=moviemeter",
         key = imdb_key,
         title = search_input.title,
         release_date = search_input.releaseDate,
