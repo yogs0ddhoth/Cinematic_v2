@@ -1,28 +1,32 @@
 use async_graphql::{InputObject, SimpleObject};
-use serde::Deserialize;
+use serde;
 
-#[derive(Deserialize, Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct AdvancedSearchData {
     pub queryString: Option<String>,
     pub results: Vec<Movie>,
     pub errorMessage: Option<String>,
 }
 
-#[derive(Deserialize, Debug, SimpleObject)]
+#[derive(serde::Deserialize, Debug, SimpleObject)]
 struct Genre {
-    key: String,
+    #[graphql(name = "name")]
     value: String,
 }
 
-#[derive(Deserialize, Debug, SimpleObject)]
+#[derive(serde::Deserialize, Debug, SimpleObject)]
 struct Star {
+    #[graphql(name = "imDbMovieID")]
     id: String,
+
     name: String,
 }
 
-#[derive(Deserialize, Debug, SimpleObject)]
+#[derive(serde::Deserialize, Debug, SimpleObject)]
 pub struct Movie {
+    #[graphql(name = "imDbID")]
     id: Option<String>,
+
     image: Option<String>,
     title: Option<String>,
     description: Option<String>,
