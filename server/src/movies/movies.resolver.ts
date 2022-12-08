@@ -1,34 +1,62 @@
 import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
 import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
+import GenresService from './genres.service';
 import { MoviesService } from './movies.service';
+import StarsService from './stars.service';
+import UsersService from './users.service';
 
 @Resolver('Movie')
 export class MoviesResolver {
-  constructor(private readonly moviesService: MoviesService) {}
-
-  @Mutation('addMovies')
-  createMany(@Args('movies') addMoviesInput: CreateMovieInput[]) {
-    return this.moviesService.createMany(addMoviesInput);
-  }
+  constructor(
+    private readonly genresService: GenresService,
+    private readonly moviesService: MoviesService,
+    private readonly starsService: StarsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Query('movies')
-  findAll() {
-    return this.moviesService.findAll();
+  async movies() {
+    return await this.moviesService.findAll();
   }
 
   @Query('movie')
-  findOne(@Args('id') id: string) {
-    return this.moviesService.findOne(id);
+  async movie(@Args('id') id: string) {
+    return await this.moviesService.findOne({ id });
+  }
+
+  @Mutation('addMovies')
+  async addMovies(@Args('movies') createMovieInput: CreateMovieInput[]) {
+    const movieService = this.moviesService;
+    return createMovieInput.map(
+      async ({ genreList, starList, ...movie }: CreateMovieInput) => {
+        const data = {
+          ...movie,
+          genreList: {
+            create: genreList,
+          },
+          starList: {
+            create: starList,
+          },
+        };
+        return await movieService.create({
+          data,
+          include: {
+            genreList: true,
+            starList: true,
+          },
+        });
+      },
+    );
   }
 
   @Mutation('updateMovie')
-  update(@Args('updateMovieInput') updateMovieInput: UpdateMovieInput) {
-    return this.moviesService.update(updateMovieInput.id, updateMovieInput);
-  }
+  async updateMovie(
+    @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
+  ) {}
 
   @Mutation('removeMovie')
-  remove(@Args('id') id: string) {
-    return this.moviesService.remove(id);
+  async remove(@Args('id') id: string) {
+    // return this.moviesService.remove();
   }
 
   // @ResolveField('')
