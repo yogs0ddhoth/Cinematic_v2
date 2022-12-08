@@ -31,11 +31,17 @@ pub async fn call_imdb(searchMovieInput: SearchMovieInput) -> Result<Vec<Movie>,
     };
 
     println!("Fetched! Serializing response...");
-    let results = match response.json::<AdvancedSearchData>().await {
+    let mut results = match response.json::<AdvancedSearchData>().await {
         Ok(data) => data.results,
         Err(e) => return Err(e.without_url()),
     };
-
+    results.retain(
+        // filter out results without a genre
+        |m| match m.genres {
+            Some(_) => true,
+            None => false,
+        },
+    );
     println!("Response Serialized. Sending data...");
     Ok(results)
 }

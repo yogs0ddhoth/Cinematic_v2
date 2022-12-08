@@ -26,16 +26,16 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     /* Build Schema */
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
-        .enable_federation()    
+        .enable_federation()
         .finish();
     /* Configure URL */
     let port = 4003;
     let address = match std::env::var("PROCESS") {
         Ok(process) => match process.as_str() {
             "PRODUCTION" => "0.0.0.0",
-            _ => "127.0.0.1"
-        }
-        _ => "127.0.0.1"
+            _ => "127.0.0.1",
+        },
+        _ => "127.0.0.1",
     };
     println!("Listening at: http://{address}:{port}");
 

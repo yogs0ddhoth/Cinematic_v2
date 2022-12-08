@@ -25,20 +25,20 @@ struct Star {
 #[derive(serde::Deserialize, Debug, SimpleObject)]
 pub struct Movie {
     #[graphql(name = "imDbID")]
-    id: Option<String>,
+    pub id: Option<String>,
 
-    image: Option<String>,
-    title: Option<String>,
-    description: Option<String>,
-    runtimeStr: Option<String>,
-    genres: Option<String>,
+    pub image: Option<String>,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub runtimeStr: Option<String>,
+    pub genres: Option<String>,
     genreList: Option<Vec<Genre>>,
-    contentRating: Option<String>,
-    imDbRating: Option<String>,
-    imDbRatingVotes: Option<String>,
-    metacriticRating: Option<String>,
-    plot: Option<String>,
-    stars: Option<String>,
+    pub contentRating: Option<String>,
+    pub imDbRating: Option<String>,
+    pub imDbRatingVotes: Option<String>,
+    pub metacriticRating: Option<String>,
+    pub plot: Option<String>,
+    pub stars: Option<String>,
     starList: Option<Vec<Star>>,
 }
 
