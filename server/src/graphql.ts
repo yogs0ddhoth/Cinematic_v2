@@ -9,35 +9,34 @@
 /* eslint-disable */
 
 export interface GenreInput {
-    key?: Nullable<string>;
-    value?: Nullable<string>;
+    name: string;
 }
 
 export interface StarInput {
-    id?: Nullable<string>;
-    name?: Nullable<string>;
+    imDbMovieID: string;
+    name: string;
 }
 
 export interface CreateMovieInput {
-    imDbId: string;
+    imDbID?: Nullable<string>;
     image?: Nullable<string>;
     title: string;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
     genres?: Nullable<string>;
-    genreList?: Nullable<Nullable<GenreInput>[]>;
+    genreList: Nullable<GenreInput>[];
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
     stars?: Nullable<string>;
-    starList?: Nullable<Nullable<StarInput>[]>;
+    starList: Nullable<StarInput>[];
 }
 
 export interface UpdateMovieInput {
     id: string;
-    imDbId: string;
+    imDbID?: Nullable<string>;
     image?: Nullable<string>;
     title: string;
     description?: Nullable<string>;
@@ -54,18 +53,17 @@ export interface UpdateMovieInput {
 }
 
 export interface Genre {
-    key: string;
-    value?: Nullable<string>;
+    name: string;
 }
 
 export interface Star {
-    id: string;
-    name?: Nullable<string>;
+    imDbMovieID: string;
+    name: string;
 }
 
 export interface Movie {
     id: string;
-    imDbId: string;
+    imDbID: string;
     image?: Nullable<string>;
     title: string;
     description?: Nullable<string>;
@@ -87,7 +85,7 @@ export interface IQuery {
 }
 
 export interface IMutation {
-    addMovies(movies?: Nullable<CreateMovieInput[]>): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
+    addMovies(movies: CreateMovieInput[]): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
     updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
     removeMovie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
 }
