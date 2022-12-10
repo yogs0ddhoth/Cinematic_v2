@@ -6,7 +6,13 @@ import { StarService } from './star/star.service';
 import { UserService } from './user/user.service';
 
 @Module({
-  providers: [PrismaService],
+  providers: [
+    GenreService,
+    MovieService,
+    PrismaService,
+    StarService,
+    UserService,
+  ],
   exports: [GenreService, MovieService, StarService, UserService],
 })
 export class ModelsModule {}
