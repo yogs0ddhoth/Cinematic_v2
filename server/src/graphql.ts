@@ -13,7 +13,6 @@ export interface GenreInput {
 }
 
 export interface StarInput {
-    imDbMovieID: string;
     name: string;
 }
 
@@ -23,33 +22,29 @@ export interface CreateMovieInput {
     title: string;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    genres?: Nullable<string>;
-    genreList: Nullable<GenreInput>[];
+    genres: Nullable<GenreInput>[];
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
-    stars?: Nullable<string>;
-    starList: Nullable<StarInput>[];
+    stars: Nullable<StarInput>[];
 }
 
 export interface UpdateMovieInput {
     id: string;
     imDbID?: Nullable<string>;
     image?: Nullable<string>;
-    title: string;
+    title?: Nullable<string>;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    genres?: Nullable<string>;
-    genreList?: Nullable<Nullable<GenreInput>[]>;
+    genres?: Nullable<Nullable<GenreInput>[]>;
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
-    stars?: Nullable<string>;
-    starList?: Nullable<Nullable<StarInput>[]>;
+    stars?: Nullable<Nullable<StarInput>[]>;
 }
 
 export interface Genre {
@@ -57,26 +52,23 @@ export interface Genre {
 }
 
 export interface Star {
-    imDbMovieID: string;
     name: string;
 }
 
 export interface Movie {
     id: string;
-    imDbID: string;
+    imDbID?: Nullable<string>;
     image?: Nullable<string>;
     title: string;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    genres?: Nullable<string>;
-    genreList?: Nullable<Nullable<Genre>[]>;
+    genres: Nullable<Genre>[];
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
-    stars?: Nullable<string>;
-    starList?: Nullable<Nullable<Star>[]>;
+    stars: Nullable<Star>[];
 }
 
 export interface IQuery {
@@ -92,7 +84,7 @@ export interface IMutation {
 
 export interface User {
     id: string;
-    movies?: Nullable<Nullable<Movie>[]>;
+    movies: Nullable<Movie>[];
 }
 
 type Nullable<T> = T | null;

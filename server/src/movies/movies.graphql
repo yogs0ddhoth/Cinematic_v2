@@ -2,30 +2,27 @@ type Genre {
   name: String!
 }
 type Star {
-  imDbMovieID: String!
   name: String!
 }
 type Movie { # as stored in DB and queried by client
   id: String!
-  imDbID: String!
+  imDbID: String
   image: String
   title: String!
   description: String
   runtimeStr: String
-  genres: String
-  genreList: [Genre]
+  genres: [Genre]!
   contentRating: String
   imDbRating: String
   imDbRatingVotes: String
   metacriticRating: String
   plot: String
-  stars: String
-  starList: [Star]
+  stars: [Star]!
 }
 
 extend type User @key(fields: "id") {
   id: ID! @external
-  movies: [Movie]
+  movies: [Movie]!
 }
 
 type Query {
@@ -43,7 +40,6 @@ input GenreInput {
   name: String!
 }
 input StarInput {
-  imDbMovieID: String!
   name: String!
 }
 input CreateMovieInput { # output of ImDB service && input to DB service
@@ -52,31 +48,27 @@ input CreateMovieInput { # output of ImDB service && input to DB service
   title: String!
   description: String
   runtimeStr: String
-  genres: String
-  genreList: [GenreInput]!
+  genres: [GenreInput]!
   contentRating: String
   imDbRating: String
   imDbRatingVotes: String
   metacriticRating: String
   plot: String
-  stars: String
-  starList: [StarInput]!
+  stars: [StarInput]!
 }
 
 input UpdateMovieInput { # unlikely to use
   id: String!
   imDbID: String
   image: String
-  title: String!
+  title: String
   description: String
   runtimeStr: String
-  genres: String
-  genreList: [GenreInput]
+  genres: [GenreInput]
   contentRating: String
   imDbRating: String
   imDbRatingVotes: String
   metacriticRating: String
   plot: String
-  stars: String
-  starList: [StarInput]
+  stars: [StarInput]
 }
