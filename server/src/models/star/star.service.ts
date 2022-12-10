@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Star } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
-export default class StarsService {
+export class StarService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: Prisma.StarCreateInput): Promise<Star> {
@@ -45,8 +45,13 @@ export default class StarsService {
     create: Prisma.StarCreateInput;
     update: Prisma.StarUpdateInput;
     where: Prisma.StarWhereUniqueInput;
-  }): Promise<Star> {
-    const { create, update, where } = params;
+    select?: Prisma.StarSelect;
+  }) {
+    const { create, update, where, select } = params;
+
+    if (select) {
+      return this.prisma.star.upsert({ create, update, where, select });
+    }
     return this.prisma.star.upsert({ create, update, where });
   }
 

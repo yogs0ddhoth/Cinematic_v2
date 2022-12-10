@@ -1,17 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Movie } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
-export class MoviesService {
+export class MovieService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** NOTE: include and select cannot both be included on the same query */
   async create(params: {
     data: Prisma.MovieCreateInput;
     include?: Prisma.MovieInclude;
-  }): Promise<Movie> {
-    const { data, include } = params;
-    return this.prisma.movie.create({ data, include });
+    select?: Prisma.MovieSelect;
+  }) {
+    const { data, include, select } = params;
+
+    if (include) {
+      return this.prisma.movie.create({ data, include });
+    }
+    if (select) {
+      return this.prisma.movie.create({ data, select });
+    }
+    return this.prisma.movie.create({ data });
   }
 
   async createMany(
@@ -56,13 +65,23 @@ export class MoviesService {
     const { where, data, include } = params;
     return this.prisma.movie.update({ where, data, include });
   }
-  
+
+  /** NOTE: include and select cannot both be included on the same query */
   async upsert(params: {
     create: Prisma.MovieCreateInput;
     update: Prisma.MovieUpdateInput;
     where: Prisma.MovieWhereUniqueInput;
-  }): Promise<Movie> {
-    const { create, update, where } = params;
+    include?: Prisma.MovieInclude;
+    select?: Prisma.MovieSelect;
+  }) {
+    const { create, update, where, include, select } = params;
+
+    if (include) {
+      return this.prisma.movie.upsert({ create, update, where, include });
+    }
+    if (select) {
+      return this.prisma.movie.upsert({ create, update, where, select });
+    }
     return this.prisma.movie.upsert({ create, update, where });
   }
 

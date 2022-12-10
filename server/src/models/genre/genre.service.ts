@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Genre } from '@prisma/client';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
-export default class GenresService {
+export class GenreService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: Prisma.GenreCreateInput): Promise<Genre> {
@@ -45,8 +45,13 @@ export default class GenresService {
     create: Prisma.GenreCreateInput;
     update: Prisma.GenreUpdateInput;
     where: Prisma.GenreWhereUniqueInput;
-  }): Promise<Genre> {
-    const { create, update, where } = params;
+    select?: Prisma.GenreSelect;
+  }) {
+    const { create, update, where, select } = params;
+
+    if (select) {
+      return this.prisma.genre.upsert({ create, update, where, select });
+    }
     return this.prisma.genre.upsert({ create, update, where });
   }
 
