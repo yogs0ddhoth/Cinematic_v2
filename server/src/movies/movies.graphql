@@ -26,14 +26,14 @@ extend type User @key(fields: "id") {
 }
 
 type Query {
-  movies: [Movie]!
-  movie(id: String!): Movie
+  movies: [Movie!]!
+  movie(id: String!): Movie!
 }
 
 type Mutation {
-  addMovies(movies: [CreateMovieInput!]!): [Movie]!
+  addMovies(movies: [CreateMovieInput!]!): [Movie!]!
   updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
-  removeMovie(id: String!): Movie
+  removeMovie(id: String!): Movie!
 }
 
 input GenreInput {
@@ -48,13 +48,13 @@ input CreateMovieInput { # output of ImDB service && input to DB service
   title: String!
   description: String
   runtimeStr: String
-  genres: [GenreInput]!
+  genres: [GenreInput!]
   contentRating: String
   imDbRating: String
   imDbRatingVotes: String
   metacriticRating: String
   plot: String
-  stars: [StarInput]!
+  stars: [StarInput!]
 }
 
 input UpdateMovieInput { # unlikely to use

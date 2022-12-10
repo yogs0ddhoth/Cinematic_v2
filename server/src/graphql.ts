@@ -22,13 +22,13 @@ export interface CreateMovieInput {
     title: string;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    genres: Nullable<GenreInput>[];
+    genres?: Nullable<GenreInput[]>;
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
-    stars: Nullable<StarInput>[];
+    stars?: Nullable<StarInput[]>;
 }
 
 export interface UpdateMovieInput {
@@ -72,14 +72,14 @@ export interface Movie {
 }
 
 export interface IQuery {
-    movies(): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
-    movie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
+    movies(): Movie[] | Promise<Movie[]>;
+    movie(id: string): Movie | Promise<Movie>;
 }
 
 export interface IMutation {
-    addMovies(movies: CreateMovieInput[]): Nullable<Movie>[] | Promise<Nullable<Movie>[]>;
+    addMovies(movies: CreateMovieInput[]): Movie[] | Promise<Movie[]>;
     updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
-    removeMovie(id: string): Nullable<Movie> | Promise<Nullable<Movie>>;
+    removeMovie(id: string): Movie | Promise<Movie>;
 }
 
 export interface User {
