@@ -22,8 +22,13 @@ export class AppResolver {
     @Args('id') id: string,
     // @Args('email') email: string
   ) {
-    return this.userService.user({ id });
-    // return this.userService.user({ email });
+    try {
+      return this.userService.user({ id });
+      // return this.userService.user({ email });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   /** Login endpoint */
@@ -32,8 +37,16 @@ export class AppResolver {
     @Args('email') email: string,
     @Args('password') password: string,
   ) {
-    const user = await this.authService.validateUser(email, password);
-    return this.authService.login(user);
+    try {
+      const user = await this.authService.validateUser(email, password);
+      if (!user) {
+        throw new Error('Invalid Login Credentials');
+      }
+      return this.authService.login(user);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   /** Signup endpoint */
@@ -42,13 +55,20 @@ export class AppResolver {
     @Args('email') email: string,
     @Args('password') password: string,
   ) {
-    const hash = await this.authService.validatePassword(password);
-    const { password: _, ...user } = await this.userService.createUser({
-      id: this.authService.generateUserId(email),
-      email,
-      password: hash,
-    });
-    return this.authService.login(user);
+    try {
+      const hash = await this.authService.validatePassword(password);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password: _, ...user } = await this.userService.createUser({
+        id: this.authService.generateUserId(email),
+        email,
+        password: hash,
+      });
+
+      return this.authService.login(user);
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   // TODO: protect route with passport jwt

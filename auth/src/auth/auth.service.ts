@@ -19,24 +19,29 @@ export class AuthService {
     /** TODO: create cryptographically strong password requirements
      *   - length, characters
      *   - regex verification
+     *   - throw an error for passwords that fail
      */
     return this.#bcrypt.hash(password, 12);
   }
 
   /** generate a unique id string for each new user */
-  generateUserId(email: string): string {
+  generateUserId(email: string) {
     return this.#uuidv5(email, namespace);
   }
 
   /** validate authentication */
   async validateUser(email: string, password: string) {
-    const { password: hash, ...user } = await this.userService.user({ email });
+    const user = await this.userService.user({ email });
+    if (!user) {
+      throw new Error('User does not Exist.');
+    }
+    const { password: hash, ...userInfo } = user;
 
-    if (await this.verifyUser(password, hash)) {
-      return user;
+    if ((await this.verifyUser(password, hash)) == false) {
+      throw new Error('Invalid Credentials!');
     }
 
-    return null;
+    return userInfo;
   }
 
   /** issue a jwt for logged in user */

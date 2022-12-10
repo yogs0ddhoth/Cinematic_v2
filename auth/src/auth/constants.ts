@@ -2,7 +2,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-console.log(process.env.SECRET_KEY);
+if (!process.env.SECRET_KEY) throw new Error('Secret Key Undefined');
+if (!process.env.NAMESPACE) throw new Error('Namespace Undefined');
 
 export const jwtConstants = {
   secret: process.env.SECRET_KEY,
