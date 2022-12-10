@@ -9,11 +9,11 @@ pub struct Query;
 
 #[Object]
 impl Query {
-    async fn searchMovies(
+    async fn search_movies(
         &self,
-        searchMovieInput: SearchMovieInput,
+        search_movie_input: SearchMovieInput,
     ) -> Result<Vec<Movie>, reqwest::Error> {
-        imdb::call_imdb(searchMovieInput).await
+        imdb::call_imdb(search_movie_input).await
     }
 }
 
@@ -31,8 +31,8 @@ mod tests {
             title: String::from("Inception"),
             certificates: String::default(),
             genres: String::default(),
-            releaseDate: String::default(),
-            userRating: String::default(),
+            release_date: String::default(),
+            user_rating: String::default(),
         };
 
         match imdb::call_imdb(test_input).await {
@@ -48,8 +48,8 @@ mod tests {
             title: String::default(),
             certificates: String::default(),
             genres: String::default(),
-            releaseDate: String::default(),
-            userRating: String::default(),
+            release_date: String::default(),
+            user_rating: String::default(),
         };
 
         assert_eq!(imdb::fmt_url(test_input), "https://imdb-api.com/API/AdvancedSearch/ERROR_NO_KEY/?title=&release_date=&genres=&certificates=&user_rating=&sort=moviemeter,desc".to_string())

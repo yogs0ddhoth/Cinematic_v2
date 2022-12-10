@@ -14,15 +14,15 @@ pub fn fmt_url(search_input: SearchMovieInput) -> String {
         "https://imdb-api.com/API/AdvancedSearch/{key}/?title={title}&title_type=feature,tv_movie,tv_special,documentary,short,tv_short&release_date={release_date}&genres={genres}&certificates={certificates}&user_rating={user_rating}&sort=moviemeter",
         key = imdb_key,
         title = search_input.title,
-        release_date = search_input.releaseDate,
+        release_date = search_input.release_date,
         genres = search_input.genres,
         certificates = search_input.certificates,
-        user_rating = search_input.userRating
+        user_rating = search_input.user_rating
     )
 }
 
-pub async fn call_imdb(searchMovieInput: SearchMovieInput) -> Result<Vec<Movie>, reqwest::Error> {
-    let url = fmt_url(searchMovieInput);
+pub async fn call_imdb(search_movie_input: SearchMovieInput) -> Result<Vec<Movie>, reqwest::Error> {
+    let url = fmt_url(search_movie_input);
 
     println!("{:#?} Fetching...", url);
     let response = match reqwest::get(url).await {
@@ -36,9 +36,12 @@ pub async fn call_imdb(searchMovieInput: SearchMovieInput) -> Result<Vec<Movie>,
         Err(e) => return Err(e.without_url()),
     };
     results.retain(
-        // filter out results without a genre
-        |m| match m.genres {
-            Some(_) => true,
+        // filter out results without a release date or genre
+        |m| match m.description {
+            Some(_) => match m.genre_list {
+                Some(_) => true,
+                None => false,
+            },
             None => false,
         },
     );
