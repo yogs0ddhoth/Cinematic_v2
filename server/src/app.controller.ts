@@ -10,8 +10,10 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  /** DEPRECATED 
   @Get('/api')
   queryAPI(@Body() query) {
     return this.appService.queryAPI();
   }
+  */
 }
