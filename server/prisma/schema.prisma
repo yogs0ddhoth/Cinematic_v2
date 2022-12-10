@@ -12,14 +12,14 @@ datasource db {
 
 model Genre {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId 
-  name             String
+  name             String   @unique
   movieIDs         String[] @db.ObjectId
   movies           Movie[]  @relation(fields: [movieIDs], references: [id])
 }
 
 model Star {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  name             String  
+  name             String   @unique
   movieIDs         String[] @db.ObjectId
   movies           Movie[]  @relation(fields: [movieIDs], references: [id])
 }
@@ -32,9 +32,9 @@ model User {
 
 model Movie {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  imDbID           String?
+  imDbID           String?  @unique
   image            String?
-  title            String
+  title            String   @unique
   description      String?
   runtimeStr       String?
   genreIDs         String[] @db.ObjectId
