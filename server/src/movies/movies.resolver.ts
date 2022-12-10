@@ -16,47 +16,74 @@ export class MoviesResolver {
 
   @Query('movies')
   async movies() {
-    return await this.moviesService.findAll();
+    try {
+      return await this.moviesService.findAll({
+        include: {
+          genres: true,
+          stars: true,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   @Query('movie')
   async movie(@Args('id') id: string) {
-    return await this.moviesService.findOne({ id });
+    try {
+      return await this.moviesService.findOne({ where: { id } });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   @Mutation('addMovies')
   async addMovies(@Args('movies') createMovieInput: CreateMovieInput[]) {
-    const movieService = this.moviesService;
-    return createMovieInput.map(
-      async ({ genreList, starList, ...movie }: CreateMovieInput) => {
-        const data = {
-          ...movie,
-          genreList: {
-            create: genreList,
-          },
-          starList: {
-            create: starList,
-          },
-        };
-        return await movieService.create({
-          data,
-          include: {
-            genreList: true,
-            starList: true,
-          },
-        });
-      },
-    );
+    try {
+      const movieService = this.moviesService;
+
+      return createMovieInput.map(
+        async ({ genres, stars, ...movie }: CreateMovieInput) => {
+          return await movieService.create({
+            data: {
+              ...movie,
+              genres: genres ? { create: genres } : undefined,
+              stars: stars ? { create: stars } : undefined,
+            },
+            include: {
+              genres: true,
+              stars: true,
+            },
+          });
+        },
+      );
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   @Mutation('updateMovie')
   async updateMovie(
     @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
-  ) {}
+  ) {
+    try {
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 
   @Mutation('removeMovie')
   async remove(@Args('id') id: string) {
-    // return this.moviesService.remove();
+    try {
+      // return this.moviesService.remove();
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
   }
 
   // @ResolveField('')
