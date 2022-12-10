@@ -5,10 +5,10 @@
     * the graphql api will be extended to all microservices using Apollo Federation
         - TODOS:
             * Create Subgraph-Services:
-                - Auth - path: ./auth - &check;SQLite, &check;Prisma ORM, &check;bcrypt, &check;JWT user auth
-                - ImDB - path: ./imdb_service - &check;fetch ImDB API &check;Subgraph Federated
-                - MovieDB - path: ./server - &check;MongoDB, Prisma ORM, <- refactor server
-                    - TODO: implement services for User, Genre, Star
+                - Auth - dir path: ./auth - &check;SQLite, &check;Prisma ORM, &check;bcrypt, &check;JWT user auth
+                - ImDB - dir path: ./imdb_service - &check;fetch ImDB API &check;Subgraph Federated
+                - MovieDB - dir path: ./server - &check;MongoDB, &check;Prisma ORM, &check;refactor server
+                    - TODO: finish implementing services for User, &check;Genre, &check;Star
                     - TODO: integrate JWT Auth for User
 
                 - Youtube API - fetch trailer by imDb id ** FUTURE DIRECTION
