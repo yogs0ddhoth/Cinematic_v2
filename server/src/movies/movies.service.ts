@@ -20,19 +20,22 @@ export class MoviesService {
     return this.prisma.movie.createMany({ data });
   }
 
-  async findAll(): Promise<Movie[]> {
-    return this.prisma.movie.findMany({
-      include: {
-        genreList: true,
-        starList: true,
-      },
-    });
+  async findAll(params: {
+    orderBy?: Prisma.MovieOrderByWithAggregationInput;
+    include?: Prisma.MovieInclude;
+  }): Promise<Movie[]> {
+    const { orderBy, include } = params;
+    return this.prisma.movie.findMany({ orderBy, include });
   }
   /**
    * @param where  id?: string
    */
-  async findOne(where: Prisma.MovieWhereUniqueInput): Promise<Movie | null> {
-    return this.prisma.movie.findUnique({ where });
+  async findOne(params: {
+    where: Prisma.MovieWhereUniqueInput;
+    include?: Prisma.MovieInclude;
+  }): Promise<Movie | null> {
+    const { where, include } = params;
+    return this.prisma.movie.findUnique({ where, include });
   }
   async findMany(params: {
     orderBy?: Prisma.MovieOrderByWithAggregationInput;
@@ -48,9 +51,19 @@ export class MoviesService {
   async update(params: {
     where: Prisma.MovieWhereUniqueInput;
     data: Prisma.MovieUpdateInput;
+    include?: Prisma.MovieInclude;
   }): Promise<Movie> {
-    const { where, data } = params;
-    return this.prisma.movie.update({ where, data });
+    const { where, data, include } = params;
+    return this.prisma.movie.update({ where, data, include });
+  }
+  
+  async upsert(params: {
+    create: Prisma.MovieCreateInput;
+    update: Prisma.MovieUpdateInput;
+    where: Prisma.MovieWhereUniqueInput;
+  }): Promise<Movie> {
+    const { create, update, where } = params;
+    return this.prisma.movie.upsert({ create, update, where });
   }
 
   async remove() {

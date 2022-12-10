@@ -15,10 +15,8 @@ export default class StarsService {
     return this.prisma.star.createMany({ data });
   }
 
-  async findOne(
-    starWhereUniqueInput: Prisma.StarWhereUniqueInput,
-  ): Promise<Star | null> {
-    return this.prisma.star.findUnique({ where: starWhereUniqueInput });
+  async findOne(where: Prisma.StarWhereUniqueInput): Promise<Star | null> {
+    return this.prisma.star.findUnique({ where });
   }
   async findMany(params: {
     orderBy?: Prisma.StarOrderByWithRelationInput;
@@ -41,6 +39,15 @@ export default class StarsService {
   }): Promise<Prisma.BatchPayload> {
     const { where, data } = params;
     return this.prisma.star.updateMany({ where, data });
+  }
+
+  async upsert(params: {
+    create: Prisma.StarCreateInput;
+    update: Prisma.StarUpdateInput;
+    where: Prisma.StarWhereUniqueInput;
+  }): Promise<Star> {
+    const { create, update, where } = params;
+    return this.prisma.star.upsert({ create, update, where });
   }
 
   async remove(where: Prisma.StarWhereUniqueInput): Promise<Star> {

@@ -41,6 +41,15 @@ export default class GenresService {
     return this.prisma.genre.updateMany({ where, data });
   }
 
+  async upsert(params: {
+    create: Prisma.GenreCreateInput;
+    update: Prisma.GenreUpdateInput;
+    where: Prisma.GenreWhereUniqueInput;
+  }): Promise<Genre> {
+    const { create, update, where } = params;
+    return this.prisma.genre.upsert({ create, update, where });
+  }
+
   async remove(where: Prisma.GenreWhereUniqueInput): Promise<Genre> {
     return this.prisma.genre.delete({ where });
   }
