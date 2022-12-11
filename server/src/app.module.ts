@@ -12,6 +12,7 @@ import { join } from 'path';
 import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 import { ModelsModule } from './models/models.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ModelsModule } from './models/models.module';
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
     }),
     ModelsModule,
+    AuthModule,
   ],
   providers: [AppService, AppResolver],
 })
