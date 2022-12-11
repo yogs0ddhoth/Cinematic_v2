@@ -42,7 +42,7 @@ export class AppService {
         });
 
         if (!id)
-          throw new Error('Could not upsert Genre:', {
+          throw new Error('Prisma could not upsert Genre:', {
             cause: { value: name },
           });
         return id;
@@ -65,7 +65,7 @@ export class AppService {
         });
 
     if (!id)
-      throw new Error('Could not upsert Movie:', {
+      throw new Error('Prisma could not upsert Movie:', {
         cause: { value: movie },
       });
 
@@ -99,7 +99,7 @@ export class AppService {
           select: { id: true },
         });
         if (!id)
-          throw new Error('Could not upsert Star:', {
+          throw new Error('Prisma could not upsert Star:', {
             cause: { value: name },
           });
         return id;
