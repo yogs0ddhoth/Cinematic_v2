@@ -26,6 +26,7 @@ model Star {
 
 model User {
   id               String   @id @map("_id") 
+  username         String   @unique
   movieIDs         String[] @db.ObjectId
   movies           Movie[]  @relation(fields: [movieIDs], references: [id])
 }
