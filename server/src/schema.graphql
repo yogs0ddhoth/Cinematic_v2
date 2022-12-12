@@ -11,13 +11,13 @@ type Movie { # as stored in DB and queried by client
   title: String!
   description: String
   runtimeStr: String
-  genres: [Genre]!
+  genres: [Genre!]
   contentRating: String
   imDbRating: String
   imDbRatingVotes: String
   metacriticRating: String
   plot: String
-  stars: [Star]!
+  stars: [Star!]
 }
 
 extend type User @key(fields: "id") {
@@ -26,12 +26,12 @@ extend type User @key(fields: "id") {
 }
 
 type Query {
-  movies: [Movie!]!
+  movies: User
   movie(id: String!): Movie!
 }
 
 type Mutation {
-  addMovies(movies: [CreateMovieInput!]!): [Movie!]!
+  addMovies(movies: [CreateMovieInput!]!): User
   updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
   removeMovie(id: String!): Movie!
 }
