@@ -5,6 +5,7 @@ import { MovieService } from './models/movie/movie.service';
 import { StarService } from './models/star/star.service';
 import { UserService } from './models/user/user.service';
 
+/** EVEN MORE GRANULAR CONCURRENT OPERATIONS WILL CAUSE WRITE CONFLICTS WITH MONGODB - SEE ROOT README */
 @Injectable()
 export class AppService {
   constructor(
@@ -25,6 +26,19 @@ export class AppService {
   async getMovieByID(id: string) {
     return await this.movieService.findOne({ where: { id } });
   }
+  async getUser(user: { id: string; username: string }) {
+    const { id } = await this.userService.upsertUser({
+      where: { id: user.id },
+      create: user,
+      update: {},
+    });
+
+    if (!id)
+      throw new Error('Prisma could not upsert User:', {
+        cause: { value: user },
+      });
+    return id;
+  }
 
   async addGenres(genres: GenreInput[], movieID: string) {
     return Promise.all(
@@ -33,12 +47,12 @@ export class AppService {
           where: { name },
           create: {
             name,
-            movieIDs: [movieID],
+            movieIDs: [movieID.toString()],
           },
           update: {
-            movieIDs: { push: movieID },
+            movieIDs: { push: movieID.toString() },
           },
-          select: { id: true },
+          // select: { id: true },
         });
 
         if (!id)
@@ -50,7 +64,7 @@ export class AppService {
     );
   }
   async addMovie({ genres, stars, ...movie }: CreateMovieInput) {
-    const { id } = movie.imDbID
+    const { id: movieID } = movie.imDbID
       ? await this.movieService.upsert({
           where: { imDbID: movie.imDbID },
           create: { ...movie },
@@ -64,24 +78,82 @@ export class AppService {
           select: { id: true },
         });
 
-    if (!id)
+    if (!movieID)
       throw new Error('Prisma could not upsert Movie:', {
         cause: { value: movie },
       });
 
-    const genreIDs = genres ? await this.addGenres(genres, id) : undefined;
-    const starIDs = stars ? await this.addStars(stars, id) : undefined;
+    const genreIDs = genres
+      ? // ? this.addGenres(genres, movieID.toString())
+        await Promise.all(
+          genres.map(async ({ name }) => {
+            const movieIDClone = movieID.toString();
+            try {
+              const { id } = await this.genreService.update({
+                where: { name },
+                data: {
+                  movieIDs: { push: movieIDClone },
+                },
+                // select: { id: true },
+              });
+              return id;
+            } catch (error) {
+              if (error.code == 'P2025') {
+                const { id } = await this.genreService.create({
+                  name,
+                  movieIDs: [movieIDClone],
+                });
+                return id;
+              }
+              throw error;
+            }
+          }),
+        )
+      : undefined;
+
+    const starIDs = stars
+      ? await Promise.all(
+          stars.map(async ({ name }) => {
+            const movieIDClone = movieID.toString();
+            try {
+              const { id } = await this.starService.update({
+                where: { name },
+                data: {
+                  movieIDs: { push: movieIDClone },
+                },
+                // select: { id: true },
+              });
+              return id;
+            } catch (error) {
+              if (error.code == 'P2025') {
+                const { id } = await this.starService.create({
+                  name,
+                  movieIDs: [movieIDClone],
+                });
+                return id;
+              }
+              throw error;
+            }
+          }),
+        )
+      : // ? this.addStars(stars, movieID.toString())
+        undefined;
 
     return this.movieService.update({
-      where: { id },
+      where: { id: movieID },
       data: {
-        genreIDs: { push: genreIDs },
-        starIDs: { push: starIDs },
+        genreIDs: {
+          push: genreIDs,
+        },
+        starIDs: {
+          push: starIDs,
+        },
       },
-      include: {
-        genres: true,
-        stars: true,
-      },
+      // include: {
+      //   genres: true,
+      //   stars: true,
+      // },
+      select: { id: true },
     });
   }
   async addStars(stars: StarInput[], movieID: string) {
@@ -91,10 +163,10 @@ export class AppService {
           where: { name },
           create: {
             name,
-            movieIDs: [movieID],
+            movieIDs: [movieID.toString()],
           },
           update: {
-            movieIDs: { push: movieID },
+            movieIDs: { push: movieID.toString() },
           },
           select: { id: true },
         });

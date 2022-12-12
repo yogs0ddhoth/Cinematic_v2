@@ -33,8 +33,7 @@ export class MovieService {
     orderBy?: Prisma.MovieOrderByWithAggregationInput;
     include?: Prisma.MovieInclude;
   }): Promise<Movie[]> {
-    const { orderBy, include } = params;
-    return this.prisma.movie.findMany({ orderBy, include });
+    return this.prisma.movie.findMany(params);
   }
   /**
    * @param where  id?: string
@@ -43,15 +42,13 @@ export class MovieService {
     where: Prisma.MovieWhereUniqueInput;
     include?: Prisma.MovieInclude;
   }): Promise<Movie | null> {
-    const { where, include } = params;
-    return this.prisma.movie.findUnique({ where, include });
+    return this.prisma.movie.findUnique(params);
   }
   async findMany(params: {
     orderBy?: Prisma.MovieOrderByWithAggregationInput;
     where: Prisma.MovieWhereInput;
   }): Promise<Movie[]> {
-    const { orderBy, where } = params;
-    return this.prisma.movie.findMany({ orderBy, where });
+    return this.prisma.movie.findMany(params);
   }
 
   /**
@@ -61,9 +58,25 @@ export class MovieService {
     where: Prisma.MovieWhereUniqueInput;
     data: Prisma.MovieUpdateInput;
     include?: Prisma.MovieInclude;
-  }): Promise<Movie> {
-    const { where, data, include } = params;
-    return this.prisma.movie.update({ where, data, include });
+    select?: Prisma.MovieSelect;
+  }) {
+    const { where, data, include, select } = params;
+
+    if (include)
+      return this.prisma.movie.update({
+        where,
+        data,
+        include,
+      });
+
+    if (select)
+      return this.prisma.movie.update({
+        where,
+        data,
+        select,
+      });
+
+    return this.prisma.movie.update({ where, data });
   }
 
   /** NOTE: include and select cannot both be included on the same query */
@@ -76,13 +89,27 @@ export class MovieService {
   }) {
     const { create, update, where, include, select } = params;
 
-    if (include) {
-      return this.prisma.movie.upsert({ create, update, where, include });
-    }
-    if (select) {
-      return this.prisma.movie.upsert({ create, update, where, select });
-    }
-    return this.prisma.movie.upsert({ create, update, where });
+    if (include)
+      return this.prisma.movie.upsert({
+        create,
+        update,
+        where,
+        include,
+      });
+
+    if (select)
+      return this.prisma.movie.upsert({
+        create,
+        update,
+        where,
+        select,
+      });
+
+    return this.prisma.movie.upsert({
+      create,
+      update,
+      where,
+    });
   }
 
   async remove() {

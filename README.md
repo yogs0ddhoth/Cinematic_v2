@@ -7,8 +7,10 @@
             * Create Subgraph-Services:
                 - Auth - dir path: ./auth - &check;SQLite, &check;Prisma ORM, &check;bcrypt, &check;JWT user auth
                 - ImDB - dir path: ./imdb_service - &check;fetch ImDB API &check;Subgraph Federated
-                - MovieDB - dir path: ./server - &check;MongoDB, &check;Prisma ORM, &check;refactor server
-                    - TODO: finish implementing services for User, &check;Genre, &check;Star
-                    - TODO: integrate JWT Auth for User
+                - MovieDB - dir path: ./server - &check;MongoDB, ~~Prisma ORM,~~ &check;refactor server
+                    - ~~implement services for &check;User, &check;Genre, &check;Star~~
+                    - &check;integrate JWT Auth for User
+                    - TODO Migrate to Mongoose as a more performant longterm solution to [WriteConflicts raised by concurrent MongoDB transactions used by Prisma's ORM](https://github.com/prisma/prisma/issues/12814) (a short term workaround would have been to implement retry middleware)
+
 
                 - Youtube API - fetch trailer by imDb id ** FUTURE DIRECTION
