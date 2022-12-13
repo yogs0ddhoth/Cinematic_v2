@@ -10,12 +10,6 @@ export class Star {
     unique: true,
   })
   name: string;
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Movie',
-  })
-  movies: Movie[];
 }
 
 export type StarDocument = mongoose.HydratedDocument<Star>;

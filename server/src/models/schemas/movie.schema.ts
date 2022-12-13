@@ -3,7 +3,6 @@ import * as mongoose from 'mongoose';
 
 import { Genre } from './genre.schema';
 import { Star } from './star.schema';
-import { User } from './user.schema';
 
 @Schema()
 export class Movie {
@@ -48,12 +47,6 @@ export class Movie {
     ref: 'Star',
   })
   stars: Star[];
-
-  @Prop({
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  })
-  users: User[];
 }
 
 export type MovieDocument = mongoose.HydratedDocument<Movie>;
