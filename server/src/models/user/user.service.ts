@@ -1,51 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+
+import { User, UserDocument } from '../schemas/user.schema';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectModel(User.name) private readonly UserModel: Model<UserDocument>,
+  ) {}
 
-  async createUser(params: {
-    data: Prisma.UserCreateInput;
-    include?: Prisma.UserInclude;
+  async create(doc: UserDocument) {
+    return this.UserModel.create(doc);
+  }
+
+  async get(params: {
+    id: string;
+    projection?: ProjectionType<UserDocument>;
+    options?: QueryOptions<UserDocument>;
   }) {
-    return this.prisma.user.create(params);
+    const { id, projection, options } = params;
+    return this.UserModel.findById(id, projection, options).exec();
   }
 
-  async user(params: {
-    where: Prisma.UserWhereUniqueInput;
-    include?: Prisma.UserInclude;
+  async update(params: {
+    id: string;
+    update: UpdateQuery<UserDocument>;
+    options?: QueryOptions<UserDocument>;
   }) {
-    return this.prisma.user.findUnique(params);
+    const { id, update, options } = params;
+    return this.UserModel.findByIdAndUpdate(id, update, options).exec();
   }
 
-  async updateUser(params: {
-    where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
-    include?: Prisma.UserInclude;
-  }): Promise<User> {
-    return this.prisma.user.update(params);
-  }
-
-  async upsertUser(params: {
-    create: Prisma.UserCreateInput;
-    update: Prisma.UserUpdateInput;
-    where: Prisma.UserWhereUniqueInput;
-    include?: Prisma.UserInclude;
-    select?: Prisma.UserSelect;
-  }) {
-    const { create, update, where, include, select } = params;
-
-    if (include)
-      return this.prisma.user.upsert({ create, update, where, include });
-    if (select)
-      return this.prisma.user.upsert({ create, update, where, select });
-
-    return this.prisma.user.upsert({ create, update, where });
-  }
-
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
-    return this.prisma.user.delete({ where });
+  async delete(params: { id: string }) {
+    const { id } = params;
+    return this.UserModel.findByIdAndDelete(id).exec();
   }
 }

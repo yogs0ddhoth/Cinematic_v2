@@ -1,61 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Genre } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+
+import { Genre, GenreDocument } from '../schemas/genre.schema';
 
 @Injectable()
 export class GenreService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectModel(Genre.name) private readonly GenreModel: Model<GenreDocument>,
+  ) {}
 
-  async create(data: Prisma.GenreCreateInput): Promise<Genre> {
-    return this.prisma.genre.create({ data });
-  }
-  async createMany(
-    data: Prisma.GenreCreateManyInput[],
-  ): Promise<Prisma.BatchPayload> {
-    return this.prisma.genre.createMany({ data });
+  async create(doc: GenreDocument) {
+    return this.GenreModel.create(doc);
   }
 
-  async findOne(where: Prisma.GenreWhereUniqueInput): Promise<Genre | null> {
-    return this.prisma.genre.findUnique({ where });
-  }
-  async findMany(params: {
-    orderBy?: Prisma.GenreOrderByWithRelationInput;
-    where: Prisma.GenreWhereInput;
-  }): Promise<Genre[]> {
-    const { orderBy, where } = params;
-    return this.prisma.genre.findMany({ orderBy, where });
+  async get(params: {
+    id: string;
+    projection?: ProjectionType<GenreDocument>;
+    options?: QueryOptions<GenreDocument>;
+  }) {
+    const { id, projection, options } = params;
+    return this.GenreModel.findById(id, projection, options).exec();
   }
 
   async update(params: {
-    where: Prisma.GenreWhereUniqueInput;
-    data: Prisma.GenreUpdateInput;
-  }): Promise<Genre> {
-    const { where, data } = params;
-    return this.prisma.genre.update({ data, where });
-  }
-  async updateMany(params: {
-    where: Prisma.GenreWhereInput;
-    data: Prisma.GenreUncheckedUpdateManyInput;
-  }): Promise<Prisma.BatchPayload> {
-    const { where, data } = params;
-    return this.prisma.genre.updateMany({ where, data });
-  }
-
-  async upsert(params: {
-    create: Prisma.GenreCreateInput;
-    update: Prisma.GenreUpdateInput;
-    where: Prisma.GenreWhereUniqueInput;
-    select?: Prisma.GenreSelect;
+    id: string;
+    update: UpdateQuery<GenreDocument>;
+    options?: QueryOptions<GenreDocument>;
   }) {
-    const { create, update, where, select } = params;
-
-    if (select) {
-      return this.prisma.genre.upsert({ create, update, where, select });
-    }
-    return this.prisma.genre.upsert({ create, update, where });
+    const { id, update, options } = params;
+    return this.GenreModel.findByIdAndUpdate(id, update, options).exec();
   }
 
-  async remove(where: Prisma.GenreWhereUniqueInput): Promise<Genre> {
-    return this.prisma.genre.delete({ where });
+  async delete(params: { id: string }) {
+    const { id } = params;
+    return this.GenreModel.findByIdAndDelete(id).exec();
   }
 }

@@ -1,61 +1,39 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Star } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+
+import { Star, StarDocument } from '../schemas/star.schema';
 
 @Injectable()
 export class StarService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @InjectModel(Star.name) private readonly StarModel: Model<StarDocument>,
+  ) {}
 
-  async create(data: Prisma.StarCreateInput): Promise<Star> {
-    return this.prisma.star.create({ data });
-  }
-  async createMany(
-    data: Prisma.StarCreateManyInput[],
-  ): Promise<Prisma.BatchPayload> {
-    return this.prisma.star.createMany({ data });
+  async create(doc: StarDocument) {
+    return this.StarModel.create(doc);
   }
 
-  async findOne(where: Prisma.StarWhereUniqueInput): Promise<Star | null> {
-    return this.prisma.star.findUnique({ where });
-  }
-  async findMany(params: {
-    orderBy?: Prisma.StarOrderByWithRelationInput;
-    where: Prisma.StarWhereInput;
-  }): Promise<Star[]> {
-    const { orderBy, where } = params;
-    return this.prisma.star.findMany({ orderBy, where });
+  async get(params: {
+    id: string;
+    projection?: ProjectionType<StarDocument>;
+    options?: QueryOptions<StarDocument>;
+  }) {
+    const { id, projection, options } = params;
+    return this.StarModel.findById(id, projection, options).exec();
   }
 
   async update(params: {
-    where: Prisma.StarWhereUniqueInput;
-    data: Prisma.StarUpdateInput;
-  }): Promise<Star> {
-    const { where, data } = params;
-    return this.prisma.star.update({ where, data });
-  }
-  async updateMany(params: {
-    where: Prisma.StarWhereInput;
-    data: Prisma.StarUncheckedUpdateManyInput;
-  }): Promise<Prisma.BatchPayload> {
-    const { where, data } = params;
-    return this.prisma.star.updateMany({ where, data });
-  }
-
-  async upsert(params: {
-    create: Prisma.StarCreateInput;
-    update: Prisma.StarUpdateInput;
-    where: Prisma.StarWhereUniqueInput;
-    select?: Prisma.StarSelect;
+    id: string;
+    update: UpdateQuery<StarDocument>;
+    options?: QueryOptions<StarDocument>;
   }) {
-    const { create, update, where, select } = params;
-
-    if (select) {
-      return this.prisma.star.upsert({ create, update, where, select });
-    }
-    return this.prisma.star.upsert({ create, update, where });
+    const { id, update, options } = params;
+    return this.StarModel.findByIdAndUpdate(id, update, options).exec();
   }
 
-  async remove(where: Prisma.StarWhereUniqueInput): Promise<Star> {
-    return this.prisma.star.delete({ where });
+  async delete(params: { id: string }) {
+    const { id } = params;
+    return this.StarModel.findByIdAndDelete(id).exec();
   }
 }
