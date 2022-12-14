@@ -22,7 +22,7 @@ export class Movie {
   runtimeStr: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
     ref: 'Genre',
   })
   genres: Genre[];
@@ -43,7 +43,7 @@ export class Movie {
   plot: string;
 
   @Prop({
-    type: mongoose.Schema.Types.ObjectId,
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
     ref: 'Star',
   })
   stars: Star[];
