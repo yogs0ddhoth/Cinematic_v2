@@ -4,7 +4,6 @@ import { Genre, GenreSchema } from './schemas/genre.schema';
 import { Movie, MovieSchema } from './schemas/movie.schema';
 import { Star, StarSchema } from './schemas/star.schema';
 import { User, UserSchema } from './schemas/user.schema';
-import { PrismaService } from 'prisma/prisma.service';
 
 import { GenreService } from './genre/genre.service';
 import { MovieService } from './movie/movie.service';
@@ -20,13 +19,7 @@ import { UserService } from './user/user.service';
       { name: Star.name, schema: StarSchema },
     ]),
   ],
-  providers: [
-    GenreService,
-    MovieService,
-    PrismaService,
-    StarService,
-    UserService,
-  ],
+  providers: [GenreService, MovieService, StarService, UserService],
   exports: [GenreService, MovieService, StarService, UserService],
 })
 export class ModelsModule {}
