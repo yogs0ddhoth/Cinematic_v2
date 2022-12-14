@@ -1,20 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import * as Mongoose from 'mongoose';
-import { CreateMovieInput, GenreInput, StarInput } from './graphql';
-import { CreateMovie } from './models/movie/dto/create-movie.dto';
+import { Types as MongooseTypes } from 'mongoose';
 
-import { User, UserDocument } from './models/schemas/user.schema';
-import { Movie } from './models/schemas/movie.schema';
-import { Genre } from './models/schemas/genre.schema';
-import { Star } from './models/schemas/star.schema';
+import { CreateMovieInput } from './graphql';
+import { CreateMovie } from './models/movie/dto/create-movie.dto';
+import { CreateGenre } from './models/genre/dto/create-genre.dto';
+import { CreateStar } from './models/star/dto/create-star.dto';
+import { userAuth } from './auth/dto/user-auth.dto';
+
+import { UserDocument } from './models/schemas/user.schema';
 
 import { GenreService } from './models/genre/genre.service';
 import { MovieService } from './models/movie/movie.service';
 import { StarService } from './models/star/star.service';
 import { UserService } from './models/user/user.service';
-import { CreateGenre } from './models/genre/dto/create-genre.dto';
-import { CreateStar } from './models/star/dto/create-star.dto';
-import { userAuth } from './auth/dto/user-auth.dto';
 
 @Injectable()
 export class AppService {
@@ -25,7 +23,7 @@ export class AppService {
     private readonly userService: UserService,
   ) {}
 
-  async addGenre({ name }: CreateGenre): Promise<Mongoose.Types.ObjectId> {
+  async addGenre({ name }: CreateGenre): Promise<MongooseTypes.ObjectId> {
     const genre = await this.genreService.get({ filter: { name } });
     if (genre) {
       return genre._id;
@@ -35,9 +33,9 @@ export class AppService {
   }
   async addMovie(
     movie: CreateMovie,
-    genreIDs: Mongoose.Types.ObjectId[],
-    starIDs: Mongoose.Types.ObjectId[],
-  ): Promise<Mongoose.Types.ObjectId> {
+    genreIDs: MongooseTypes.ObjectId[],
+    starIDs: MongooseTypes.ObjectId[],
+  ): Promise<MongooseTypes.ObjectId> {
     const existingMovie = await this.movieService.get({
       filter: { title: movie.title },
     });
@@ -76,7 +74,7 @@ export class AppService {
     console.log('updated movie:', _id);
     return _id;
   }
-  async addStar({ name }: CreateStar): Promise<Mongoose.Types.ObjectId> {
+  async addStar({ name }: CreateStar): Promise<MongooseTypes.ObjectId> {
     const star = await this.starService.get({ filter: { name } });
     if (star) {
       return star._id;
@@ -87,16 +85,16 @@ export class AppService {
 
   async addMovies(
     movies: CreateMovieInput[],
-  ): Promise<Mongoose.Types.ObjectId[]> {
+  ): Promise<MongooseTypes.ObjectId[]> {
     return Promise.all(
       movies.map(async ({ genres, stars, ...movie }) => {
-        const genreIDs: Mongoose.Types.ObjectId[] = genres
+        const genreIDs: MongooseTypes.ObjectId[] = genres
           ? await Promise.all(
               genres.map(async (genre) => await this.addGenre(genre)),
             )
           : [];
 
-        const starIDs: Mongoose.Types.ObjectId[] = stars
+        const starIDs: MongooseTypes.ObjectId[] = stars
           ? await Promise.all(
               stars.map(async (star) => await this.addStar(star)),
             )
