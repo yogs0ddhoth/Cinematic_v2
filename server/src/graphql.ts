@@ -62,29 +62,29 @@ export interface Movie {
     title: string;
     description?: Nullable<string>;
     runtimeStr?: Nullable<string>;
-    genres: Nullable<Genre>[];
+    genres?: Nullable<Genre[]>;
     contentRating?: Nullable<string>;
     imDbRating?: Nullable<string>;
     imDbRatingVotes?: Nullable<string>;
     metacriticRating?: Nullable<string>;
     plot?: Nullable<string>;
-    stars: Nullable<Star>[];
+    stars?: Nullable<Star[]>;
 }
 
 export interface IQuery {
-    movies(): Movie[] | Promise<Movie[]>;
+    movies(): Nullable<User> | Promise<Nullable<User>>;
     movie(id: string): Movie | Promise<Movie>;
 }
 
 export interface IMutation {
-    addMovies(movies: CreateMovieInput[]): Movie[] | Promise<Movie[]>;
+    addMovies(movies: CreateMovieInput[]): Nullable<User> | Promise<Nullable<User>>;
     updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
     removeMovie(id: string): Movie | Promise<Movie>;
 }
 
 export interface User {
     id: string;
-    movies: Nullable<Movie>[];
+    movies?: Nullable<Movie[]>;
 }
 
 type Nullable<T> = T | null;
