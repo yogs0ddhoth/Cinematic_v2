@@ -26,11 +26,14 @@ export class AppService {
   async addGenre({ name }: CreateGenre): Promise<MongooseTypes.ObjectId> {
     const genre = await this.genreService.get({ filter: { name } });
     if (genre) {
+      console.log('Found genre:', genre._id);
       return genre._id;
     }
     const { _id } = await this.genreService.create({ name });
+    console.log('Created genre:', _id);
     return _id;
   }
+
   async addMovie(
     movie: CreateMovie,
     genreIDs: MongooseTypes.ObjectId[],
@@ -74,19 +77,22 @@ export class AppService {
     console.log('updated movie:', _id);
     return _id;
   }
+
   async addStar({ name }: CreateStar): Promise<MongooseTypes.ObjectId> {
     const star = await this.starService.get({ filter: { name } });
     if (star) {
+      console.log('Found star:', star._id);
       return star._id;
     }
     const { _id } = await this.starService.create({ name });
+    console.log('Created star:', _id);
     return _id;
   }
 
   async addMovies(
     movies: CreateMovieInput[],
   ): Promise<MongooseTypes.ObjectId[]> {
-    return Promise.all(
+    return await Promise.all(
       movies.map(async ({ genres, stars, ...movie }) => {
         const genreIDs: MongooseTypes.ObjectId[] = genres
           ? await Promise.all(
@@ -137,11 +143,11 @@ export class AppService {
 
   async getUser(userAuth: userAuth): Promise<string> {
     const { id, username } = userAuth;
-    const user = await this.userService.get({
-      id,
-    });
-    if (user) return user._id;
+    const user = await this.userService.get({ id });
 
+    if (user) {
+      return user._id;
+    }
     const { _id } = await this.userService.create({
       _id: id,
       username: username,
