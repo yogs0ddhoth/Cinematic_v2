@@ -14,6 +14,7 @@ import { StarService } from './models/star/star.service';
 import { UserService } from './models/user/user.service';
 import { CreateGenre } from './models/genre/dto/create-genre.dto';
 import { CreateStar } from './models/star/dto/create-star.dto';
+import { userAuth } from './auth/dto/user-auth.dto';
 
 @Injectable()
 export class AppService {
@@ -24,29 +25,48 @@ export class AppService {
     private readonly userService: UserService,
   ) {}
 
-  async addGenre({ name }: CreateGenre): Promise<string> {
+  async addGenre({ name }: CreateGenre): Promise<Mongoose.Types.ObjectId> {
     const genre = await this.genreService.get({ filter: { name } });
     if (genre) {
-      return genre.id;
-    } else {
-      const { id } = await this.genreService.create({ name });
-      return id;
+      return genre._id;
     }
+    const { _id } = await this.genreService.create({ name });
+    return _id;
   }
-  async addMovie(params: {
-    movie: CreateMovie;
-    genreIDs: string[];
-    starIDs: string[];
-  }) {
-    console.log('what the fuck');
-    const { movie, genreIDs, starIDs } = params;
-    const movieDoc = await this.movieService.get({
-      filter: { title: params.movie.title },
+  async addMovie(
+    movie: CreateMovie,
+    genreIDs: Mongoose.Types.ObjectId[],
+    starIDs: Mongoose.Types.ObjectId[],
+  ): Promise<Mongoose.Types.ObjectId> {
+    const existingMovie = await this.movieService.get({
+      filter: { title: movie.title },
     });
-    if (movieDoc) {
-      return movieDoc.id;
+    if (existingMovie) {
+      console.log('Found movie:', existingMovie._id);
+
+      const { _id } = existingMovie;
+      const updatedMovie = await this.movieService.update({
+        _id,
+        update: {
+          $addToSet: {
+            genres: { $each: genreIDs },
+            stars: { $each: starIDs },
+          },
+        },
+      });
+      if (!updatedMovie)
+        throw new Error('Error: could not update movie', {
+          cause: {
+            value: { existingMovie },
+          },
+        });
+      return updatedMovie._id;
     }
-    const { _id } = await this.movieService.create(movie);
+    const { _id } = await this.movieService.create({
+      ...movie,
+      genres: genreIDs,
+      stars: starIDs,
+    });
     if (!_id)
       throw new Error('Error: could not create movie', {
         cause: {
@@ -54,70 +74,51 @@ export class AppService {
         },
       });
     console.log('updated movie:', _id);
-
-    // Needs debugging - mongoose doesn't seem to want to parse the update properly
-    const updatedMovie = await this.movieService.update({
-      _id,
-      update: {
-        $addToSet: {
-          genres: {
-            $each: genreIDs,
-          },
-        },
-      },
-    });
-    if (!updatedMovie)
-      throw new Error('Error: could not update movie', {
-        cause: {
-          value: { movie },
-        },
-      });
-    return updatedMovie.id;
+    return _id;
   }
-  async addStar({ name }: CreateStar): Promise<string> {
+  async addStar({ name }: CreateStar): Promise<Mongoose.Types.ObjectId> {
     const star = await this.starService.get({ filter: { name } });
     if (star) {
-      return star.id;
-    } else {
-      const { id } = await this.starService.create({ name });
-      return id;
+      return star._id;
     }
+    const { _id } = await this.starService.create({ name });
+    return _id;
   }
 
-  async addMovies(movies: CreateMovieInput[]): Promise<string[]> {
-    return await Promise.all(
+  async addMovies(
+    movies: CreateMovieInput[],
+  ): Promise<Mongoose.Types.ObjectId[]> {
+    return Promise.all(
       movies.map(async ({ genres, stars, ...movie }) => {
-        // console.log('Movie:', movie);
-
-        const genreIDs: string[] = genres
+        const genreIDs: Mongoose.Types.ObjectId[] = genres
           ? await Promise.all(
               genres.map(async (genre) => await this.addGenre(genre)),
             )
           : [];
-        // console.log('genreIds:', genreIDs);
 
-        const starIDs: string[] = stars
+        const starIDs: Mongoose.Types.ObjectId[] = stars
           ? await Promise.all(
               stars.map(async (star) => await this.addStar(star)),
             )
           : [];
-        // console.log('starIDs:', starIDs);
-        // console.log('\n');
 
-        return this.addMovie({
-          movie,
-          genreIDs,
-          starIDs,
-        });
+        return this.addMovie(movie, genreIDs, starIDs);
       }),
     );
   }
+  async addMoviesToUser(
+    id: string,
+    movies: CreateMovieInput[],
+  ): Promise<UserDocument> {
+    const movieIDs = await this.addMovies(movies);
 
-  // async addMoviesToUser();
-  async getUser(user: { id: string; username: string }): Promise<UserDocument> {
-    const { id, username } = user;
-    const userDoc = await this.userService.get({
+    const updatedUser = await this.userService.update({
       id,
+      update: {
+        $addToSet: {
+          movies: { $each: movieIDs },
+        },
+      },
       options: {
         populate: {
           path: 'movies',
@@ -127,8 +128,26 @@ export class AppService {
         },
       },
     });
+    if (!updatedUser)
+      throw new Error('Error: could not update User:', {
+        cause: {
+          value: { id, movieIDs },
+        },
+      });
+    return updatedUser;
+  }
 
-    if (!userDoc) return this.userService.create({ _id: id, username });
-    return userDoc;
+  async getUser(userAuth: userAuth): Promise<string> {
+    const { id, username } = userAuth;
+    const user = await this.userService.get({
+      id,
+    });
+    if (user) return user._id;
+
+    const { _id } = await this.userService.create({
+      _id: id,
+      username: username,
+    });
+    return _id;
   }
 }
