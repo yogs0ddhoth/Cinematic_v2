@@ -1,7 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
-import { Movie, User } from '@prisma/client';
-import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
+import { CreateMovieInput, GenreInput, UpdateMovieInput } from 'src/graphql';
 import { AppService } from './app.service';
 import { CurrentUser, GqlJwtAuthGuard } from './auth/jwt-auth.guard';
 
@@ -13,14 +12,15 @@ export class AppResolver {
   @UseGuards(GqlJwtAuthGuard)
   async movies(
     @CurrentUser()
-    user: {
+    userAuth: {
       id: string;
       username: string;
     },
   ) {
     try {
-      console.log(user);
-      return await this.appService.getUser(user);
+      console.log(userAuth);
+      const user = await this.appService.getUser(userAuth);
+      return user;
     } catch (error) {
       console.log(error);
       return error;
@@ -28,9 +28,9 @@ export class AppResolver {
   }
 
   @Query('movie')
-  async movie(@Args('id') id: string): Promise<Movie | null> {
+  async movie(@Args('id') id: string) {
     try {
-      return await this.appService.getMovieByID(id);
+      // return await this.appService.getMovieByID(id);
     } catch (error) {
       console.log(error);
       return error;
@@ -41,26 +41,16 @@ export class AppResolver {
   @UseGuards(GqlJwtAuthGuard)
   async addMovies(
     @CurrentUser()
-    user: { id: string; username: string },
+    userAuth: { id: string; username: string },
     @Args('movies')
     movies: CreateMovieInput[],
   ) {
-    // let trying;
-    // do {
-    //   try {
-    //     trying = false;
-    //     return await this.appService.addMovies(user, movies);
-    //   } catch (error) {
-    //     console.log(error);
-    //     trying = true;
-    //   }
-    // } while (trying);
     try {
-      const createdMovies = await Promise.all(
-        movies.map((movie) => this.appService.addMovie(movie)),
-      );
-      console.log(createdMovies);
-      return await this.appService.getUser(user);
+      console.log(userAuth);
+      const user = await this.appService.getUser(userAuth);
+
+      this.appService.addMovies(movies);
+      return user;
     } catch (error) {
       console.log(error);
       return error;
