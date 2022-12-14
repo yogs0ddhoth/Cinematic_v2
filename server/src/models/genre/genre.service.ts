@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+} from 'mongoose';
 
 import { Genre, GenreDocument } from '../schemas/genre.schema';
+import { CreateGenre } from './dto/create-genre.dto';
 
 @Injectable()
 export class GenreService {
@@ -10,26 +17,26 @@ export class GenreService {
     @InjectModel(Genre.name) private readonly GenreModel: Model<GenreDocument>,
   ) {}
 
-  async create(doc: GenreDocument) {
+  async create(doc: CreateGenre) {
     return this.GenreModel.create(doc);
   }
 
   async get(params: {
-    id: string;
+    filter: FilterQuery<GenreDocument>;
     projection?: ProjectionType<GenreDocument>;
     options?: QueryOptions<GenreDocument>;
   }) {
-    const { id, projection, options } = params;
-    return this.GenreModel.findById(id, projection, options).exec();
+    const { filter, projection, options } = params;
+    return this.GenreModel.findOne(filter, projection, options).exec();
   }
 
   async update(params: {
-    id: string;
+    filter: FilterQuery<GenreDocument>;
     update: UpdateQuery<GenreDocument>;
     options?: QueryOptions<GenreDocument>;
   }) {
-    const { id, update, options } = params;
-    return this.GenreModel.findByIdAndUpdate(id, update, options).exec();
+    const { filter, update, options } = params;
+    return this.GenreModel.findOneAndUpdate(filter, update, options).exec();
   }
 
   async delete(params: { id: string }) {

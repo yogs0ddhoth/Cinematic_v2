@@ -1,8 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+} from 'mongoose';
 
 import { Star, StarDocument } from '../schemas/star.schema';
+import { CreateStar } from './dto/create-star.dto';
 
 @Injectable()
 export class StarService {
@@ -10,26 +17,26 @@ export class StarService {
     @InjectModel(Star.name) private readonly StarModel: Model<StarDocument>,
   ) {}
 
-  async create(doc: StarDocument) {
+  async create(doc: CreateStar) {
     return this.StarModel.create(doc);
   }
 
   async get(params: {
-    id: string;
+    filter: FilterQuery<StarDocument>;
     projection?: ProjectionType<StarDocument>;
     options?: QueryOptions<StarDocument>;
   }) {
-    const { id, projection, options } = params;
-    return this.StarModel.findById(id, projection, options).exec();
+    const { filter, projection, options } = params;
+    return this.StarModel.findOne(filter, projection, options).exec();
   }
 
   async update(params: {
-    id: string;
+    filter: FilterQuery<StarDocument>;
     update: UpdateQuery<StarDocument>;
     options?: QueryOptions<StarDocument>;
   }) {
-    const { id, update, options } = params;
-    return this.StarModel.findByIdAndUpdate(id, update, options).exec();
+    const { filter, update, options } = params;
+    return this.StarModel.findOneAndUpdate(filter, update, options).exec();
   }
 
   async delete(params: { id: string }) {

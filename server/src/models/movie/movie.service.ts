@@ -1,8 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  Model,
+  ProjectionType,
+  QueryOptions,
+  UpdateQuery,
+  Types,
+} from 'mongoose';
 
 import { Movie, MovieDocument } from '../schemas/movie.schema';
+import { CreateMovie } from './dto/create-movie.dto';
 
 @Injectable()
 export class MovieService {
@@ -10,26 +18,26 @@ export class MovieService {
     @InjectModel(Movie.name) private readonly MovieModel: Model<MovieDocument>,
   ) {}
 
-  async create(doc: MovieDocument) {
-    return this.MovieModel.create(doc);
+  async create(doc: CreateMovie) {
+    return await (await this.MovieModel.create(doc)).save();
   }
 
   async get(params: {
-    id: string;
+    filter: FilterQuery<MovieDocument>;
     projection?: ProjectionType<MovieDocument>;
     options?: QueryOptions<MovieDocument>;
   }) {
-    const { id, projection, options } = params;
-    return this.MovieModel.findById(id, projection, options).exec();
+    const { filter, projection, options } = params;
+    return this.MovieModel.findOne(filter, projection, options).exec();
   }
 
   async update(params: {
-    id: string;
+    _id: Types.ObjectId;
     update: UpdateQuery<MovieDocument>;
     options?: QueryOptions<MovieDocument>;
   }) {
-    const { id, update, options } = params;
-    return this.MovieModel.findByIdAndUpdate(id, update, options).exec();
+    const { _id, update, options } = params;
+    return this.MovieModel.findByIdAndUpdate(_id, update, options).exec();
   }
 
   async delete(params: { id: string }) {
