@@ -22,7 +22,7 @@ type Movie { # as stored in DB and queried by client
 
 extend type User @key(fields: "id") {
   id: ID! @external
-  movies: [Movie]!
+  movies: [Movie!]
 }
 
 type Query {
