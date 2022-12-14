@@ -18,8 +18,8 @@ export class MovieService {
     @InjectModel(Movie.name) private readonly MovieModel: Model<MovieDocument>,
   ) {}
 
-  async create(doc: CreateMovie) {
-    return await (await this.MovieModel.create(doc)).save();
+  async create(docs: CreateMovie | CreateMovie[]) {
+    return this.MovieModel.create(docs);
   }
 
   async get(params: {
