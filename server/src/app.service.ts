@@ -29,9 +29,20 @@ export class AppService {
       console.log('Found genre:', genre._id);
       return genre._id;
     }
-    const { _id } = await this.genreService.create({ name });
-    console.log('Created genre:', _id);
-    return _id;
+    try {
+      const { _id } = await this.genreService.create({ name });
+      console.log('Created genre:', _id);
+      return _id;
+    } catch (error) {
+      if (error.name === 'MongoServerError' && error.code === 11000) {
+        const genre = await this.genreService.get({ filter: { name } });
+        if (genre) {
+          console.log('Caught an error, and found genre:', genre._id);
+          return genre._id;
+        }
+      }
+      throw error;
+    }
   }
 
   async addMovie(
@@ -84,9 +95,20 @@ export class AppService {
       console.log('Found star:', star._id);
       return star._id;
     }
-    const { _id } = await this.starService.create({ name });
-    console.log('Created star:', _id);
-    return _id;
+    try {
+      const { _id } = await this.starService.create({ name });
+      console.log('Created star:', _id);
+      return _id;
+    } catch (error) {
+      if (error.name === 'MongoServerError' && error.code === 11000) {
+        const star = await this.starService.get({ filter: { name } });
+        if (star) {
+          console.log('Caught an error, and found star:', star._id);
+          return star._id;
+        }
+      }
+      throw error;
+    }
   }
 
   async addMovies(
@@ -138,6 +160,20 @@ export class AppService {
           value: { id, movieIDs },
         },
       });
+    if (!updatedUser.movies.length) {
+      const freshFindUser = await this.userService.get({
+        id,
+        options: {
+          populate: {
+            path: 'movies',
+            populate: {
+              path: 'stars genres',
+            },
+          },
+        },
+      });
+      if (freshFindUser) return freshFindUser;
+    }
     return updatedUser;
   }
 
