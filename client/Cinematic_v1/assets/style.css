@@ -1,0 +1,33 @@
+.jumbotron{
+    background-image: url("./images/banner.jpg");
+    background-repeat: repeat;
+    background-size: auto 100%;
+}
+
+#search-form{
+width: 10%;
+margin-left: auto;
+margin-right: auto;
+}
+
+ body{
+  font-family: 'Oswald', sans-serif;
+  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+ }
+
+ #header{
+  font-size: 100px;
+  letter-spacing: 3px;
+  -webkit-text-stroke: 4px black;
+  
+ }
+
+ h2{
+     color:white;
+     font-size: large;
+ }
+
+ a{
+    vertical-align: bottom;
+ }
+ 
