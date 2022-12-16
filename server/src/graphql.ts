@@ -79,7 +79,7 @@ export interface IQuery {
 export interface IMutation {
     addMovies(movies: CreateMovieInput[]): Nullable<User> | Promise<Nullable<User>>;
     updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
-    removeMovie(id: string): Movie | Promise<Movie>;
+    removeMovie(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export interface User {
