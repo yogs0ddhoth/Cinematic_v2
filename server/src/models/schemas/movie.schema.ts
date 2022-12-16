@@ -12,7 +12,7 @@ export class Movie {
   @Prop()
   image: string;
 
-  @Prop({ unique: true })
+  @Prop()
   title: string;
 
   @Prop()
