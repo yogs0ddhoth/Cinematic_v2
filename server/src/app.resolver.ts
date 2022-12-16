@@ -38,10 +38,8 @@ export class AppResolver {
   @Mutation('addMovies')
   @UseGuards(GqlJwtAuthGuard)
   async addMovies(
-    @CurrentUser()
-    userAuth: userAuth,
-    @Args('movies')
-    movies: CreateMovieInput[],
+    @CurrentUser() userAuth: userAuth,
+    @Args('movies') movies: CreateMovieInput[],
   ) {
     try {
       console.log(userAuth);
@@ -55,22 +53,25 @@ export class AppResolver {
     }
   }
 
-  @Mutation('updateMovie')
-  async updateMovie(
-    @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
-  ) {
-    try {
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
+  // @Mutation('updateMovie')
+  // async updateMovie(
+  //   @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
+  // ) {
+  //   try {
+  //   } catch (error) {
+  //     console.log(error);
+  //     return error;
+  //   }
+  // }
 
   @Mutation('removeMovie')
   @UseGuards(GqlJwtAuthGuard)
-  async remove(@Args('id') id: string) {
+  async remove(@CurrentUser() userAuth: userAuth, @Args('id') id: string) {
     try {
-      // return this.moviesService.remove();
+      console.log(id);
+      const user = await this.appService.removeMoviefromUser(userAuth.id, id);
+      console.log(user);
+      return user;
     } catch (error) {
       console.log(error);
       return error;
