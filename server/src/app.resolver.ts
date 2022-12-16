@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
-import { CreateMovieInput, GenreInput, UpdateMovieInput } from 'src/graphql';
+import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
 import { AppService } from './app.service';
 import { userAuth } from './auth/dto/user-auth.dto';
 import { CurrentUser, GqlJwtAuthGuard } from './auth/jwt-auth.guard';
@@ -47,7 +47,9 @@ export class AppResolver {
       console.log(userAuth);
       const userID = await this.appService.getUser(userAuth);
 
-      return await this.appService.addMoviesToUser(userID, movies);
+      return await this.appService.getUserMovies(
+        await this.appService.addMoviesToUser(userID, movies),
+      );
     } catch (error) {
       console.log(error);
     }
