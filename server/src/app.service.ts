@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Mongoose, Types as MongooseTypes } from 'mongoose';
+import { Types as MongooseTypes } from 'mongoose';
 
 import { CreateMovieInput } from './graphql';
 import { CreateMovie } from './models/movie/dto/create-movie.dto';
@@ -155,7 +155,7 @@ export class AppService {
         },
       });
       if (!updatedMovie)
-        // error handling
+        // handle possible errors
         throw new Error('Error: could not update movie', {
           cause: {
             value: { existingMovie, genreIDs, starIDs },
@@ -163,7 +163,6 @@ export class AppService {
         });
       return updatedMovie._id; // return updated document ID
     }
-
     // if document not found
     const { _id } = await this.movieService.create({
       ...movie,
@@ -297,5 +296,22 @@ export class AppService {
         cause: { value: id },
       });
     return user;
+  }
+
+  async removeMoviefromUser(userID: string, movieID: string) {
+    return await this.userService.update({
+      id: userID,
+      update: {
+        $pull: {
+          movies: { _id: movieID },
+        },
+      },
+      options: {
+        populate: {
+          path: 'movies',
+          populate: 'genres stars',
+        },
+      },
+    });
   }
 }
