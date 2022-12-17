@@ -6,7 +6,7 @@ use async_graphql::{
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use dotenvy::dotenv;
 
-use imdb_service::Query;
+use movie_search_service::Query;
 
 async fn index(
     schema: web::Data<Schema<Query, EmptyMutation, EmptySubscription>>,

@@ -1,27 +1,20 @@
 use async_graphql::{InputObject, SimpleObject};
 use serde;
 
-#[derive(serde::Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct AdvancedSearchData {
-    pub query_string: Option<String>,
-    pub results: Vec<Movie>,
-    pub error_message: Option<String>,
-}
-
-#[derive(serde::Deserialize, Debug, SimpleObject)]
+/* TODO: refactor to accomidate new omdb results */
+#[derive(Debug, SimpleObject)]
 pub struct Genre {
     #[graphql(name = "name")]
     value: String,
 }
 
-#[derive(serde::Deserialize, Debug, SimpleObject)]
+#[derive(Debug, SimpleObject)]
 pub struct Star {
     name: String,
 }
 
-#[derive(serde::Deserialize, Debug, SimpleObject)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, SimpleObject)]
+#[graphql(rename_fields = "camelCase")]
 pub struct Movie {
     #[graphql(name = "imDbID")]
     pub id: Option<String>,
