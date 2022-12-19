@@ -5,7 +5,7 @@ A Backend for data persistance, incorporating microservice architecture, built f
     * Subgraph-Services:
         - Auth - dir path: ./auth - &check;SQLite, &check;Prisma ORM, &check;bcrypt, &check;JWT user auth
         - Movie Search - dir path: ./movie_search_service - ~~&check;fetch ImDB API~~ &check;Subgraph Federated
-            - migrate from imdb to OmDB API, and youtube API search to accommodate more robust api usage - refactor graph and schemas on MovieDB
+            - migrate from imdb to OmDB API to accommodate more robust api usage - refactor graph and schemas on MovieDB
         - MovieDB - dir path: ./server - &check;MongoDB, ~~Prisma ORM,~~ &check;refactor server
             - implement services for &check;User, &check;Genre, &check;Star
             - &check; integrate JWT Auth for User
