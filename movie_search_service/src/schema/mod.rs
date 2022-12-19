@@ -1,5 +1,4 @@
 use async_graphql::{InputObject, SimpleObject};
-use serde;
 
 /* TODO: refactor to accomidate new omdb results */
 #[derive(Debug, SimpleObject)]
@@ -16,8 +15,8 @@ pub struct Star {
 #[derive(Debug, SimpleObject)]
 #[graphql(rename_fields = "camelCase")]
 pub struct Movie {
-    #[graphql(name = "imDbID")]
-    pub id: Option<String>,
+    #[graphql(name = "imdbID")]
+    pub imdb_id: Option<String>,
 
     pub image: Option<String>,
     pub title: Option<String>,
@@ -48,7 +47,7 @@ pub struct SearchMovieInput {
     pub genres: String,
 
     #[graphql(default)]
-    pub release_date: String,
+    pub release_year: String,
 
     #[graphql(default)]
     pub user_rating: String,
