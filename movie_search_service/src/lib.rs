@@ -2,7 +2,7 @@ pub mod imdb;
 pub mod omdb;
 pub mod schema;
 
-use std::{env, borrow::Borrow};
+use std::{env, borrow::Borrow, result};
 use async_graphql::Object;
 use omdb::{OMDbMovie, OMDBSearchData};
 use reqwest;
@@ -22,11 +22,28 @@ impl Query {
         let omdb_search_url = fmt_omdb_search_url(&search_movie_input, "s");
         
         let client = reqwest::Client::new();
+        // let movies = Vec::new();
+        {
+            let (mut omdb_results_1, mut omdb_results_2) = tokio::join!(
+                send_get::<OMDBSearchData>(omdb_search_url.clone(), client.borrow(), ),
+                send_get::<OMDBSearchData>(omdb_search_url.clone() + "&page=2", client.borrow()),
+            );
+    
+            let ids = match (omdb_results_1, omdb_results_2) {
+                (Ok(results_1), Ok(results_2)) => match (results_1.search, results_2.search) {
+                    (Some(mut s1), Some(mut s2)) => {
+                        s1.append(&mut s2);
+                        s1
+                    }
+                    (Some(s1), None) => s1,
+                    (None, Some(s2)) => s2,
+                    _ => Vec::new() // needs a better solution
 
-        let (mut omdb_results_1, mut omdb_results_2) = tokio::join!(
-            send_get::<OMDBSearchData>(omdb_search_url.clone(), client.borrow(), ),
-            send_get::<OMDBSearchData>(omdb_search_url.clone() + "&page=2", client.borrow()),
-        );
+                }
+                (Err(e), _) => return Err(e),
+                (Ok(_), Err(e)) => return Err(e),
+            };
+        }
         /* *
          * TODO: 
          *  - combine omdb_results_1 and omdb_results_2 in to a vector of type OMDBSearchResult
