@@ -1,5 +1,6 @@
 pub mod imdb;
 pub mod omdb;
+
 pub mod schema;
 
 use std::{env, borrow::Borrow, result};
@@ -19,7 +20,7 @@ impl Query {
         search_movie_input: SearchMovieInput,
     ) -> Result<Vec<Movie>, reqwest::Error> {
         // let mut imdb_results = imdb::call_imdb(fmt_imdb_url(search_movie_input)).await;
-        let omdb_search_url = fmt_omdb_search_url(&search_movie_input, "s");
+        let omdb_search_url = fmt_omdb_search_url(&search_movie_input.title, &search_movie_input.release_year, "s");
         
         let client = reqwest::Client::new();
         // let movies = Vec::new();
@@ -71,13 +72,17 @@ pub fn fmt_imdb_url(search_input: SearchMovieInput) -> String {
         key = imdb_key,
         title = search_input.title,
         release_date = search_input.release_year,
-        genres = search_input.genres,
-        certificates = search_input.certificates,
+        genres = 
+            // search_input.genres,
+            "",
+        certificates = 
+            // search_input.certificates,
+            "",
         user_rating = search_input.user_rating
     )
 }
 
-pub fn fmt_omdb_search_url(search_input: &SearchMovieInput, search_type: &str) -> String {
+pub fn fmt_omdb_search_url(search_movie: &String, release_year: &String, search_type: &str) -> String {
     let omdb_key = match env::var("OMDB_KEY") {
         Ok(data) => data,
         Err(data) => {
@@ -89,8 +94,8 @@ pub fn fmt_omdb_search_url(search_input: &SearchMovieInput, search_type: &str) -
         "https://www.omdbapi.com/?apikey={key}&{search_type}={title}&y={year}",
         key = omdb_key,
         search_type = search_type,
-        title = search_input.title,
-        year = search_input.release_year,
+        title = search_movie,
+        year = release_year,
     )
 }
 
@@ -127,8 +132,8 @@ mod tests {
 
         let test_input = SearchMovieInput {
             title: String::from("Inception"),
-            certificates: String::default(),
-            genres: String::default(),
+            // certificates: String::default(),
+            // genres: String::default(),
             release_year: String::default(),
             user_rating: String::default(),
         };
@@ -146,8 +151,8 @@ mod tests {
 
         let test_input = SearchMovieInput {
             title: String::from("Inception"),
-            certificates: String::default(),
-            genres: String::default(),
+            // certificates: String::default(),
+            // genres: String::default(),
             release_year: String::default(),
             user_rating: String::default(),
         };
@@ -155,8 +160,8 @@ mod tests {
         let client = reqwest::Client::new();
 
         let (omdb_results_1, omdb_results_2) = tokio::join!(
-            send_get::<OMDBSearchData>(fmt_omdb_search_url(&test_input, "s"), client.borrow()),
-            send_get::<OMDbMovie>(fmt_omdb_search_url(&test_input, "t"), client.borrow()),
+            send_get::<OMDBSearchData>(fmt_omdb_search_url(&test_input.title, &test_input.release_year, "s"), client.borrow()),
+            send_get::<OMDbMovie>(fmt_omdb_search_url(&test_input.title, &test_input.release_year, "t"), client.borrow()),
         );
         println!("{:#?}", omdb_results_1);
         println!("{:#?}", omdb_results_2);
@@ -172,8 +177,8 @@ mod tests {
         /* simulates the #[graphql(default)] for each field */
         let test_input = SearchMovieInput {
             title: String::default(),
-            certificates: String::default(),
-            genres: String::default(),
+            // certificates: String::default(),
+            // genres: String::default(),
             release_year: String::default(),
             user_rating: String::default(),
         };
