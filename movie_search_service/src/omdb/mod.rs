@@ -5,14 +5,14 @@ use serde;
 pub struct OMDBSearchData {
     pub search: Option<Vec<OMDBSearchResult>>,
     pub response: String,
-    pub error:Option<String>
+    pub error: Option<String>,
 }
 
 #[derive(serde::Deserialize, Debug)]
 pub struct OMDBSearchResult {
     // deserialize only the imdbID needed for detailed data request
     #[serde(rename = "imdbID")]
-    pub imdb_id: String
+    pub imdb_id: String,
 }
 
 #[derive(serde::Deserialize, Debug)]

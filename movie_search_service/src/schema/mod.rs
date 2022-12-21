@@ -45,7 +45,6 @@ pub struct SearchMovieInput {
 
     // #[graphql(default)]
     // pub genres: String,
-
     #[graphql(default)]
     pub release_year: String,
 
