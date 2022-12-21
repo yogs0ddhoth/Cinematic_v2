@@ -4,6 +4,7 @@ pub mod omdb;
 pub mod schema;
 
 use std::{env, borrow::Borrow, result};
+use actix_web::error::HttpError;
 use async_graphql::Object;
 use omdb::{OMDbMovie, OMDBSearchData};
 use reqwest;
@@ -20,29 +21,23 @@ impl Query {
         search_movie_input: SearchMovieInput,
     ) -> Result<Vec<Movie>, reqwest::Error> {
         // let mut imdb_results = imdb::call_imdb(fmt_imdb_url(search_movie_input)).await;
-        let omdb_search_url = fmt_omdb_search_url(&search_movie_input.title, &search_movie_input.release_year, "s");
+        let omdb_search_url = fmt_omdb_search_url(&search_movie_input, "s");
         
         let client = reqwest::Client::new();
         // let movies = Vec::new();
         {
             let (mut omdb_results_1, mut omdb_results_2) = tokio::join!(
-                send_get::<OMDBSearchData>(omdb_search_url.clone(), client.borrow(), ),
-                send_get::<OMDBSearchData>(omdb_search_url.clone() + "&page=2", client.borrow()),
+                send_get_reqwest::<OMDBSearchData>(omdb_search_url.clone(), client.borrow(), ),
+                send_get_reqwest::<OMDBSearchData>(omdb_search_url.clone() + "&page=2", client.borrow()),
             );
-    
-            let ids = match (omdb_results_1, omdb_results_2) {
-                (Ok(results_1), Ok(results_2)) => match (results_1.search, results_2.search) {
-                    (Some(mut s1), Some(mut s2)) => {
-                        s1.append(&mut s2);
-                        s1
-                    }
-                    (Some(s1), None) => s1,
-                    (None, Some(s2)) => s2,
-                    _ => Vec::new() // needs a better solution
-
+            // omdb_results_1?;
+            let ids = match (omdb_results_1?.search, omdb_results_2?.search) {
+                (Some(mut results_1), Some(mut results_2)) => {
+                    results_1.append(&mut results_2);
                 }
-                (Err(e), _) => return Err(e),
-                (Ok(_), Err(e)) => return Err(e),
+                // (Some(results_1), None) => {}
+                // (None, None) => return Err(/** TODO implement Error Type for this situation */),
+                // _ => return Err("Inconsistant search results")
             };
         }
         /* *
@@ -82,25 +77,25 @@ pub fn fmt_imdb_url(search_input: SearchMovieInput) -> String {
     )
 }
 
-pub fn fmt_omdb_search_url(search_movie: &String, release_year: &String, search_type: &str) -> String {
+pub fn fmt_omdb_search_url(search_input: &SearchMovieInput, search_type: &str) -> String {
     let omdb_key = match env::var("OMDB_KEY") {
         Ok(data) => data,
         Err(data) => {
             println!("Error getting OMDb Key: {:#?}", data);
-            String::from("ERROR_NO_KEY")
+            String::from("NO_KEY")
         }
     };
     format!(
-        "https://www.omdbapi.com/?apikey={key}&{search_type}={title}&y={year}",
+        "https://www.omdbapi.com/?apikey={key}&{search_type}={movie}&y={year}",
         key = omdb_key,
         search_type = search_type,
-        title = search_movie,
-        year = release_year,
+        movie = search_input.search_for,
+        year = search_input.release_year,
     )
 }
 
 /// build and send GET request to url, deserialize response to type parameter, and return results
-pub async fn send_get<T: for<'de> serde::Deserialize<'de>>(url: String, client: &reqwest::Client) -> Result<T, reqwest::Error> 
+pub async fn send_get_reqwest<T: for<'de> serde::Deserialize<'de>>(url: String, client: &reqwest::Client) -> Result<T, reqwest::Error> 
 {
     println!("{:#?} Fetching...", url);
     let response = match client
@@ -131,7 +126,7 @@ mod tests {
         dotenv().ok();
 
         let test_input = SearchMovieInput {
-            title: String::from("Inception"),
+            search_for: String::from("Inception"),
             // certificates: String::default(),
             // genres: String::default(),
             release_year: String::default(),
@@ -150,7 +145,7 @@ mod tests {
         dotenv().ok();
 
         let test_input = SearchMovieInput {
-            title: String::from("Inception"),
+            search_for: String::from("Inception"),
             // certificates: String::default(),
             // genres: String::default(),
             release_year: String::default(),
@@ -160,8 +155,8 @@ mod tests {
         let client = reqwest::Client::new();
 
         let (omdb_results_1, omdb_results_2) = tokio::join!(
-            send_get::<OMDBSearchData>(fmt_omdb_search_url(&test_input.title, &test_input.release_year, "s"), client.borrow()),
-            send_get::<OMDbMovie>(fmt_omdb_search_url(&test_input.title, &test_input.release_year, "t"), client.borrow()),
+            send_get_reqwest::<OMDBSearchData>(fmt_omdb_search_url(&test_input, "s"), client.borrow()),
+            send_get_reqwest::<OMDbMovie>(fmt_omdb_search_url(&test_input, "t"), client.borrow()),
         );
         println!("{:#?}", omdb_results_1);
         println!("{:#?}", omdb_results_2);
@@ -176,7 +171,7 @@ mod tests {
     fn fmt_url_works() {
         /* simulates the #[graphql(default)] for each field */
         let test_input = SearchMovieInput {
-            title: String::default(),
+            search_for: String::default(),
             // certificates: String::default(),
             // genres: String::default(),
             release_year: String::default(),

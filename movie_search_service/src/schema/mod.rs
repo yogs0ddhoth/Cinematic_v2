@@ -53,6 +53,5 @@ pub struct SearchMovieInput {
     pub user_rating: String,
 
     #[graphql(default)]
-    #[graphql(name = "title")]
-    pub search_for: String,
+    pub title: String,
 }
