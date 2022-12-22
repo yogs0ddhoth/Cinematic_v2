@@ -3,9 +3,13 @@ pub mod omdb;
 
 pub mod schema;
 
-use actix_web::error::HttpError;
+use actix_web::{error::HttpError, http::Error};
 use async_graphql::Object;
 use async_trait::async_trait;
+use futures::{
+    future,
+    stream::{self, StreamExt},
+};
 use omdb::{OMDBSearchData, OMDBSearchResult, OMDbMovie};
 use reqwest;
 use schema::{Movie, SearchMovieInput};
@@ -15,18 +19,18 @@ use tokio;
 
 #[async_trait]
 trait Request {
-    async fn send_get_reqwest<T: for<'de> serde::Deserialize<'de>>(
+    async fn send_get_request<T: for<'de> serde::Deserialize<'de>>(
         &self,
-        url: String,
+        url: &String,
     ) -> Result<T, reqwest::Error>;
 }
 
 #[async_trait]
 impl Request for reqwest::Client {
     /// build and send GET request to url, deserialize response to type parameter, and return results
-    async fn send_get_reqwest<T: for<'de> serde::Deserialize<'de>>(
+    async fn send_get_request<T: for<'de> serde::Deserialize<'de>>(
         &self,
-        url: String,
+        url: &String,
     ) -> Result<T, reqwest::Error> {
         println!("{:#?} Fetching...", url);
         let response = match self.get(url).send().await {
@@ -56,29 +60,54 @@ impl Query {
         // let mut imdb_results = imdb::call_imdb(fmt_imdb_url(search_movie_input)).await;
 
         let client = reqwest::Client::new();
-        // let movies = Vec::new();
-        {
-            let (mut omdb_results_1, mut omdb_results_2) = tokio::join!(
-                client.send_get_reqwest::<OMDBSearchData>(search_movie_input.fmt_omdb_url()),
-                client.send_get_reqwest::<OMDBSearchData>(
-                    search_movie_input.fmt_omdb_url() + "&page=2"
-                ),
-            );
 
-            // let ids = match (omdb_results_1?.search, omdb_results_2?.search) {
-            //     (Some(mut results_1), Some(mut results_2)) => {
-            //         results_1.append(&mut results_2);
-            //     }
-            //     // (Some(results_1), None) => {}
-            //     // (None, None) => return Err(/** TODO implement Error Type for this situation */),
-            //     // _ => return Err("Inconsistant search results")
-            // };
+        // Create a Vec<String> of urls based on search_movie_input
+        let mut search_urls = Vec::new();
+        for i in 1..search_movie_input.pages {
+            // for pagination
+            search_urls.push(format!(
+                "{url}&page={num}",
+                url = search_movie_input.fmt_omdb_url(),
+                num = i
+            ));
         }
+        let search_results = future::join_all(search_urls.iter().map(|url| {
+            // Concurrently make the requests, and extract releavant data. TODO: Handle possible Error Responses
+            let client = &client;
+            async move {
+                match client.send_get_request::<OMDBSearchData>(url).await {
+                    Ok(result) => match result.search {
+                        Some(data) => data,
+                        None => panic!(),
+                    },
+                    Err(_) => panic!(), // TODO: Add proper error handling
+                }
+            }
+        }))
+        .await;
+
+        // convert search_results into a Vec<String> of urls to fetch details of
+        let mut id_urls = Vec::new();
+        search_results.iter().for_each(|results| {
+            for result in results {
+                id_urls.push(result.fmt_omdb_url())
+            }
+        });
+        let movie_results = future::join_all(id_urls.iter().map(|url| {
+            // Concurrently make the requests, and extract releavant data. TODO: Handle possible Error Responses
+            let client = &client;
+            async move {
+                match client.send_get_request::<OMDbMovie>(url).await {
+                    Ok(movie) => movie,
+                    Err(_) => panic!(),
+                }
+            }
+        }))
+        .await;
+
         /* *
          * TODO:
-         *  - call async omdb searches of each element of omdb_results_1.search and omdb_results_2.search
-         *  - update Movie fields
-         *  - add new() impl method that combines OMDbMovie and IMDbMovie to make a new movie
+         *  - update Movie fields and impl method of converting OMDbMovie to Movie
          */
         Ok(/* Placeholder result */ vec![Movie {
             imdb_id: todo!(),
@@ -149,6 +178,7 @@ mod tests {
             title: String::from("Star%20Wars"),
             release_year: String::default(),
             user_rating: String::default(),
+            pages: 1,
         };
         let test_omdb_search_result = OMDBSearchResult {
             imdb_id: String::from("tt0076759"),
@@ -157,8 +187,8 @@ mod tests {
         let client = reqwest::Client::new();
 
         let (omdb_results_1, omdb_results_2) = tokio::join!(
-            client.send_get_reqwest::<OMDBSearchData>(test_search_movie_input.fmt_omdb_url()),
-            client.send_get_reqwest::<OMDbMovie>(test_omdb_search_result.fmt_omdb_url()),
+            client.send_get_request::<OMDBSearchData>(test_search_movie_input.fmt_omdb_url()),
+            client.send_get_request::<OMDbMovie>(test_omdb_search_result.fmt_omdb_url()),
         );
         println!("{:#?}", omdb_results_1);
         println!("{:#?}", omdb_results_2);
