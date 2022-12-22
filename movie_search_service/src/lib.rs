@@ -5,7 +5,7 @@ pub mod schema;
 use async_graphql::Object;
 use async_trait::async_trait;
 use futures::future;
-use omdb::{OMDBSearchData, OMDBSearchResult, OMDbMovie};
+use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
 use reqwest;
 use schema::{Movie, SearchMovieInput};
 use serde;
@@ -23,7 +23,6 @@ trait Request {
         urls: Vec<String>,
     ) -> Vec<Result<T, reqwest::Error>>;
 }
-
 #[async_trait]
 impl Request for reqwest::Client {
     /// Build and send GET request to url, deserialize response to type parameter, propogate error, and return results
@@ -51,7 +50,6 @@ impl Request for reqwest::Client {
 }
 
 pub struct Query;
-
 #[Object]
 impl Query {
     async fn search_movies(
@@ -76,7 +74,7 @@ impl Query {
 
             // concurrently send requests for each of the urls
             client
-                .send_many_get_requests::<OMDBSearchData>(search_urls)
+                .send_many_get_requests::<OMDbSearchData>(search_urls)
                 .await
                 .iter()
                 .for_each(|results| {
@@ -116,23 +114,26 @@ impl Query {
                 });
         }
 
-        /* *
-         * TODO:
-         *  - update Movie fields and impl method of converting OMDbMovie to Movie
-         */
         Ok(/* Placeholder result */ vec![Movie {
             imdb_id: todo!(),
-            image: todo!(),
             title: todo!(),
-            description: todo!(),
-            runtime_str: todo!(),
-            genre_list: todo!(),
+            image: todo!(),
+            year: todo!(),
+            released: todo!(),
             content_rating: todo!(),
-            im_db_rating: todo!(),
-            im_db_rating_votes: todo!(),
-            metacritic_rating: todo!(),
+            runtime: todo!(),
+            director: todo!(),
+            writer: todo!(),
+            actors: todo!(),
             plot: todo!(),
-            star_list: todo!(),
+            genres: todo!(),
+            language: todo!(),
+            country: todo!(),
+            awards: todo!(),
+            ratings: todo!(),
+            box_office: todo!(),
+            production: todo!(),
+            imdb_votes: todo!(),
         }])
     }
 }
@@ -149,7 +150,6 @@ pub trait FormatUrl {
         }
     }
 }
-
 impl FormatUrl for SearchMovieInput {
     fn fmt_omdb_url(&self) -> String {
         format!(
@@ -160,13 +160,81 @@ impl FormatUrl for SearchMovieInput {
         )
     }
 }
-impl FormatUrl for OMDBSearchResult {
+impl FormatUrl for OMDbSearchResult {
     fn fmt_omdb_url(&self) -> String {
         format!(
             "https://www.omdbapi.com/?apikey={key}&i={id}",
             key = self.get_omdb_key(),
             id = self.imdb_id,
         )
+    }
+}
+
+/* *
+ * TODO:
+ *  - *maybe* impl From<String> for Actor, Genre
+ *  - impl From<OMDbRating> for Rating
+ */
+impl From<OMDbMovie> for Movie {
+    fn from(t: OMDbMovie) -> Self {
+        Movie {
+            imdb_id: t.check_field(&t.imdb_id),
+
+            title: t.check_field(&t.title),
+            year: t.check_field(&t.year),
+            released: t.check_field(&t.released),
+            content_rating: t.check_field(&t.rated),
+            runtime: t.check_field(&t.runtime),
+
+            director: t.check_field(&t.director),
+            writer: t.check_field(&t.writer),
+            actors: match t.actors.len() > 0 {
+                true => Some(
+                    t.actors
+                        .split(", ")
+                        .map(|actor| schema::Actor {
+                            name: actor.to_string(),
+                        })
+                        .collect(),
+                ),
+                false => None,
+            },
+
+            plot: t.check_field(&t.plot),
+            genres: match t.actors.len() > 0 {
+                true => Some(
+                    t.genre
+                        .split(", ")
+                        .map(|genre| schema::Genre {
+                            name: genre.to_string(),
+                        })
+                        .collect(),
+                ),
+                false => None,
+            },
+
+            language: t.check_field(&t.language),
+            country: t.check_field(&t.country),
+            awards: t.check_field(&t.awards),
+            image: t.check_field(&t.poster),
+
+            ratings: match t.ratings.len() > 0 {
+                true => Some(
+                    t.ratings
+                        .iter()
+                        .map(|rating| schema::Rating {
+                            source: rating.source.to_string(),
+                            score: rating.value.to_string(),
+                        })
+                        .collect(),
+                ),
+                false => None,
+            },
+
+            imdb_votes: t.check_field(&t.imdb_votes),
+            box_office: t.check_field(&t.box_office),
+            production: t.check_field(&t.production),
+        }
     }
 }
 
@@ -186,10 +254,12 @@ mod tests {
             release_year: String::default(),
             user_rating: String::default(),
             pages: 1,
+            content_rating: String::default(),
+            genres: String::default(),
         };
         let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
 
-        let test_omdb_search_result = OMDBSearchResult {
+        let test_omdb_search_result = OMDbSearchResult {
             imdb_id: String::from("tt0076759"),
         };
         let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
@@ -197,7 +267,7 @@ mod tests {
         let client = reqwest::Client::new();
 
         let (omdb_results_1, omdb_results_2) = tokio::join!(
-            client.send_get_request::<OMDBSearchData>(&test_search_movie_url),
+            client.send_get_request::<OMDbSearchData>(&test_search_movie_url),
             client.send_get_request::<OMDbMovie>(&test_omdb_search_url),
         );
         println!("{:#?}", omdb_results_1);
@@ -208,6 +278,7 @@ mod tests {
         };
     }
 
+    // test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
     #[tokio::test]
     async fn many_get_requests_work() {
         dotenv().ok();
@@ -217,6 +288,8 @@ mod tests {
             release_year: String::default(),
             user_rating: String::default(),
             pages: 3,
+            content_rating: String::default(),
+            genres: String::default(),
         };
 
         let client = reqwest::Client::new();
@@ -237,7 +310,7 @@ mod tests {
 
             // concurrently send requests for each of the urls
             client
-                .send_many_get_requests::<OMDBSearchData>(search_urls)
+                .send_many_get_requests::<OMDbSearchData>(search_urls)
                 .await
                 .iter()
                 .for_each(|results| {
