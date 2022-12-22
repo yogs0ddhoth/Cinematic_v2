@@ -207,4 +207,57 @@ mod tests {
             _ => panic!("Something went wrong with results"),
         };
     }
+
+    #[tokio::test]
+    async fn many_get_requests_work() {
+        dotenv().ok();
+
+        let test_search_movie_input = SearchMovieInput {
+            title: String::from("Star%20Wars"),
+            release_year: String::default(),
+            user_rating: String::default(),
+            pages: 3,
+        };
+
+        let client = reqwest::Client::new();
+
+        let mut id_urls = Vec::new();
+        {
+            // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
+            let mut search_urls = Vec::new();
+            for i in 1..test_search_movie_input.pages {
+                // for pagination
+                // push urls for each page (see omdb api) to search_urls
+                search_urls.push(format!(
+                    "{url}&page={num}",
+                    url = test_search_movie_input.fmt_omdb_url(),
+                    num = i
+                ));
+            }
+
+            // concurrently send requests for each of the urls
+            client
+                .send_many_get_requests::<OMDBSearchData>(search_urls)
+                .await
+                .iter()
+                .for_each(|results| {
+                    // Filter out error responses and convert search_results into imdb ids of type String and push to id_urls
+                    match results {
+                        Ok(data) => match &data.search {
+                            Some(result_page) => {
+                                for result in result_page {
+                                    id_urls.push(result.fmt_omdb_url())
+                                }
+                            }
+                            None => match &data.error {
+                                Some(err) => println!("Found an Error: {}", err),
+                                None => (),
+                            },
+                        },
+                        Err(err) => println!("Found an Error: {:#?}", err),
+                    }
+                });
+        }
+        println!("{:#?}", id_urls);
+    }
 }
