@@ -53,4 +53,7 @@ pub struct SearchMovieInput {
 
     #[graphql(default)]
     pub title: String,
+
+    #[graphql(default = 1)]
+    pub pages: i32,
 }
