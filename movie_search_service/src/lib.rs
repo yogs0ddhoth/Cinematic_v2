@@ -103,38 +103,17 @@ impl Query {
             client
                 .send_many_get_requests::<OMDbMovie>(id_urls)
                 .await
-                .iter()
+                .into_iter()
                 .for_each(|result| {
                     // Filter out error responses and push OMDbMovie to movies
                     println!("Filtering results...");
                     match result {
-                        Ok(movie) => movies.push(movie),
+                        Ok(movie) => movies.push(Movie::from(movie)),
                         Err(err) => println!("Found an Error: {:#?}", err),
                     }
                 });
         }
-
-        Ok(/* Placeholder result */ vec![Movie {
-            imdb_id: todo!(),
-            title: todo!(),
-            image: todo!(),
-            year: todo!(),
-            released: todo!(),
-            content_rating: todo!(),
-            runtime: todo!(),
-            director: todo!(),
-            writer: todo!(),
-            actors: todo!(),
-            plot: todo!(),
-            genres: todo!(),
-            language: todo!(),
-            country: todo!(),
-            awards: todo!(),
-            ratings: todo!(),
-            box_office: todo!(),
-            production: todo!(),
-            imdb_votes: todo!(),
-        }])
+        Ok(movies)
     }
 }
 
@@ -266,10 +245,16 @@ mod tests {
         // println!("{test_omdb_search_url}");
         // println!("{test_search_movie_url}");
 
-        assert_eq!("https://www.omdbapi.com/?apikey=NO_KEY&s=Star%20Wars&y=", test_search_movie_url);
-        assert_eq!("https://www.omdbapi.com/?apikey=NO_KEY&i=tt0076759", test_omdb_search_url);
+        assert_eq!(
+            "https://www.omdbapi.com/?apikey=NO_KEY&s=Star%20Wars&y=",
+            test_search_movie_url
+        );
+        assert_eq!(
+            "https://www.omdbapi.com/?apikey=NO_KEY&i=tt0076759",
+            test_omdb_search_url
+        );
     }
-    
+
     #[tokio::test]
     async fn get_requests_work() {
         dotenv().ok();
@@ -363,7 +348,7 @@ mod tests {
                                     println!("Found an Error: {}", err);
                                     panic!("Request Errors");
                                 }
-                                None => panic!("Request Errors: No Result found.")
+                                None => panic!("Request Errors: No Result found."),
                             },
                         },
                         Err(err) => {
