@@ -170,24 +170,28 @@ impl FormatUrl for OMDbSearchResult {
     }
 }
 
-/* *
- * TODO:
- *  - *maybe* impl From<String> for Actor, Genre
- *  - impl From<OMDbRating> for Rating
- */
+impl Movie {
+    /// Check String, and if "N/A", return None
+    pub fn check_for_null(field: &String) -> Option<String> {
+        match field.as_str() {
+            "N/A" => None,
+            _ => Some(field.to_string()),
+        }
+    }
+}
 impl From<OMDbMovie> for Movie {
     fn from(t: OMDbMovie) -> Self {
         Movie {
-            imdb_id: t.check_field(&t.imdb_id),
+            imdb_id: Movie::check_for_null(&t.imdb_id),
 
-            title: t.check_field(&t.title),
-            year: t.check_field(&t.year),
-            released: t.check_field(&t.released),
-            content_rating: t.check_field(&t.rated),
-            runtime: t.check_field(&t.runtime),
+            title: Movie::check_for_null(&t.title),
+            year: Movie::check_for_null(&t.year),
+            released: Movie::check_for_null(&t.released),
+            content_rating: Movie::check_for_null(&t.rated),
+            runtime: Movie::check_for_null(&t.runtime),
 
-            director: t.check_field(&t.director),
-            writer: t.check_field(&t.writer),
+            director: Movie::check_for_null(&t.director),
+            writer: Movie::check_for_null(&t.writer),
             actors: match t.actors.len() > 0 {
                 true => Some(
                     t.actors
@@ -200,7 +204,7 @@ impl From<OMDbMovie> for Movie {
                 false => None,
             },
 
-            plot: t.check_field(&t.plot),
+            plot: Movie::check_for_null(&t.plot),
             genres: match t.actors.len() > 0 {
                 true => Some(
                     t.genre
@@ -213,10 +217,10 @@ impl From<OMDbMovie> for Movie {
                 false => None,
             },
 
-            language: t.check_field(&t.language),
-            country: t.check_field(&t.country),
-            awards: t.check_field(&t.awards),
-            image: t.check_field(&t.poster),
+            language: Movie::check_for_null(&t.language),
+            country: Movie::check_for_null(&t.country),
+            awards: Movie::check_for_null(&t.awards),
+            image: Movie::check_for_null(&t.poster),
 
             ratings: match t.ratings.len() > 0 {
                 true => Some(
@@ -231,9 +235,9 @@ impl From<OMDbMovie> for Movie {
                 false => None,
             },
 
-            imdb_votes: t.check_field(&t.imdb_votes),
-            box_office: t.check_field(&t.box_office),
-            production: t.check_field(&t.production),
+            imdb_votes: Movie::check_for_null(&t.imdb_votes),
+            box_office: Movie::check_for_null(&t.box_office),
+            production: Movie::check_for_null(&t.production),
         }
     }
 }
@@ -244,7 +248,6 @@ mod tests {
     use dotenvy::dotenv;
     use tokio;
 
-    /// test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.32s
     #[tokio::test]
     async fn get_requests_work() {
         dotenv().ok();
@@ -278,7 +281,6 @@ mod tests {
         };
     }
 
-    // test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.26s
     #[tokio::test]
     async fn many_get_requests_work() {
         dotenv().ok();

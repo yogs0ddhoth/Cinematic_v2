@@ -59,11 +59,3 @@ pub struct OMDbMovie {
     // api specific information
     pub response: String,
 }
-impl OMDbMovie {
-    pub fn check_field(&self, field: &String) -> Option<String> {
-        match field.as_str() {
-            "N/A" => None,
-            _ => Some(field.to_string()),
-        }
-    }
-}
