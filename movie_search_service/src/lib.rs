@@ -1,4 +1,3 @@
-pub mod imdb;
 pub mod omdb;
 pub mod schema;
 
@@ -78,7 +77,7 @@ impl Query {
                 .await
                 .iter()
                 .for_each(|results| {
-                    // Filter out error responses and convert search_results into imdb ids of type String and push to id_urls
+                    // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
                     println!("Filtering results...");
                     match results {
                         Ok(data) => match &data.search {
@@ -105,7 +104,7 @@ impl Query {
                 .await
                 .into_iter()
                 .for_each(|result| {
-                    // Filter out error responses and push OMDbMovie to movies
+                    // Filter out error responses, convert OMDbMovie to Movie, and push to movies
                     println!("Filtering results...");
                     match result {
                         Ok(movie) => movies.push(Movie::from(movie)),
