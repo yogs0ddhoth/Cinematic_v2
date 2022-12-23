@@ -248,6 +248,28 @@ mod tests {
     use dotenvy::dotenv;
     use tokio;
 
+    #[test]
+    fn fmt_omdb_url_works() {
+        let test_search_movie_input = SearchMovieInput {
+            title: String::from("Star%20Wars"),
+            release_year: String::default(),
+            user_rating: String::default(),
+            pages: 1,
+            content_rating: String::default(),
+            genres: String::default(),
+        };
+        let test_omdb_search_result = OMDbSearchResult {
+            imdb_id: String::from("tt0076759"),
+        };
+        let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
+        let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
+        // println!("{test_omdb_search_url}");
+        // println!("{test_search_movie_url}");
+
+        assert_eq!("https://www.omdbapi.com/?apikey=NO_KEY&s=Star%20Wars&y=", test_search_movie_url);
+        assert_eq!("https://www.omdbapi.com/?apikey=NO_KEY&i=tt0076759", test_omdb_search_url);
+    }
+    
     #[tokio::test]
     async fn get_requests_work() {
         dotenv().ok();
@@ -273,11 +295,26 @@ mod tests {
             client.send_get_request::<OMDbSearchData>(&test_search_movie_url),
             client.send_get_request::<OMDbMovie>(&test_omdb_search_url),
         );
-        println!("{:#?}", omdb_results_1);
-        println!("{:#?}", omdb_results_2);
+
         match (omdb_results_1, omdb_results_2) {
-            (Ok(result_1), Ok(result_2)) => (result_1, result_2),
-            _ => panic!("Something went wrong with results"),
+            (Ok(result_1), Ok(result_2)) => {
+                // println!("{:#?}", result_1);
+                // println!("{:#?}", result_2);
+                assert!(result_1.search.is_some());
+                assert!(result_2.imdb_id == "tt0076759");
+            }
+            (Ok(_), Err(err)) => {
+                println!("Caught Error: {:#?}", err);
+                panic!("Request Errors");
+            }
+            (Err(err), Ok(_)) => {
+                println!("Caught Error: {:#?}", err);
+                panic!("Request Errors");
+            }
+            (Err(err_1), Err(err_2)) => {
+                println!("Caught Errors: {:#?}, {:#?}", err_1, err_2);
+                panic!("Request Errors");
+            }
         };
     }
 
@@ -293,7 +330,6 @@ mod tests {
             content_rating: String::default(),
             genres: String::default(),
         };
-
         let client = reqwest::Client::new();
 
         let mut id_urls = Vec::new();
@@ -301,8 +337,6 @@ mod tests {
             // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
             let mut search_urls = Vec::new();
             for i in 1..test_search_movie_input.pages {
-                // for pagination
-                // push urls for each page (see omdb api) to search_urls
                 search_urls.push(format!(
                     "{url}&page={num}",
                     url = test_search_movie_input.fmt_omdb_url(),
@@ -325,14 +359,21 @@ mod tests {
                                 }
                             }
                             None => match &data.error {
-                                Some(err) => println!("Found an Error: {}", err),
-                                None => (),
+                                Some(err) => {
+                                    println!("Found an Error: {}", err);
+                                    panic!("Request Errors");
+                                }
+                                None => panic!("Request Errors: No Result found.")
                             },
                         },
-                        Err(err) => println!("Found an Error: {:#?}", err),
+                        Err(err) => {
+                            println!("Found an Error: {:#?}", err);
+                            panic!("Request Errors");
+                        }
                     }
                 });
         }
-        println!("{:#?}", id_urls);
+        // this request should produce results
+        assert!(id_urls.len() > 0);
     }
 }
