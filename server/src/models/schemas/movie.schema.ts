@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import * as mongoose from 'mongoose';
+import {
+  Schema as MongooseSchema,
+  HydratedDocument as MongooseHydratedDocument,
+} from 'mongoose';
 
-import { Genre, GenreSchema } from './genre.schema';
+import { Genre } from './genre.schema';
 import { Actor } from './actor.schema';
 import { Rating, RatingSchema } from './rating.schema';
 
@@ -32,7 +35,7 @@ export class Movie {
   writer: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    type: [{ type: MongooseSchema.Types.ObjectId }],
     ref: 'Actor',
   })
   actors: Actor[];
@@ -41,10 +44,8 @@ export class Movie {
   plot: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    type: [{ type: MongooseSchema.Types.ObjectId }],
     ref: 'Genre',
-    // TODO: convert to subdocument array
-    // type: [GenreSchema]
   })
   genres: Genre[];
 
@@ -61,21 +62,20 @@ export class Movie {
   image: string;
 
   @Prop({
-    type: [RatingSchema]
+    type: [RatingSchema],
   })
   ratings: Rating[];
 
   @Prop()
-  imDbRatingVotes: string;
+  imdbVotes: string;
 
   @Prop()
-  metacriticRating: string;
+  boxOffice: string;
 
-  
-
-  
+  @Prop()
+  production: string;
 }
 
-export type MovieDocument = mongoose.HydratedDocument<Movie>;
+export type MovieDocument = MongooseHydratedDocument<Movie>;
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);
