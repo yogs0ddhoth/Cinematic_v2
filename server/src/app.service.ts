@@ -4,14 +4,14 @@ import { Types as MongooseTypes } from 'mongoose';
 import { CreateMovieInput } from './graphql';
 import { CreateMovie } from './models/movie/dto/create-movie.dto';
 import { CreateGenre } from './models/genre/dto/create-genre.dto';
-import { CreateStar } from './models/star/dto/create-star.dto';
+import { CreateActor } from './models/actor/dto/create-actor.dto';
 import { userAuth } from './auth/dto/user-auth.dto';
 
 import { UserDocument } from './models/schemas/user.schema';
 
 import { GenreService } from './models/genre/genre.service';
 import { MovieService } from './models/movie/movie.service';
-import { StarService } from './models/star/star.service';
+import { ActorService } from './models/actor/actor.service';
 import { UserService } from './models/user/user.service';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class AppService {
   constructor(
     private readonly genreService: GenreService,
     private readonly movieService: MovieService,
-    private readonly starService: StarService,
+    private readonly actorService: ActorService,
     private readonly userService: UserService,
   ) {}
 
@@ -59,12 +59,12 @@ export class AppService {
 
   /**
    * Query database for the Star, and create one if it doesn't exist
-   * @param CreateStar
+   * @param CreateActor
    * @returns Promise: the found Star ID as a Mongoose ObjectId
-   * @type {CreateStar} { name: string }
+   * @type {CreateActor} { name: string }
    */
-  async addStar({ name }: CreateStar): Promise<MongooseTypes.ObjectId> {
-    const star = await this.starService.get({ filter: { name } }); // query the database for genre by unique name
+  async addStar({ name }: CreateActor): Promise<MongooseTypes.ObjectId> {
+    const star = await this.actorService.get({ filter: { name } }); // query the database for genre by unique name
     if (star) {
       // if document exists
       console.log('Found star:', star._id);
@@ -72,7 +72,7 @@ export class AppService {
     }
     try {
       // if document not found
-      const { _id } = await this.starService.create({ name }); // create new document
+      const { _id } = await this.actorService.create({ name }); // create new document
       console.log('Created star:', _id);
       return _id; // return created subdocument id
     } catch (error) {
@@ -81,7 +81,7 @@ export class AppService {
         error.name === 'MongoServerError' &&
         error.code === 11000 // Mongo Server Error E11000 unique key (name field) already exists
       ) {
-        const star = await this.starService.get({ filter: { name } }); // retry the query
+        const star = await this.actorService.get({ filter: { name } }); // retry the query
         if (star) {
           console.log('Caught an error, and found star:', star._id);
           return star._id; // return the found subdocument ID

@@ -1,10 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-import { Movie } from './movie.schema';
-
 @Schema()
-export class Star {
+export class Actor {
   @Prop({
     required: true,
     unique: true,
@@ -12,6 +10,6 @@ export class Star {
   name: string;
 }
 
-export type StarDocument = mongoose.HydratedDocument<Star>;
+export type ActorDocument = mongoose.HydratedDocument<Actor>;
 
-export const StarSchema = SchemaFactory.createForClass(Star);
+export const ActorSchema = SchemaFactory.createForClass(Actor);
