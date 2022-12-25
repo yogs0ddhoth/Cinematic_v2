@@ -1,8 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 
-import { Genre } from './genre.schema';
-import { Star } from './star.schema';
+import { Genre, GenreSchema } from './genre.schema';
+import { Actor } from './actor.schema';
+import { Rating, RatingSchema } from './rating.schema';
 
 @Schema()
 export class Movie {
@@ -10,28 +11,59 @@ export class Movie {
   imDbID: string;
 
   @Prop()
-  image: string;
-
-  @Prop()
   title: string;
 
   @Prop()
-  description: string;
+  year: string;
 
   @Prop()
-  runtimeStr: string;
-
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId }],
-    ref: 'Genre',
-  })
-  genres: Genre[];
+  released: string;
 
   @Prop()
   contentRating: string;
 
   @Prop()
-  imDbRating: string;
+  runtime: string;
+
+  @Prop()
+  director: string;
+
+  @Prop()
+  writer: string;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    ref: 'Actor',
+  })
+  actors: Actor[];
+
+  @Prop()
+  plot: string;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    ref: 'Genre',
+    // TODO: convert to subdocument array
+    // type: [GenreSchema]
+  })
+  genres: Genre[];
+
+  @Prop()
+  language: string;
+
+  @Prop()
+  country: string;
+
+  @Prop()
+  awards: string;
+
+  @Prop()
+  image: string;
+
+  @Prop({
+    type: [RatingSchema]
+  })
+  ratings: Rating[];
 
   @Prop()
   imDbRatingVotes: string;
@@ -39,14 +71,9 @@ export class Movie {
   @Prop()
   metacriticRating: string;
 
-  @Prop()
-  plot: string;
+  
 
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId }],
-    ref: 'Star',
-  })
-  stars: Star[];
+  
 }
 
 export type MovieDocument = mongoose.HydratedDocument<Movie>;
