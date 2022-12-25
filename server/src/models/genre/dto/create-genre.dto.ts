@@ -1,3 +1,7 @@
+import { Types } from 'mongoose';
+
 export class CreateGenre {
-  name: string;
+  readonly name: string;
+
+  readonly movieID?: Types.ObjectId | null;
 }
