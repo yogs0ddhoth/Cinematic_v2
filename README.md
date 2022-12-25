@@ -5,12 +5,13 @@ A Backend for data persistance, incorporating microservice architecture, built f
     * Subgraph-Services:
         - Auth - dir path: ./auth - &check;SQLite, &check;Prisma ORM, &check;bcrypt, &check;JWT user auth
         - Movie Search - dir path: ./movie_search_service - ~~&check;fetch ImDB API~~ &check;Subgraph Federated
-            - migrate from imdb to OmDB API to accommodate more robust api usage - refactor graph and schemas on MovieDB
+            - &check; migrate from imdb to OmDB API to accommodate more robust api usage - &check; refactor graph and schemas on MovieDB
         - MovieDB - dir path: ./server - &check;MongoDB, ~~Prisma ORM,~~ &check;refactor server
             - implement services for &check;User, &check;Genre, &check;Star
             - &check; integrate JWT Auth for User
             - &check; Migrate to Mongoose as a more performant longterm solution to [WriteConflicts raised by concurrent MongoDB transactions used by Prisma's ORM](https://github.com/prisma/prisma/issues/12814) (a short term workaround would have been to implement retry middleware)
             - &check; handle errors caused by possible concurrent write to subdocument - MUCH easier with mongoose
+            - update models and services according to schema changes
     - Configure supergraph and apollo router
 * Fill out Client:
     - replace legacy jquery rendering with angular/ngx-bootstrap rendering
