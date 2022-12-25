@@ -23,7 +23,7 @@ pub struct Movie {
     #[graphql(name = "imdbID")]
     pub imdb_id: Option<String>,
 
-    pub title: Option<String>,
+    pub title: String,
     pub year: Option<String>,
     pub released: Option<String>,
     pub content_rating: Option<String>,
