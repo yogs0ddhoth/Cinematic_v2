@@ -118,6 +118,7 @@ impl Query {
 
 pub trait FormatUrl {
     fn fmt_omdb_url(&self) -> String;
+    /// Get OMDB_KEY from enviornmental variables. Return "NO_KEY" if none found.
     fn get_omdb_key(&self) -> String {
         match env::var("OMDB_KEY") {
             Ok(data) => data,
@@ -162,7 +163,7 @@ impl From<OMDbMovie> for Movie {
         Movie {
             imdb_id: Movie::check_for_null(&t.imdb_id),
 
-            title: Movie::check_for_null(&t.title),
+            title: t.title,
             year: Movie::check_for_null(&t.year),
             released: Movie::check_for_null(&t.released),
             content_rating: Movie::check_for_null(&t.rated),
