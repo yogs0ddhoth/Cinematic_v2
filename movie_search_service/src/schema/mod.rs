@@ -48,7 +48,7 @@ pub struct Movie {
     pub production: Option<String>,
 }
 
-#[derive(InputObject)]
+#[derive(Debug, InputObject)]
 #[graphql(rename_fields = "camelCase")]
 pub struct SearchMovieInput {
     #[graphql(default)]

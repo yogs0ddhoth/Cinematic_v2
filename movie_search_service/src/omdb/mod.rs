@@ -29,32 +29,32 @@ pub struct OMDbMovie {
     pub imdb_id: String,
 
     pub title: String,
-    pub year: String,
-    pub released: String,
-    pub rated: String,
-    pub runtime: String,
+    pub year: Option<String>,
+    pub released: Option<String>,
+    pub rated: Option<String>,
+    pub runtime: Option<String>,
 
-    pub director: String,
-    pub writer: String,
-    pub actors: String,
+    pub director: Option<String>,
+    pub writer: Option<String>,
+    pub actors: Option<String>,
 
-    pub plot: String,
-    pub genre: String,
+    pub plot: Option<String>,
+    pub genre: Option<String>,
 
-    pub language: String,
-    pub country: String,
-    pub awards: String,
-    pub poster: String,
+    pub language: Option<String>,
+    pub country: Option<String>,
+    pub awards: Option<String>,
+    pub poster: Option<String>,
 
     pub ratings: Vec<OMDbRating>,
-    pub metascore: String,
+    pub metascore: Option<String>,
     #[serde(rename = "imdbRating")]
-    pub imdb_rating: String,
+    pub imdb_rating: Option<String>,
     #[serde(rename = "imdbVotes")]
-    pub imdb_votes: String,
+    pub imdb_votes: Option<String>,
 
-    pub box_office: String,
-    pub production: String,
+    pub box_office: Option<String>,
+    pub production: Option<String>,
 
     // api specific information
     pub response: String,

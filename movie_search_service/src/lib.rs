@@ -56,12 +56,11 @@ impl Query {
         search_movie_input: SearchMovieInput,
     ) -> Result<Vec<Movie>, reqwest::Error> {
         let client = reqwest::Client::new();
-
         let mut id_urls = Vec::new();
         {
             // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
             let mut search_urls = Vec::new();
-            for i in 1..search_movie_input.pages {
+            for i in 1..search_movie_input.pages + 1 {
                 // for pagination
                 // push urls for each page (see omdb api) to search_urls
                 search_urls.push(format!(
@@ -70,7 +69,6 @@ impl Query {
                     num = i
                 ));
             }
-
             // concurrently send requests for each of the urls
             client
                 .send_many_get_requests::<OMDbSearchData>(search_urls)
@@ -112,6 +110,7 @@ impl Query {
                     }
                 });
         }
+        println!("Done! Sending response...");
         Ok(movies)
     }
 }
@@ -151,55 +150,64 @@ impl FormatUrl for OMDbSearchResult {
 
 impl Movie {
     /// Check String, and if "N/A", return None
-    pub fn check_for_null(field: &String) -> Option<String> {
-        match field.as_str() {
-            "N/A" => None,
-            _ => Some(field.to_string()),
+    pub fn check_for_null(field: Option<String>) -> Option<String> {
+        match field {
+            Some(data) => match data.as_str() {
+                "N/A" => None,
+                _ => Some(data.to_string()),
+            },
+            None => None,
         }
     }
 }
 impl From<OMDbMovie> for Movie {
     fn from(t: OMDbMovie) -> Self {
         Movie {
-            imdb_id: Movie::check_for_null(&t.imdb_id),
+            imdb_id: Some(t.imdb_id),
 
             title: t.title,
-            year: Movie::check_for_null(&t.year),
-            released: Movie::check_for_null(&t.released),
-            content_rating: Movie::check_for_null(&t.rated),
-            runtime: Movie::check_for_null(&t.runtime),
+            year: Movie::check_for_null(t.year),
+            released: Movie::check_for_null(t.released),
+            content_rating: Movie::check_for_null(t.rated),
+            runtime: Movie::check_for_null(t.runtime),
 
-            director: Movie::check_for_null(&t.director),
-            writer: Movie::check_for_null(&t.writer),
-            actors: match t.actors.len() > 0 {
-                true => Some(
-                    t.actors
-                        .split(", ")
-                        .map(|actor| schema::Actor {
-                            name: actor.to_string(),
-                        })
-                        .collect(),
-                ),
-                false => None,
+            director: Movie::check_for_null(t.director),
+            writer: Movie::check_for_null(t.writer),
+            actors: match Movie::check_for_null(t.actors) {
+                Some(actors) => match actors.len() > 0 {
+                    true => Some(
+                        actors
+                            .split(", ")
+                            .map(|actor| schema::Actor {
+                                name: actor.to_string(),
+                            })
+                            .collect(),
+                    ),
+                    false => None,
+                },
+                None => None,
             },
 
-            plot: Movie::check_for_null(&t.plot),
-            genres: match t.actors.len() > 0 {
-                true => Some(
-                    t.genre
-                        .split(", ")
-                        .map(|genre| schema::Genre {
-                            name: genre.to_string(),
-                        })
-                        .collect(),
-                ),
-                false => None,
+            plot: Movie::check_for_null(t.plot),
+            genres: match Movie::check_for_null(t.genre) {
+                Some(genres) => match genres.len() > 0 {
+                    true => Some(
+                        genres
+                            .split(", ")
+                            .map(|genre| schema::Genre {
+                                name: genre.to_string(),
+                            })
+                            .collect(),
+                    ),
+                    false => None,
+                },
+                None => None,
             },
 
-            language: Movie::check_for_null(&t.language),
-            country: Movie::check_for_null(&t.country),
-            awards: Movie::check_for_null(&t.awards),
-            image: Movie::check_for_null(&t.poster),
+            language: Movie::check_for_null(t.language),
+            country: Movie::check_for_null(t.country),
+            awards: Movie::check_for_null(t.awards),
+            image: Movie::check_for_null(t.poster),
 
             ratings: match t.ratings.len() > 0 {
                 true => Some(
@@ -214,9 +222,9 @@ impl From<OMDbMovie> for Movie {
                 false => None,
             },
 
-            imdb_votes: Movie::check_for_null(&t.imdb_votes),
-            box_office: Movie::check_for_null(&t.box_office),
-            production: Movie::check_for_null(&t.production),
+            imdb_votes: Movie::check_for_null(t.imdb_votes),
+            box_office: Movie::check_for_null(t.box_office),
+            production: Movie::check_for_null(t.production),
         }
     }
 }
