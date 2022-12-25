@@ -1,23 +1,30 @@
-type Genre {
+type Actor {
   name: String!
 }
-type Star {
+type Genre {
   name: String!
 }
 type Movie { # as stored in DB and queried by client
   id: String!
-  imDbID: String
-  image: String
+  imdbID: String
   title: String!
-  description: String
-  runtimeStr: String
-  genres: [Genre!]
+  year: String
+  released: String
   contentRating: String
-  imDbRating: String
-  imDbRatingVotes: String
-  metacriticRating: String
+  runtime: String
+  director: String
+  writer: String
+  actors: [Actor!]
   plot: String
-  stars: [Star!]
+  genres: [Genre!]
+  language: String
+  country: String
+  awards: String
+  image: String
+  ratings: [Rating!]
+  imdbVotes: String
+  boxOffice: String
+  production: String
 }
 
 extend type User @key(fields: "id") {
@@ -36,39 +43,62 @@ type Mutation {
   removeMovie(id: String!): User
 }
 
+type Rating {
+  source: String!
+  score: String!
+}
+
 input GenreInput {
   name: String!
 }
-input StarInput {
+input ActorInput {
   name: String!
 }
-input CreateMovieInput { # output of ImDB service && input to DB service
-  imDbID: String
-  image: String
-  title: String!
-  description: String
-  runtimeStr: String
-  genres: [GenreInput!]
+input RatingInput {
+  source: String!
+  score: String!
+}
+input CreateMovieInput { # output of movie_search_service && input to DB service
+  imdbID: String
+  title: String
+  year: String
+  released: String
   contentRating: String
-  imDbRating: String
-  imDbRatingVotes: String
-  metacriticRating: String
+  runtime: String
+  director: String
+  writer: String
+  actors: [ActorInput!]
   plot: String
-  stars: [StarInput!]
+  genres: [GenreInput!]
+  language: String
+  country: String
+  awards: String
+  image: String
+  ratings: [RatingInput!]
+  imdbVotes: String
+  boxOffice: String
+  production: String
 }
 
 input UpdateMovieInput { # unlikely to use
   id: String!
-  imDbID: String
-  image: String
+  imdbID: String
   title: String
-  description: String
-  runtimeStr: String
-  genres: [GenreInput]
+  year: String
+  released: String
   contentRating: String
-  imDbRating: String
-  imDbRatingVotes: String
-  metacriticRating: String
+  runtime: String
+  director: String
+  writer: String
+  actors: [ActorInput!]
   plot: String
-  stars: [StarInput]
+  genres: [GenreInput!]
+  language: String
+  country: String
+  awards: String
+  image: String
+  ratings: [RatingInput!]
+  imdbVotes: String
+  boxOffice: String
+  production: String
 }
