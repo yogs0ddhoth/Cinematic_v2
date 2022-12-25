@@ -10,6 +10,12 @@ export class Genre {
     unique: true,
   })
   name: string;
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    ref: 'Movie',
+  })
+  movies: Movie[];
 }
 
 export type GenreDocument = mongoose.HydratedDocument<Genre>;

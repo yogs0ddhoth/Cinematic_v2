@@ -1,8 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import {
-  Schema as MongooseSchema,
-  HydratedDocument as MongooseHydratedDocument,
-} from 'mongoose';
+import * as mongoose from 'mongoose';
 
 import { Genre } from './genre.schema';
 import { Actor } from './actor.schema';
@@ -35,7 +32,7 @@ export class Movie {
   writer: string;
 
   @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId }],
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
     ref: 'Actor',
   })
   actors: Actor[];
@@ -44,7 +41,7 @@ export class Movie {
   plot: string;
 
   @Prop({
-    type: [{ type: MongooseSchema.Types.ObjectId }],
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
     ref: 'Genre',
   })
   genres: Genre[];
@@ -76,6 +73,6 @@ export class Movie {
   production: string;
 }
 
-export type MovieDocument = MongooseHydratedDocument<Movie>;
+export type MovieDocument = mongoose.HydratedDocument<Movie>;
 
 export const MovieSchema = SchemaFactory.createForClass(Movie);
