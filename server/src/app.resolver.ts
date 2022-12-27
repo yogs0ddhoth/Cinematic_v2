@@ -18,7 +18,7 @@ export class AppResolver {
     try {
       console.log(userAuth);
       const user = await this.appService.getUser(userAuth);
-      return user;
+      return await this.appService.getUserMovies(user);
     } catch (error) {
       console.log(error);
       return error;
@@ -53,6 +53,7 @@ export class AppResolver {
     }
   }
 
+  // unlikely to use
   // @Mutation('updateMovie')
   // async updateMovie(
   //   @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
@@ -73,7 +74,7 @@ export class AppResolver {
       console.log(user);
       return user;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
       return error;
     }
   }
