@@ -1,5 +1,5 @@
 export class CreateMovie {
-  readonly imDbID?: string | null;
+  readonly imdbID?: string | null;
 
   readonly title: string;
   readonly year?: string | null;

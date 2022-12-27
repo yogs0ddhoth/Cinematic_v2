@@ -8,7 +8,7 @@ import { Rating, RatingSchema } from './rating.schema';
 @Schema()
 export class Movie {
   @Prop({ unique: true })
-  imDbID: string;
+  imdbID: string;
 
   @Prop()
   title: string;
