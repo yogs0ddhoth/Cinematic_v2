@@ -32,12 +32,10 @@ export class AppService {
     name,
     movieID,
   }: CreateGenre): Promise<mongoose.Types.ObjectId> {
-    // const genre = await this.genreService.get({ filter: { name } }); // query the database for genre by unique name
-
     try {
-      // get document and add reference to movies if not present;
-      // create document with reference if none found;
+      // find document by filter and add reference to movies if not present;
       const genre = await this.genreService.update({
+        // get document and add reference to movies if not present;
         filter: { name },
         update: {
           $addToSet: {
@@ -46,12 +44,14 @@ export class AppService {
         },
         options: {
           new: true,
+          // create document with reference if none found;
           upsert: true,
         },
       });
+
       if (!genre)
-        // error handling
-        throw new Error('Error: could not findOneAndUpdate ', {
+        // catch null return values
+        throw new Error('Error: findOneAndUpdate returned null', {
           cause: {
             value: { genre: name, movieID, upsert: true },
           },
@@ -73,8 +73,7 @@ export class AppService {
     movieID,
   }: CreateActor): Promise<mongoose.Types.ObjectId> {
     try {
-      // get document and add reference to movies if not present;
-      // create document with reference if none found;
+      // find document by filter and add reference to movies if not present;
       const actor = await this.actorService.update({
         filter: { name },
         update: {
@@ -84,12 +83,13 @@ export class AppService {
         },
         options: {
           new: true,
+          // create document with reference if none found;
           upsert: true,
         },
       });
       if (!actor)
-        // error handling
-        throw new Error('Error: could not findOneAndUpdate ', {
+        // catch null return values
+        throw new Error('Error: findOneAndUpdate returned null', {
           cause: {
             value: { actor: name, movieID, upsert: true },
           },
@@ -106,94 +106,95 @@ export class AppService {
    * @param genreIDs type mongoose.Types.ObjectId document references
    * @param actorIDs type mongoose.Types.ObjectId document references
    * @returns Promise: the associated Movie ID as a Mongoose ObjectId
-   * @type {CreateMovie}
-   *
-   * {
-   *   imDbID?: string | null;
-   *
-   *   title: string;
-   *
-   *   year?: string | null;
-   *
-   *   released?: string | null;
-   *
-   *   contentRating?: string | null;
-   *
-   *   runtime?: string | null;
-   *
-   *   director?: string | null;
-   *
-   *   writer?: string | null;
-   *
-   *   plot?: string | null;
-   *
-   *   language?: string | null;
-   *
-   *   country?: string | null;
-   *
-   *   awards?: string | null;
-   *
-   *   image?: string | null;
-   *
-   *   ratings?: { source: string; score: string }[] | null;
-   *
-   *   imdbVotes?: string | null;
-   *
-   *   boxOffice?: string | null;
-   *
-   *   production?: string | null;
-   * }
+   * @type {CreateMovie} see './models/movie/dto/create-movie.dto.ts'
    */
   async addMovie({
     genres,
     actors,
     ...movie
   }: CreateMovieInput): Promise<mongoose.Types.ObjectId> {
-    const existingMovie = await this.movieService.get({
-      filter: movie.imdbID ? { imdbID: movie.imdbID } : { title: movie.title },
-    }); // query the database for movie by imdbID or unique name
+    try {
+      const existingMovie = await this.movieService.get({
+        filter: movie.imdbID
+          ? { imdbID: movie.imdbID }
+          : { title: movie.title },
+      }); // query the database for movie by imdbID or unique name
 
-    const { _id: movieID } = existingMovie
-      ? existingMovie
-      : await this.movieService.create(movie); // create document if not found
+      const { _id: movieID } = existingMovie
+        ? existingMovie
+        : await this.movieService.create(movie); // create document if not found
 
-    const genreIDs: mongoose.Types.ObjectId[] = genres
-      ? await Promise.all(
-          genres.map(
-            // add movie reference to genres, create documents if not found
-            async ({ name }) => await this.addGenre({ name, movieID }),
-          ),
-        )
-      : [];
-    const actorIDs: mongoose.Types.ObjectId[] = actors
-      ? await Promise.all(
-          // add movie reference to actors, create documents if not found
-          actors.map(
-            async ({ name }) => await this.addActor({ name, movieID }),
-          ),
-        )
-      : [];
-    // add Genre and Actor references to Movie, if not there already
-    const updatedMovie = await this.movieService.update({
-      _id: movieID,
-      update: {
-        $addToSet: {
-          genres: { $each: genreIDs },
-          actors: { $each: actorIDs },
+      const genreIDs: mongoose.Types.ObjectId[] = genres
+        ? ((
+            await Promise.all(
+              genres.map(
+                // add movie reference to genres, create documents if not found
+                async ({ name }) => {
+                  try {
+                    return await this.addGenre({ name, movieID });
+                  } catch (error) {
+                    // throw MongooseErrors, log null return values
+                    if (error instanceof mongoose.MongooseError) {
+                      throw error;
+                    }
+                    console.log(error);
+                  }
+                },
+              ),
+            )
+          ).filter(
+            // filter out possible undefined results due to errors
+            (result) => result instanceof mongoose.Types.ObjectId,
+          ) as mongoose.Types.ObjectId[])
+        : [];
+
+      const actorIDs: mongoose.Types.ObjectId[] = actors
+        ? ((
+            await Promise.all(
+              // add movie reference to actors, create documents if not found
+              actors.map(async ({ name }) => {
+                try {
+                  return await this.addActor({ name, movieID });
+                } catch (error) {
+                  // throw MongooseErrors, log null return values
+                  if (error instanceof mongoose.MongooseError) {
+                    throw error;
+                  }
+                  console.log(error);
+                }
+              }),
+            )
+          ).filter(
+            // filter out possible undefined results due to errors
+            (result) => result instanceof mongoose.Types.ObjectId,
+          ) as mongoose.Types.ObjectId[])
+        : [];
+
+      // add Genre and Actor references to Movie, if not there already
+      const updatedMovie = await this.movieService.update({
+        _id: movieID,
+        update: {
+          $addToSet: {
+            genres: { $each: genreIDs },
+            actors: { $each: actorIDs },
+          },
         },
-      },
-      options: {
-        select: '_id',
-      },
-    });
-    if (!updatedMovie)
-      // handle possible errors
-      throw new Error('Error: could not update movie', {
-        cause: {
-          value: { existingMovie, genreIDs, actorIDs },
+        options: {
+          select: '_id',
         },
       });
-    return updatedMovie._id; // return created document ID
+
+      if (!updatedMovie)
+        // catch possible null return value
+        throw new Error('Error: findOneAndUpdate returned null', {
+          cause: {
+            value: { existingMovie, genreIDs, actorIDs },
+          },
+        });
+      return updatedMovie._id; // return created document ID
+    } catch (error) {
+      throw error;
+    }
   }
 
   /**
@@ -205,14 +206,26 @@ export class AppService {
   async addMovies(
     movies: CreateMovieInput[],
   ): Promise<mongoose.Types.ObjectId[]> {
-    return await Promise.all(
-      movies.map(async (movie) => {
-        const { _id: movieID } = await this.addMovie(movie);
-
-        // query movie ID, creating documents that don't exist
-        return movieID;
-      }),
-    );
+    return (
+      await Promise.all(
+        movies.map(async (movie) => {
+          try {
+            // query movie ID, creating documents that don't exist
+            const { _id: movieID } = await this.addMovie(movie);
+            return movieID;
+          } catch (error) {
+            // throw MongooseErrors, log null return values
+            if (error instanceof mongoose.MongooseError) {
+              throw error;
+            }
+            console.log(error);
+          }
+        }),
+      )
+    ).filter(
+      // filter out possible undefined responses due to errors
+      (result) => result instanceof mongoose.Types.ObjectId,
+    ) as mongoose.Types.ObjectId[];
   }
 
   /**
@@ -241,7 +254,8 @@ export class AppService {
     });
 
     if (!updatedUser)
-      throw new Error('Error: could not update User:', {
+      // catch possible null return value
+      throw new Error('Error: findByIdAndUpdate returned null', {
         cause: {
           value: { id, movieIDs },
         },
@@ -293,7 +307,7 @@ export class AppService {
     });
     if (!user)
       // throw error if document does not exist
-      throw new Error('Error: could not find User', {
+      throw new Error('Error: could not findOne User by id filter', {
         cause: { value: id },
       });
     return user;
