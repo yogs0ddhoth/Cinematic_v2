@@ -12,63 +12,94 @@ export interface GenreInput {
     name: string;
 }
 
-export interface StarInput {
+export interface ActorInput {
     name: string;
 }
 
+export interface RatingInput {
+    source: string;
+    score: string;
+}
+
 export interface CreateMovieInput {
-    imDbID?: Nullable<string>;
-    image?: Nullable<string>;
+    imdbID?: Nullable<string>;
     title: string;
-    description?: Nullable<string>;
-    runtimeStr?: Nullable<string>;
-    genres?: Nullable<GenreInput[]>;
+    year?: Nullable<string>;
+    released?: Nullable<string>;
     contentRating?: Nullable<string>;
-    imDbRating?: Nullable<string>;
-    imDbRatingVotes?: Nullable<string>;
-    metacriticRating?: Nullable<string>;
+    runtime?: Nullable<string>;
+    director?: Nullable<string>;
+    writer?: Nullable<string>;
+    actors?: Nullable<ActorInput[]>;
     plot?: Nullable<string>;
-    stars?: Nullable<StarInput[]>;
+    genres?: Nullable<GenreInput[]>;
+    language?: Nullable<string>;
+    country?: Nullable<string>;
+    awards?: Nullable<string>;
+    image?: Nullable<string>;
+    ratings?: Nullable<RatingInput[]>;
+    imdbVotes?: Nullable<string>;
+    boxOffice?: Nullable<string>;
+    production?: Nullable<string>;
 }
 
 export interface UpdateMovieInput {
     id: string;
-    imDbID?: Nullable<string>;
-    image?: Nullable<string>;
+    imdbID?: Nullable<string>;
     title?: Nullable<string>;
-    description?: Nullable<string>;
-    runtimeStr?: Nullable<string>;
-    genres?: Nullable<Nullable<GenreInput>[]>;
+    year?: Nullable<string>;
+    released?: Nullable<string>;
     contentRating?: Nullable<string>;
-    imDbRating?: Nullable<string>;
-    imDbRatingVotes?: Nullable<string>;
-    metacriticRating?: Nullable<string>;
+    runtime?: Nullable<string>;
+    director?: Nullable<string>;
+    writer?: Nullable<string>;
+    actors?: Nullable<ActorInput[]>;
     plot?: Nullable<string>;
-    stars?: Nullable<Nullable<StarInput>[]>;
+    genres?: Nullable<GenreInput[]>;
+    language?: Nullable<string>;
+    country?: Nullable<string>;
+    awards?: Nullable<string>;
+    image?: Nullable<string>;
+    ratings?: Nullable<RatingInput[]>;
+    imdbVotes?: Nullable<string>;
+    boxOffice?: Nullable<string>;
+    production?: Nullable<string>;
+}
+
+export interface Actor {
+    name: string;
 }
 
 export interface Genre {
     name: string;
 }
 
-export interface Star {
-    name: string;
-}
-
 export interface Movie {
     id: string;
-    imDbID?: Nullable<string>;
-    image?: Nullable<string>;
+    imdbID?: Nullable<string>;
     title: string;
-    description?: Nullable<string>;
-    runtimeStr?: Nullable<string>;
-    genres?: Nullable<Genre[]>;
+    year?: Nullable<string>;
+    released?: Nullable<string>;
     contentRating?: Nullable<string>;
-    imDbRating?: Nullable<string>;
-    imDbRatingVotes?: Nullable<string>;
-    metacriticRating?: Nullable<string>;
+    runtime?: Nullable<string>;
+    director?: Nullable<string>;
+    writer?: Nullable<string>;
+    actors?: Nullable<Actor[]>;
     plot?: Nullable<string>;
-    stars?: Nullable<Star[]>;
+    genres?: Nullable<Genre[]>;
+    language?: Nullable<string>;
+    country?: Nullable<string>;
+    awards?: Nullable<string>;
+    image?: Nullable<string>;
+    ratings?: Nullable<Rating[]>;
+    imdbVotes?: Nullable<string>;
+    boxOffice?: Nullable<string>;
+    production?: Nullable<string>;
+}
+
+export interface Rating {
+    source: string;
+    score: string;
 }
 
 export interface IQuery {
