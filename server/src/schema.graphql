@@ -27,6 +27,7 @@ type Movie { # as stored in DB and queried by client
   country: String
   awards: String
   image: String
+  trailers: [String]
 
   ratings: [Rating!]
   imdbVotes: String
@@ -88,6 +89,7 @@ input CreateMovieInput { # output of movie_search_service && input to DB service
   country: String
   awards: String
   image: String
+  trailers: [String]
 
   ratings: [RatingInput!]
   imdbVotes: String

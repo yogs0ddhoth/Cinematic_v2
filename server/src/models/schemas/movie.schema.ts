@@ -58,6 +58,9 @@ export class Movie {
   @Prop()
   image: string;
 
+  @Prop()
+  trailers: string[];
+
   @Prop({
     type: [RatingSchema],
   })
