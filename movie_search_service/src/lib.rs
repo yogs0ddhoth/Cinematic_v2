@@ -3,12 +3,15 @@ pub mod schema;
 
 use async_graphql::Object;
 use async_trait::async_trait;
-use futures::future;
+use futures::{stream, StreamExt};
 use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
 use reqwest;
 use schema::{Movie, SearchMovieInput};
 use serde;
 use std::env;
+
+// maximum number of concurrent requests
+const MAX_CONCURRENT_REQUESTS: usize = 50;
 
 #[async_trait]
 trait Request {
@@ -38,12 +41,17 @@ impl Request for reqwest::Client {
         &self,
         urls: Vec<String>,
     ) -> Vec<Result<T, reqwest::Error>> {
-        future::join_all(urls.iter().map(|url| async move {
-            match self.send_get_request::<T>(url).await {
-                Ok(result) => Ok(result),
-                Err(err) => Err(err),
-            }
-        }))
+        stream::iter( // convert the iterator of futures into a stream
+            urls.into_iter().map(|url| async move {
+                match self.send_get_request::<T>(&url).await {
+                    Ok(result) => Ok(result),
+                    Err(err) => Err(err),
+                }
+            })
+        )
+        // buffer the max number of concurrent requests at a time to prevent resource overload
+        .buffer_unordered(MAX_CONCURRENT_REQUESTS) 
+        .collect::<Vec<Result<T, reqwest::Error>>>()
         .await
     }
 }
@@ -329,13 +337,14 @@ mod tests {
         {
             // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
             let mut search_urls = Vec::new();
-            for i in 1..test_search_movie_input.pages {
+            for i in 1..test_search_movie_input.pages + 1 {
                 search_urls.push(format!(
                     "{url}&page={num}",
                     url = test_search_movie_input.fmt_omdb_url(),
                     num = i
                 ));
             }
+            assert!(search_urls.len() == 3);
 
             // concurrently send requests for each of the urls
             client
@@ -367,6 +376,6 @@ mod tests {
                 });
         }
         // this request should produce results
-        assert!(id_urls.len() > 0);
+        assert!(id_urls.len() == 30);
     }
 }
