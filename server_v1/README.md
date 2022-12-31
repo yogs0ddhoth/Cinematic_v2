@@ -1,1 +1,0 @@
-# DEPRICATED - THIS SERVICE HAS BEEN SPLIT INTO movie, auth, and imdb services
