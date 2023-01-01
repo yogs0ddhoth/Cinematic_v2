@@ -1,5 +1,6 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { Actor, Genre, Movie, Rating } from 'src/graphql';
 
 @Component({
   selector: 'app-movie-display',
@@ -8,9 +9,26 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 })
 export class MovieDisplayComponent implements OnInit {
   modalRef?: BsModalRef;
+  @Input() movie!: Movie;
+  genres?: Genre[];
+  actors?: Actor[];
+  ratings?: Rating[];
+  image?: string;
+  trailers?: string[];
+
   constructor(private readonly modalService: BsModalService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const { genres, actors, ratings, trailers, image, ...movie } = this.movie;
+
+    if (genres) this.genres = genres;
+    if (actors) this.actors = actors;
+    if (ratings) this.ratings = ratings;
+    if (image) this.image = image;
+    if (trailers) this.trailers = trailers;
+
+    this.movie = movie;
+  }
 
   openModal(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
