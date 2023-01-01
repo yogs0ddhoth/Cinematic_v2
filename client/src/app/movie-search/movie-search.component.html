@@ -1,0 +1,12 @@
+<div class="container">
+    <form>
+      <div class="input-group">
+        <input type="text" id="search-input" class="form-control" placeholder="Enter Your Movie Title Here">
+        <button class="btn btn-dark">Search</button>
+      </div>
+    </form>
+    
+    <div *ngFor="let movie of movies">
+      <app-movie-display *ngIf="movie" [movie]="movie"></app-movie-display>
+    </div>
+</div>

@@ -12,8 +12,8 @@ import { AppComponent } from './app.component';
 import { ApolloTestComponent } from './apollo-test/apollo-test.component';
 import { ImdbTestComponent } from './imdb-test/imdb-test.component';
 import { LayoutComponent } from './layout/layout.component';
-import { SearchFormComponent } from './search-form/search-form.component';
 import { MovieDisplayComponent } from './movie-display/movie-display.component';
+import { MovieSearchComponent } from './movie-search/movie-search.component';
 
 @NgModule({
   declarations: [
@@ -21,8 +21,8 @@ import { MovieDisplayComponent } from './movie-display/movie-display.component';
     ApolloTestComponent,
     ImdbTestComponent,
     LayoutComponent,
-    SearchFormComponent,
     MovieDisplayComponent,
+    MovieSearchComponent,
   ],
   imports: [
     BrowserModule,
