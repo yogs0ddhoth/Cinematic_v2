@@ -89,7 +89,7 @@ input CreateMovieInput { # output of movie_search_service && input to DB service
   country: String
   awards: String
   image: String
-  trailers: [String]
+  trailers: [String!]
 
   ratings: [RatingInput!]
   imdbVotes: String
