@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "generate": "ts-node --transpile-only generate-typings && cd ./src/movies && prisma generate && prisma db push",
+    "generate": "ts-node --transpile-only generate-typings",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -22,6 +22,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@apollo/federation": "^0.38.1",
     "@apollo/subgraph": "^2.2.1",
     "@nestjs/apollo": "^10.1.7",
     "@nestjs/common": "^9.0.0",
