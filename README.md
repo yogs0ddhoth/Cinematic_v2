@@ -17,13 +17,13 @@ A backend for third-party API calls, data persistance, and user auth, incorporat
             - &check; update models and services according to schema changes
             - add genre(GenreInput): Genre, actor(ActorInput): Actor resolvers
             - write unit tests for AppService
-        - **Trailer Search** - TODO:
-            - implement microservice to query Youtube API for movie trailers and filter results for relevance
+        - **Trailer Search** - 
+            - implement microservice to query Youtube API for movie trailers &check; and filter results for relevance
             - respond with selected list of url paths 
     - Configure supergraph and apollo router
 * **Fill out Client**:
     - replace legacy jquery rendering with angular/ngx-bootstrap rendering
-    - create user authentication (login/logout) and profile components
+    - create user authentication (login/logout forms) and profile components
     - create navbar components to link homepage, profile, and auth
 * **Configure Docker**:
     - finish docker/compose files
