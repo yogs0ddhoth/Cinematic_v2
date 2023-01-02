@@ -37,17 +37,17 @@ async fn main() -> std::io::Result<()> {
         },
         _ => "127.0.0.1",
     };
-    println!("Listening at: http://{address}:{port}");
+    println!("Listening at: http://{address}:{port}/graphql");
 
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(schema.clone()))
             .service(
-                web::resource("/")
+                web::resource("/graphql")
                     .guard(guard::Get())
                     .to(graphql_playground),
             )
-            .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(web::resource("/graphql").guard(guard::Post()).to(index))
     })
     .bind((address, port))?
     .run()

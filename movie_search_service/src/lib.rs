@@ -1,7 +1,7 @@
 pub mod omdb;
 pub mod schema;
 
-use async_graphql::Object;
+use async_graphql::{Object, Context};
 use async_trait::async_trait;
 use futures::{stream, StreamExt};
 use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
@@ -56,70 +56,87 @@ impl Request for reqwest::Client {
     }
 }
 
+#[tokio::main]
+async fn omdb_search(search_movie_input: SearchMovieInput) -> Vec<Movie> {
+    let client = reqwest::Client::new();
+    let mut id_urls = Vec::new();
+    {
+        // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
+        let mut search_urls = Vec::new();
+        for i in 1..search_movie_input.pages + 1 {
+            // for pagination
+            // push urls for each page (see omdb api) to search_urls
+            search_urls.push(format!(
+                "{url}&page={num}",
+                url = search_movie_input.fmt_omdb_url(),
+                num = i
+            ));
+        }
+        // concurrently send requests for each of the urls
+        client
+            .send_many_get_requests::<OMDbSearchData>(search_urls)
+            .await
+            .iter()
+            .for_each(|results| {
+                // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
+                println!("Filtering results...");
+                match results {
+                    Ok(data) => match &data.search {
+                        Some(result_page) => {
+                            for result in result_page {
+                                id_urls.push(result.fmt_omdb_url())
+                            }
+                        }
+                        None => match &data.error {
+                            Some(err) => println!("Found an Error: {}", err),
+                            None => (),
+                        },
+                    },
+                    Err(err) => println!("Found an Error: {:#?}", err),
+                }
+            });
+    }
+
+    let mut movies = Vec::new();
+    {
+        // concurrently send requests for each of the id url
+        client
+            .send_many_get_requests::<OMDbMovie>(id_urls)
+            .await
+            .into_iter()
+            .for_each(|result| {
+                // Filter out error responses, and push to movies
+                println!("Filtering results...");
+                match result {
+                    Ok(movie) => movies.push(Movie::from(movie)),
+                    Err(err) => println!("Found an Error: {:#?}", err),
+                }
+            });
+    }
+    println!("Done! Sending response...");
+    movies
+}
+
+
 pub struct Query;
 #[Object]
 impl Query {
+    
     async fn search_movies(
         &self,
         search_movie_input: SearchMovieInput,
-    ) -> Result<Vec<Movie>, reqwest::Error> {
-        let client = reqwest::Client::new();
-        let mut id_urls = Vec::new();
-        {
-            // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
-            let mut search_urls = Vec::new();
-            for i in 1..search_movie_input.pages + 1 {
-                // for pagination
-                // push urls for each page (see omdb api) to search_urls
-                search_urls.push(format!(
-                    "{url}&page={num}",
-                    url = search_movie_input.fmt_omdb_url(),
-                    num = i
-                ));
-            }
-            // concurrently send requests for each of the urls
-            client
-                .send_many_get_requests::<OMDbSearchData>(search_urls)
-                .await
-                .iter()
-                .for_each(|results| {
-                    // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
-                    println!("Filtering results...");
-                    match results {
-                        Ok(data) => match &data.search {
-                            Some(result_page) => {
-                                for result in result_page {
-                                    id_urls.push(result.fmt_omdb_url())
-                                }
-                            }
-                            None => match &data.error {
-                                Some(err) => println!("Found an Error: {}", err),
-                                None => (),
-                            },
-                        },
-                        Err(err) => println!("Found an Error: {:#?}", err),
-                    }
-                });
-        }
+    ) -> Vec<Movie> {
+        omdb_search(search_movie_input)
+    }
 
-        let mut movies = Vec::new();
-        {
-            // concurrently send requests for each of the id url
-            client
-                .send_many_get_requests::<OMDbMovie>(id_urls)
-                .await
-                .into_iter()
-                .for_each(|result| {
-                    // Filter out error responses, convert OMDbMovie to Movie, and push to movies
-                    println!("Filtering results...");
-                    match result {
-                        Ok(movie) => movies.push(Movie::from(movie)),
-                        Err(err) => println!("Found an Error: {:#?}", err),
-                    }
-                });
-        }
-        println!("Done! Sending response...");
-        Ok(movies)
+    #[graphql(entity)]
+    async fn find_movie_by_title<'a>(
+        &self,
+        ctx: &'a Context<'_>,
+        #[graphql(key)] title: String,
+    ) -> Option<&'a Movie> {
+        let movies = ctx.data_unchecked::<Vec<Movie>>();
+        movies.iter().find(|movie| movie.title == title)
     }
 }
 
