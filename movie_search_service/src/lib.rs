@@ -1,7 +1,7 @@
 pub mod omdb;
 pub mod schema;
 
-use async_graphql::{ComplexObject, Context, Object};
+use async_graphql::Object;
 use async_trait::async_trait;
 use futures::{stream, StreamExt};
 use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
