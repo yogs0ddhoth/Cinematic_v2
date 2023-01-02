@@ -1,0 +1,75 @@
+type Actor {
+	name: String!
+}
+
+
+
+type Genre {
+	name: String!
+}
+
+
+
+type Movie {
+	imdbID: String
+	title: String!
+	year: String
+	released: String
+	contentRating: String
+	runtime: String
+	director: String
+	writer: String
+	actors: [Actor!]
+	plot: String
+	genres: [Genre!]
+	language: String
+	country: String
+	awards: String
+	image: String
+	trailers: MovieTrailers!
+	ratings: [Rating!]
+	imdbVotes: String
+	boxOffice: String
+	production: String
+}
+
+type MovieTrailers {
+	title: String!
+}
+
+type Query {
+	searchMovies(searchMovieInput: SearchMovieInput!): [Movie!]!
+	_service: _Service!
+	_entities(representations: [_Any!]!): [_Entity]!
+}
+
+type Rating {
+	source: String!
+	score: String!
+}
+
+input SearchMovieInput {
+	contentRating: String! = ""
+	genres: String! = ""
+	releaseYear: String! = ""
+	userRating: String! = ""
+	title: String! = ""
+	pages: Int! = 1
+}
+
+
+"""
+The `_Any` scalar is used to pass representations of entities from external
+services into the root `_entities` field for execution.
+"""
+scalar _Any
+
+union _Entity = MovieTrailers
+
+type _Service {
+	sdl: String
+}
+
+schema {
+	query: Query
+}

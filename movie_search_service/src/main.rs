@@ -1,3 +1,5 @@
+use std::fs;
+
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
@@ -28,6 +30,7 @@ async fn main() -> std::io::Result<()> {
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .enable_federation()
         .finish();
+    fs::write("schema.graphql", &schema.sdl()).unwrap();
     /* Configure URL */
     let port = 4003;
     let address = match std::env::var("PROCESS") {
