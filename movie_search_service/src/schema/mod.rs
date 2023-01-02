@@ -12,6 +12,11 @@ pub struct Actor {
 }
 
 #[derive(Debug, SimpleObject)]
+pub struct MovieTrailers {
+    pub title: String,
+}
+
+#[derive(Debug, SimpleObject)]
 pub struct Rating {
     pub source: String,
     pub score: String,
@@ -40,6 +45,7 @@ pub struct Movie {
     pub country: Option<String>,
     pub awards: Option<String>,
     pub image: Option<String>,
+    pub trailers: MovieTrailers,
 
     pub ratings: Option<Vec<Rating>>,
     pub imdb_votes: Option<String>,
