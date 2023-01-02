@@ -1,12 +1,12 @@
 pub mod omdb;
 pub mod schema;
 
-use async_graphql::{Object, Context};
+use async_graphql::{ComplexObject, Context, Object};
 use async_trait::async_trait;
 use futures::{stream, StreamExt};
 use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
 use reqwest;
-use schema::{Movie, SearchMovieInput};
+use schema::{Movie, MovieTrailers, SearchMovieInput};
 use serde;
 use std::env;
 
@@ -41,102 +41,109 @@ impl Request for reqwest::Client {
         &self,
         urls: Vec<String>,
     ) -> Vec<Result<T, reqwest::Error>> {
-        stream::iter( // convert the iterator of futures into a stream
+        stream::iter(
+            // convert the iterator of futures into a stream
             urls.into_iter().map(|url| async move {
                 match self.send_get_request::<T>(&url).await {
                     Ok(result) => Ok(result),
                     Err(err) => Err(err),
                 }
-            })
+            }),
         )
         // buffer the max number of concurrent requests at a time to prevent resource overload
-        .buffer_unordered(MAX_CONCURRENT_REQUESTS) 
+        .buffer_unordered(MAX_CONCURRENT_REQUESTS)
         .collect::<Vec<Result<T, reqwest::Error>>>()
         .await
     }
 }
 
-#[tokio::main]
-async fn omdb_search(search_movie_input: SearchMovieInput) -> Vec<Movie> {
-    let client = reqwest::Client::new();
-    let mut id_urls = Vec::new();
-    {
-        // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
-        let mut search_urls = Vec::new();
-        for i in 1..search_movie_input.pages + 1 {
-            // for pagination
-            // push urls for each page (see omdb api) to search_urls
-            search_urls.push(format!(
-                "{url}&page={num}",
-                url = search_movie_input.fmt_omdb_url(),
-                num = i
-            ));
+impl OMDbMovie {
+    /// Check String, and if "N/A", return None
+    pub fn check_for_null(field: Option<String>) -> Option<String> {
+        match field {
+            Some(data) => match data.as_str() {
+                "N/A" => None,
+                _ => Some(data.to_string()),
+            },
+            None => None,
         }
-        // concurrently send requests for each of the urls
-        client
-            .send_many_get_requests::<OMDbSearchData>(search_urls)
-            .await
-            .iter()
-            .for_each(|results| {
-                // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
-                println!("Filtering results...");
-                match results {
-                    Ok(data) => match &data.search {
-                        Some(result_page) => {
-                            for result in result_page {
-                                id_urls.push(result.fmt_omdb_url())
+    }
+
+    async fn get_omdb_movies(search_movie_input: SearchMovieInput) -> Vec<OMDbMovie> {
+        let client = reqwest::Client::new();
+        let mut id_urls = Vec::new();
+        {
+            // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
+            let mut search_urls = Vec::new();
+            for i in 1..search_movie_input.pages + 1 {
+                // for pagination
+                // push urls for each page (see omdb api) to search_urls
+                search_urls.push(format!(
+                    "{url}&page={num}",
+                    url = search_movie_input.fmt_omdb_url(),
+                    num = i
+                ));
+            }
+            // concurrently send requests for each of the urls
+            client
+                .send_many_get_requests::<OMDbSearchData>(search_urls)
+                .await
+                .iter()
+                .for_each(|results| {
+                    // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
+                    println!("Filtering results...");
+                    match results {
+                        Ok(data) => match &data.search {
+                            Some(result_page) => {
+                                for result in result_page {
+                                    id_urls.push(result.fmt_omdb_url())
+                                }
                             }
-                        }
-                        None => match &data.error {
-                            Some(err) => println!("Found an Error: {}", err),
-                            None => (),
+                            None => match &data.error {
+                                Some(err) => println!("Found an Error: {}", err),
+                                None => (),
+                            },
                         },
-                    },
-                    Err(err) => println!("Found an Error: {:#?}", err),
-                }
-            });
-    }
+                        Err(err) => println!("Found an Error: {:#?}", err),
+                    }
+                });
+        }
 
-    let mut movies = Vec::new();
-    {
-        // concurrently send requests for each of the id url
-        client
-            .send_many_get_requests::<OMDbMovie>(id_urls)
-            .await
-            .into_iter()
-            .for_each(|result| {
-                // Filter out error responses, and push to movies
-                println!("Filtering results...");
-                match result {
-                    Ok(movie) => movies.push(Movie::from(movie)),
-                    Err(err) => println!("Found an Error: {:#?}", err),
-                }
-            });
+        let mut movies = Vec::new();
+        {
+            // concurrently send requests for each of the id url
+            client
+                .send_many_get_requests::<OMDbMovie>(id_urls)
+                .await
+                .into_iter()
+                .for_each(|result| {
+                    // Filter out error responses, and push to movies
+                    println!("Filtering results...");
+                    match result {
+                        Ok(movie) => movies.push(movie),
+                        Err(err) => println!("Found an Error: {:#?}", err),
+                    }
+                });
+        }
+        println!("Done! Sending response...");
+        movies
     }
-    println!("Done! Sending response...");
-    movies
 }
-
 
 pub struct Query;
 #[Object]
 impl Query {
-    
-    async fn search_movies(
-        &self,
-        search_movie_input: SearchMovieInput,
-    ) -> Vec<Movie> {
-        omdb_search(search_movie_input)
+    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
+        let movies = OMDbMovie::get_omdb_movies(search_movie_input).await;
+        movies.into_iter().map(|movie| Movie::from(movie)).collect()
     }
 
     #[graphql(entity)]
-    async fn find_movie_by_title<'a>(
+    async fn find_movie_trailers_by_title<'a>(
         &self,
-        ctx: &'a Context<'_>,
         #[graphql(key)] title: String,
-    ) -> Option<&'a Movie> {
-        let movies = ctx.data_unchecked::<Vec<Movie>>();
-        movies.iter().find(|movie| movie.title == title)
+    ) -> MovieTrailers {
+        MovieTrailers { title }
     }
 }
 
@@ -173,32 +180,20 @@ impl FormatUrl for OMDbSearchResult {
     }
 }
 
-impl Movie {
-    /// Check String, and if "N/A", return None
-    pub fn check_for_null(field: Option<String>) -> Option<String> {
-        match field {
-            Some(data) => match data.as_str() {
-                "N/A" => None,
-                _ => Some(data.to_string()),
-            },
-            None => None,
-        }
-    }
-}
 impl From<OMDbMovie> for Movie {
     fn from(t: OMDbMovie) -> Self {
         Movie {
             imdb_id: Some(t.imdb_id),
 
-            title: t.title,
-            year: Movie::check_for_null(t.year),
-            released: Movie::check_for_null(t.released),
-            content_rating: Movie::check_for_null(t.rated),
-            runtime: Movie::check_for_null(t.runtime),
+            title: String::from(&t.title),
+            year: OMDbMovie::check_for_null(t.year),
+            released: OMDbMovie::check_for_null(t.released),
+            content_rating: OMDbMovie::check_for_null(t.rated),
+            runtime: OMDbMovie::check_for_null(t.runtime),
 
-            director: Movie::check_for_null(t.director),
-            writer: Movie::check_for_null(t.writer),
-            actors: match Movie::check_for_null(t.actors) {
+            director: OMDbMovie::check_for_null(t.director),
+            writer: OMDbMovie::check_for_null(t.writer),
+            actors: match OMDbMovie::check_for_null(t.actors) {
                 Some(actors) => match actors.len() > 0 {
                     true => Some(
                         actors
@@ -213,8 +208,8 @@ impl From<OMDbMovie> for Movie {
                 None => None,
             },
 
-            plot: Movie::check_for_null(t.plot),
-            genres: match Movie::check_for_null(t.genre) {
+            plot: OMDbMovie::check_for_null(t.plot),
+            genres: match OMDbMovie::check_for_null(t.genre) {
                 Some(genres) => match genres.len() > 0 {
                     true => Some(
                         genres
@@ -229,10 +224,12 @@ impl From<OMDbMovie> for Movie {
                 None => None,
             },
 
-            language: Movie::check_for_null(t.language),
-            country: Movie::check_for_null(t.country),
-            awards: Movie::check_for_null(t.awards),
-            image: Movie::check_for_null(t.poster),
+            language: OMDbMovie::check_for_null(t.language),
+            country: OMDbMovie::check_for_null(t.country),
+            awards: OMDbMovie::check_for_null(t.awards),
+            image: OMDbMovie::check_for_null(t.poster),
+
+            trailers: MovieTrailers { title: t.title },
 
             ratings: match t.ratings.len() > 0 {
                 true => Some(
@@ -247,9 +244,9 @@ impl From<OMDbMovie> for Movie {
                 false => None,
             },
 
-            imdb_votes: Movie::check_for_null(t.imdb_votes),
-            box_office: Movie::check_for_null(t.box_office),
-            production: Movie::check_for_null(t.production),
+            imdb_votes: OMDbMovie::check_for_null(t.imdb_votes),
+            box_office: OMDbMovie::check_for_null(t.box_office),
+            production: OMDbMovie::check_for_null(t.production),
         }
     }
 }
