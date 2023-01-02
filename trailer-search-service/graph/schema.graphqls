@@ -1,0 +1,8 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+type MovieTrailers @key(fields: "title") {
+  title: String!
+  trailers: [String!]
+}
