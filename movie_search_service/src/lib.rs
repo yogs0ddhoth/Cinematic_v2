@@ -4,11 +4,11 @@ pub mod schema;
 use async_graphql::Object;
 use async_trait::async_trait;
 use futures::{stream, StreamExt};
-use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
+use omdb::{OMDbMovie, OMDbSearchData, OMDbSearchResult, OMDbRating};
 use reqwest;
-use schema::{Movie, MovieTrailers, SearchMovieInput};
+use schema::{Movie, MovieTrailers, SearchMovieInput, RatingInput};
 use serde;
-use std::env;
+use std::{env, collections::HashMap};
 
 // maximum number of concurrent requests
 const MAX_CONCURRENT_REQUESTS: usize = 50;
@@ -58,17 +58,6 @@ impl Request for reqwest::Client {
 }
 
 impl OMDbMovie {
-    /// Check String, and if "N/A", return None
-    pub fn check_for_null(field: Option<String>) -> Option<String> {
-        match field {
-            Some(data) => match data.as_str() {
-                "N/A" => None,
-                _ => Some(data.to_string()),
-            },
-            None => None,
-        }
-    }
-
     async fn get_omdb_movies(search_movie_input: SearchMovieInput) -> Vec<OMDbMovie> {
         let client = reqwest::Client::new();
         let mut id_urls = Vec::new();
@@ -158,19 +147,64 @@ impl FormatUrl for SearchMovieInput {
 impl SearchMovieInput {
     /// Apply filters, if defined, to movie
     /// Returns true if the movie matches filters
-    fn match_filters(&self, movie: &OMDbMovie) -> bool {
+    fn match_filters(&self, OMDbMovie { rated, genre, ratings, .. }: &OMDbMovie) -> bool {
         if let Some(content_rating) = &self.content_rating {
-            if let Some(rated) = &movie.rated {
-                if !(content_rating == rated) {
+            match rated {
+                Some(rated) => if !(content_rating == rated) {
                     return false;
                 }
+                None => return false,
             }
         }
         if let Some(genres) = &self.genres {
-            if let Some(genre) = &movie.genre {
-                if !genre.contains(genres) {
+            match genre {
+                Some(genre) => if !genre.contains(genres) {
                     return false;
                 }
+                None => return false,
+            }
+            return false;
+        }
+        if let Some(ratings_filter) = &self.ratings {
+            match ratings {
+                Some(ratings) => {
+                    let mut ratings_map: HashMap<String, String> = HashMap::new();
+                    for OMDbRating { source, value } in ratings {
+                        ratings_map.insert(source.to_string(), value.to_string());
+                    }
+
+                    for RatingInput { source, score } in ratings_filter {
+                        match ratings_map.contains_key(source) {
+                            true => match source.as_str() {
+                                // TODO: ADD ERROR HANDLING AND TEST
+                                "Internet Movie Database" | "Metacritic" => {
+                                    let rating_value = ratings_map.get(source).unwrap()
+                                        .trim().split("/").next().unwrap()
+                                        .parse::<f64>().unwrap()
+                                    ;
+                                    if score < &rating_value {
+                                        return false
+                                    }
+                                }
+                                "Rotten Tomatoes" => {
+                                    let rating_value = ratings_map.get(source).unwrap()
+                                        .trim().split("%").next().unwrap()
+                                        .parse::<f64>().unwrap()
+                                    ;
+                                    if score < &rating_value {
+                                        return false
+                                    }
+                                }
+                                _ => {
+                                    println!("Invalid Rating Source: {}", source);
+                                    continue;
+                                }
+                            }
+                            false => return false,
+                        }
+                    }
+                }
+                None => return false,
             }
         }
         true
@@ -187,20 +221,32 @@ impl FormatUrl for OMDbSearchResult {
     }
 }
 
+impl Movie {
+    /// Check String, and if "N/A", return None
+    fn check_for_null(field: Option<String>) -> Option<String> {
+        match field {
+            Some(data) => match data.as_str() {
+                "N/A" => None,
+                _ => Some(data.to_string()),
+            },
+            None => None,
+        }
+    }
+}
 impl From<OMDbMovie> for Movie {
     fn from(t: OMDbMovie) -> Self {
         Movie {
             imdb_id: Some(t.imdb_id),
 
             title: String::from(&t.title),
-            year: OMDbMovie::check_for_null(t.year),
-            released: OMDbMovie::check_for_null(t.released),
-            content_rating: OMDbMovie::check_for_null(t.rated),
-            runtime: OMDbMovie::check_for_null(t.runtime),
+            year: Self::check_for_null(t.year),
+            released: Self::check_for_null(t.released),
+            content_rating: Self::check_for_null(t.rated),
+            runtime: Self::check_for_null(t.runtime),
 
-            director: OMDbMovie::check_for_null(t.director),
-            writer: OMDbMovie::check_for_null(t.writer),
-            actors: match OMDbMovie::check_for_null(t.actors) {
+            director: Self::check_for_null(t.director),
+            writer: Self::check_for_null(t.writer),
+            actors: match Self::check_for_null(t.actors) {
                 Some(actors) => match actors.len() > 0 {
                     true => Some(
                         actors
@@ -215,8 +261,8 @@ impl From<OMDbMovie> for Movie {
                 None => None,
             },
 
-            plot: OMDbMovie::check_for_null(t.plot),
-            genres: match OMDbMovie::check_for_null(t.genre) {
+            plot: Self::check_for_null(t.plot),
+            genres: match Self::check_for_null(t.genre) {
                 Some(genres) => match genres.len() > 0 {
                     true => Some(
                         genres
@@ -231,29 +277,29 @@ impl From<OMDbMovie> for Movie {
                 None => None,
             },
 
-            language: OMDbMovie::check_for_null(t.language),
-            country: OMDbMovie::check_for_null(t.country),
-            awards: OMDbMovie::check_for_null(t.awards),
-            image: OMDbMovie::check_for_null(t.poster),
+            language: Self::check_for_null(t.language),
+            country: Self::check_for_null(t.country),
+            awards: Self::check_for_null(t.awards),
+            image: Self::check_for_null(t.poster),
 
             trailers: MovieTrailers { title: t.title },
 
-            ratings: match t.ratings.len() > 0 {
-                true => Some(
-                    t.ratings
+            ratings: match t.ratings {
+                Some(ratings) => Some(
+                    ratings
                         .iter()
-                        .map(|rating| schema::Rating {
-                            source: rating.source.to_string(),
-                            score: rating.value.to_string(),
+                        .map(|OMDbRating { source, value }| schema::Rating {
+                            source: source.to_string(),
+                            score: value.to_string(),
                         })
                         .collect(),
                 ),
-                false => None,
+                None => None,
             },
 
-            imdb_votes: OMDbMovie::check_for_null(t.imdb_votes),
-            box_office: OMDbMovie::check_for_null(t.box_office),
-            production: OMDbMovie::check_for_null(t.production),
+            imdb_votes: Self::check_for_null(t.imdb_votes),
+            box_office: Self::check_for_null(t.box_office),
+            production: Self::check_for_null(t.production),
         }
     }
 }
@@ -286,7 +332,7 @@ mod tests {
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
             release_year: String::new(),
-            user_rating: None,
+            ratings: None,
             pages: 1,
             content_rating: None,
             genres: None,
@@ -316,7 +362,7 @@ mod tests {
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
             release_year: String::new(),
-            user_rating: None,
+            ratings: None,
             pages: 1,
             content_rating: None,
             genres: None,
@@ -337,8 +383,6 @@ mod tests {
 
         match (omdb_results_1, omdb_results_2) {
             (Ok(result_1), Ok(result_2)) => {
-                // println!("{:#?}", result_1);
-                // println!("{:#?}", result_2);
                 assert!(result_1.search.is_some());
                 assert!(result_2.imdb_id == "tt0076759");
             }
@@ -364,7 +408,7 @@ mod tests {
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
             release_year: String::new(),
-            user_rating: None,
+            ratings: None,
             pages: 3,
             content_rating: Some(String::from("PG")),
             genres: Some(String::from("Action")),
@@ -443,5 +487,6 @@ mod tests {
                 });
         }
         assert!(movies.len() > 0);
+        println!("{:#?}", movies);
     }
 }

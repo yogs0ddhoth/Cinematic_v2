@@ -1,6 +1,5 @@
 use async_graphql::{InputObject, SimpleObject};
 
-/* TODO: refactor to accomidate new omdb results */
 #[derive(Debug, SimpleObject)]
 pub struct Genre {
     pub name: String,
@@ -59,7 +58,7 @@ pub struct Movie {
 pub struct SearchMovieInput {
     pub content_rating: Option<String>,
     pub genres: Option<String>,
-    pub user_rating: Option<String>,
+    pub ratings: Option<Vec<RatingInput>>,
 
     #[graphql(default)]
     pub release_year: String,
@@ -69,4 +68,11 @@ pub struct SearchMovieInput {
 
     #[graphql(default = 1)]
     pub pages: i32,
+}
+
+#[derive(Debug, InputObject)]
+#[graphql(rename_fields = "camelCase")]
+pub struct RatingInput {
+    pub source: String,
+    pub score: f64,
 }

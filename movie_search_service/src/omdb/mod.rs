@@ -46,7 +46,7 @@ pub struct OMDbMovie {
     pub awards: Option<String>,
     pub poster: Option<String>,
 
-    pub ratings: Vec<OMDbRating>,
+    pub ratings: Option<Vec<OMDbRating>>,
     pub metascore: Option<String>,
     #[serde(rename = "imdbRating")]
     pub imdb_rating: Option<String>,
