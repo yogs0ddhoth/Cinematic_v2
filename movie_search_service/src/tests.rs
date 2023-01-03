@@ -1,6 +1,6 @@
 use super::*;
 use crate::client::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
-use crate::schema::{Movie, MovieTrailers, SearchMovieInput};
+use crate::schema::{SearchMovieInput, RatingInput};
 use dotenvy::dotenv;
 use tokio;
 
@@ -85,7 +85,22 @@ async fn many_get_requests_with_filters_work() {
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
-        ratings: None,
+        ratings: Some(
+            vec![
+                RatingInput {
+                    source: String::from("Metacritic"),
+                    score: 60.0,
+                },
+                RatingInput {
+                    source: String::from("Internet Movie Database"),
+                    score: 6.0,
+                },
+                RatingInput {
+                    source: String::from("Rotten Tomatoes"),
+                    score: 60.0,
+                }
+            ]
+        ),
         pages: 3,
         content_rating: Some(String::from("PG")),
         genres: Some(String::from("Action")),
@@ -153,7 +168,7 @@ async fn many_get_requests_with_filters_work() {
                             println!("{:#?}", movie);
                             assert_eq!(movie.rated, test_search_movie_input.content_rating);
                             if let Some(genre) = &movie.genre {
-                                assert!(genre.contains(&String::from("PG")));
+                                assert!(genre.contains("PG"));
                             } else {
                                 panic!("match_filters failed to filter out None values")
                             }
@@ -170,4 +185,40 @@ async fn many_get_requests_with_filters_work() {
     }
     // assert!(movies.len() > 0);
     println!("{:#?}", movies);
+}
+
+#[tokio::test]
+async fn match_filters_works() {
+    dotenv().ok();
+
+    let test_search_movie_input = SearchMovieInput {
+        title: String::new(),
+        release_year: String::new(),
+        ratings: Some(
+            vec![
+                RatingInput {
+                    source: String::from("Metacritic"),
+                    score: 80.0,
+                },
+                RatingInput {
+                    source: String::from("Internet Movie Database"),
+                    score: 8.0,
+                },
+                RatingInput {
+                    source: String::from("Rotten Tomatoes"),
+                    score: 80.0,
+                }
+            ]
+        ),
+        pages: 1,
+        content_rating: Some(String::from("PG")),
+        genres: Some(String::from("Action")),
+    };
+    let test_omdb_search_result = OMDbSearchResult {
+        imdb_id: String::from("tt0080684"),
+    };
+    let client = reqwest::Client::new();
+    let omdb_movie = client.send_get_request::<OMDbMovie>(&test_omdb_search_result.fmt_omdb_url()).await.unwrap();
+    println!("{:#?}", omdb_movie);
+    assert!(test_search_movie_input.match_filters(&omdb_movie));
 }

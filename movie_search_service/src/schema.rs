@@ -3,7 +3,7 @@ use super::{
     Filter, FormatUrl,
 };
 use async_graphql::{InputObject, Object, SimpleObject};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, SimpleObject)]
 pub struct Genre {
@@ -115,69 +115,76 @@ impl Filter<OMDbMovie> for SearchMovieInput {
                 None => return false,
             }
         }
-        if let Some(genres) = &self.genres {
+        if let Some(genre_filters) = &self.genres {
             match genre {
                 Some(genre) => {
-                    if !genre.contains(genres) {
-                        return false;
+                    let mut genre_list: HashSet<&str> = HashSet::new();
+                    for genre_name in genre.split(", ") {
+                        genre_list.insert(genre_name);
+                    }
+
+                    for filter in genre_filters.split(", ") {
+                        if !genre_list.contains(filter) {
+                            return false;
+                        }
                     }
                 }
                 None => return false,
             }
-            return false;
         }
-        // if let Some(ratings_filter) = &self.ratings {
-        //     match ratings {
-        //         Some(ratings) => {
-        //             let mut ratings_map: HashMap<String, String> = HashMap::new();
-        //             for OMDbRating { source, value } in ratings {
-        //                 ratings_map.insert(source.to_string(), value.to_string());
-        //             }
+        if let Some(ratings_filter) = &self.ratings {
+            match ratings {
+                Some(ratings) => {
+                    let mut ratings_map: HashMap<String, String> = HashMap::new();
+                    for OMDbRating { source, value } in ratings {
+                        ratings_map.insert(source.to_string(), value.to_string());
+                    }
 
-        //             for RatingInput { source, score } in ratings_filter {
-        //                 match ratings_map.contains_key(source) {
-        //                     true => match source.as_str() {
-        //                         // TODO: ADD ERROR HANDLING AND TEST
-        //                         "Internet Movie Database" | "Metacritic" => {
-        //                             let rating_value = ratings_map
-        //                                 .get(source)
-        //                                 .unwrap()
-        //                                 .trim()
-        //                                 .split("/")
-        //                                 .next()
-        //                                 .unwrap()
-        //                                 .parse::<f64>()
-        //                                 .unwrap();
-        //                             if score < &rating_value {
-        //                                 return false;
-        //                             }
-        //                         }
-        //                         "Rotten Tomatoes" => {
-        //                             let rating_value = ratings_map
-        //                                 .get(source)
-        //                                 .unwrap()
-        //                                 .trim()
-        //                                 .split("%")
-        //                                 .next()
-        //                                 .unwrap()
-        //                                 .parse::<f64>()
-        //                                 .unwrap();
-        //                             if score < &rating_value {
-        //                                 return false;
-        //                             }
-        //                         }
-        //                         _ => {
-        //                             println!("Invalid Rating Source: {}", source);
-        //                             continue;
-        //                         }
-        //                     },
-        //                     false => return false,
-        //                 }
-        //             }
-        //         }
-        //         None => return false,
-        //     }
-        // }
+                    for RatingInput { source, score } in ratings_filter {
+                        match ratings_map.contains_key(source) {
+                            true => match source.as_str() {
+                                // TODO: ADD ERROR HANDLING AND TEST
+                                "Internet Movie Database" | "Metacritic" => {
+                                    let rating_value = ratings_map
+                                        .get(source)
+                                        .unwrap()
+                                        .trim()
+                                        .split("/")
+                                        .next()
+                                        .unwrap()
+                                        .parse::<f64>()
+                                        .unwrap();
+                                    if score > &rating_value {
+                                        return false;
+                                    }
+                                }
+                                "Rotten Tomatoes" => {
+                                    let rating_value = ratings_map
+                                        .get(source)
+                                        .unwrap()
+                                        .trim()
+                                        .split("%")
+                                        .next()
+                                        .unwrap()
+                                        .parse::<f64>()
+                                        .unwrap();
+                                    println!("{score} {rating_value}");
+                                    if score > &rating_value {
+                                        return false;
+                                    }
+                                }
+                                _ => {
+                                    println!("Invalid Rating Source: {}", source);
+                                    continue;
+                                }
+                            },
+                            false => return false,
+                        }
+                    }
+                }
+                None => return false,
+            }
+        }
         true
     }
 }
