@@ -1,4 +1,4 @@
-use std::fs;
+use std::{env, fs};
 
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::{
@@ -6,9 +6,47 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use async_trait::async_trait;
 use dotenvy::dotenv;
+use reqwest;
+use schema::Query;
+use serde;
 
-use movie_search_service::Query;
+pub mod client;
+pub mod schema;
+#[cfg(test)]
+mod tests;
+
+pub trait Filter<T: for<'de> serde::Deserialize<'de>> {
+    fn match_filters(&self, object: &T) -> bool;
+}
+
+pub trait FormatUrl {
+    fn fmt_omdb_url(&self) -> String;
+    /// Get OMDB_KEY from enviornmental variables. Return "NO_KEY" if none found.
+    fn get_omdb_key(&self) -> String {
+        match env::var("OMDB_KEY") {
+            Ok(data) => data,
+            Err(data) => {
+                println!("Error getting OMDb Key: {:#?}", data);
+                String::from("NO_KEY")
+            }
+        }
+    }
+}
+
+#[async_trait]
+trait Request {
+    async fn send_get_request<T: for<'de> serde::Deserialize<'de>>(
+        &self,
+        url: &String,
+    ) -> Result<T, reqwest::Error>;
+
+    async fn send_many_get_requests<T: for<'de> serde::Deserialize<'de> + std::marker::Send>(
+        &self,
+        urls: Vec<String>,
+    ) -> Vec<Result<T, reqwest::Error>>;
+}
 
 async fn index(
     schema: web::Data<Schema<Query, EmptyMutation, EmptySubscription>>,
