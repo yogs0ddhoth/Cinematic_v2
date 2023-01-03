@@ -57,17 +57,12 @@ pub struct Movie {
 #[derive(Debug, InputObject)]
 #[graphql(rename_fields = "camelCase")]
 pub struct SearchMovieInput {
-    #[graphql(default)]
-    pub content_rating: String,
-
-    #[graphql(default)]
-    pub genres: String,
+    pub content_rating: Option<String>,
+    pub genres: Option<String>,
+    pub user_rating: Option<String>,
 
     #[graphql(default)]
     pub release_year: String,
-
-    #[graphql(default)]
-    pub user_rating: String,
 
     #[graphql(default)]
     pub title: String,

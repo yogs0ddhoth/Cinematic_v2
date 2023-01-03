@@ -117,33 +117,18 @@ impl OMDbMovie {
                 .await
                 .into_iter()
                 .for_each(|result| {
-                    // Filter out error responses, and push to movies
                     println!("Filtering results...");
                     match result {
-                        Ok(movie) => movies.push(movie),
+                        // Filter out error responses
+                        Ok(movie) => if search_movie_input.match_filters(&movie) {
+                            movies.push(movie)
+                        }
                         Err(err) => println!("Found an Error: {:#?}", err),
                     }
                 });
         }
         println!("Done! Sending response...");
         movies
-    }
-}
-
-pub struct Query;
-#[Object]
-impl Query {
-    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
-        let movies = OMDbMovie::get_omdb_movies(search_movie_input).await;
-        movies.into_iter().map(|movie| Movie::from(movie)).collect()
-    }
-
-    #[graphql(entity)]
-    async fn find_movie_trailers_by_title<'a>(
-        &self,
-        #[graphql(key)] title: String,
-    ) -> MovieTrailers {
-        MovieTrailers { title }
     }
 }
 
@@ -170,6 +155,28 @@ impl FormatUrl for SearchMovieInput {
         )
     }
 }
+impl SearchMovieInput {
+    /// Apply filters, if defined, to movie
+    /// Returns true if the movie matches filters
+    fn match_filters(&self, movie: &OMDbMovie) -> bool {
+        if let Some(content_rating) = &self.content_rating {
+            if let Some(rated) = &movie.rated {
+                if !(content_rating == rated) {
+                    return false;
+                }
+            }
+        }
+        if let Some(genres) = &self.genres {
+            if let Some(genre) = &movie.genre {
+                if !genre.contains(genres) {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
+
 impl FormatUrl for OMDbSearchResult {
     fn fmt_omdb_url(&self) -> String {
         format!(
@@ -251,6 +258,23 @@ impl From<OMDbMovie> for Movie {
     }
 }
 
+pub struct Query;
+#[Object]
+impl Query {
+    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
+        let movies = OMDbMovie::get_omdb_movies(search_movie_input).await;
+        movies.into_iter().map(|movie| Movie::from(movie)).collect()
+    }
+
+    #[graphql(entity)]
+    async fn find_movie_trailers_by_title<'a>(
+        &self,
+        #[graphql(key)] title: String,
+    ) -> MovieTrailers {
+        MovieTrailers { title }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -261,11 +285,11 @@ mod tests {
     fn fmt_omdb_url_works() {
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
-            release_year: String::default(),
-            user_rating: String::default(),
+            release_year: String::new(),
+            user_rating: None,
             pages: 1,
-            content_rating: String::default(),
-            genres: String::default(),
+            content_rating: None,
+            genres: None,
         };
         let test_omdb_search_result = OMDbSearchResult {
             imdb_id: String::from("tt0076759"),
@@ -291,11 +315,11 @@ mod tests {
 
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
-            release_year: String::default(),
-            user_rating: String::default(),
+            release_year: String::new(),
+            user_rating: None,
             pages: 1,
-            content_rating: String::default(),
-            genres: String::default(),
+            content_rating: None,
+            genres: None,
         };
         let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
 
@@ -334,16 +358,16 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn many_get_requests_work() {
+    async fn many_get_requests_with_filters_work() {
         dotenv().ok();
 
         let test_search_movie_input = SearchMovieInput {
             title: String::from("Star%20Wars"),
-            release_year: String::default(),
-            user_rating: String::default(),
+            release_year: String::new(),
+            user_rating: None,
             pages: 3,
-            content_rating: String::default(),
-            genres: String::default(),
+            content_rating: Some(String::from("PG")),
+            genres: Some(String::from("Action")),
         };
         let client = reqwest::Client::new();
 
@@ -391,5 +415,33 @@ mod tests {
         }
         // this request should produce results
         assert!(id_urls.len() == 30);
+
+        let mut movies = Vec::new();
+        {
+            // concurrently send requests for each of the id url
+            client
+                .send_many_get_requests::<OMDbMovie>(id_urls)
+                .await
+                .into_iter()
+                .for_each(|result| {
+                    match result {
+                        // Filter out error responses
+                        Ok(movie) => if test_search_movie_input.match_filters(&movie) {
+                            assert_eq!(movie.rated, test_search_movie_input.content_rating);
+                            if let Some(genre) = &movie.genre {
+                                assert!(genre.contains(&String::from("PG")));
+                            } else {
+                                panic!("match_filters failed to filter out None values")
+                            }
+                            movies.push(movie)
+                        }
+                        Err(err) => {
+                            println!("Found an Error: {:#?}", err); 
+                            panic!("Request Errors");
+                        }
+                    }
+                });
+        }
+        assert!(movies.len() > 0);
     }
 }
