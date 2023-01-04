@@ -16,6 +16,17 @@ impl Genre {
 }
 
 #[derive(Debug, SimpleObject)]
+pub struct Director {
+    name: String,
+}
+impl Director {
+    /// Constructor Method
+    pub fn new(value: String) -> Self {
+        Director { name: value }
+    }
+}
+
+#[derive(Debug, SimpleObject)]
 pub struct Actor {
     name: String,
 }
@@ -74,7 +85,7 @@ pub struct Movie {
     content_rating: Option<String>,
     runtime: Option<String>,
 
-    director: Option<String>,
+    director: Option<Director>,
     writers: Option<Vec<Writer>>,
     actors: Option<Vec<Actor>>,
 
@@ -152,14 +163,17 @@ impl From<OMDbMovie> for Movie {
     fn from(movie: OMDbMovie) -> Self {
         Movie {
             imdb_id: Some(movie.imdb_id().to_string()),
-
             title: String::from(movie.title().to_string()),
+            
             year: Self::check_string_for_null(movie.year()),
             released: Self::check_string_for_null(movie.released()),
             content_rating: Self::check_string_for_null(movie.rated()),
             runtime: Self::check_string_for_null(movie.runtime()),
 
-            director: Self::check_string_for_null(movie.director()),
+            director: match Self::check_string_for_null(movie.director()) {
+                Some(director) => Some(Director::new(director)),
+                None => None
+            },
             writers: match Self::check_string_for_null(movie.writer()) {
                 Some(writers) => match writers.len() > 0 {
                     true => Some(
@@ -227,8 +241,10 @@ impl From<OMDbMovie> for Movie {
 #[graphql(rename_fields = "camelCase")]
 pub struct SearchMovieInput {
     pub content_rating: Option<Vec<String>>,
+    pub director: Option<String>,
     pub genres: Option<Vec<String>>,
     pub ratings: Option<Vec<RatingInput>>,
+    pub writers: Option<Vec<String>>,
 
     #[graphql(default)]
     pub release_year: String,

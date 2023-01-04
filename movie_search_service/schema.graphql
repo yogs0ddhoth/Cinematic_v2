@@ -2,13 +2,17 @@ type Actor {
 	name: String!
 }
 
-
+type Director {
+  name: String!
+}
 
 type Genre {
 	name: String!
 }
 
-
+type Writer {
+	name: String!
+}
 
 type Movie {
 	imdbID: String
@@ -17,8 +21,8 @@ type Movie {
 	released: String
 	contentRating: String
 	runtime: String
-	director: String
-	writer: String
+	director: Director
+	writers: [Writer!]
 	actors: [Actor!]
 	plot: String
 	genres: [Genre!]
@@ -29,11 +33,11 @@ type Movie {
 	trailers: MovieTrailers!
 	ratings: [Rating!]
 	imdbVotes: String
-	boxOffice: String
 	production: String
+	boxOffice: String
 }
 
-type MovieTrailers {
+type MovieTrailers @key(fields: "title") {
 	title: String!
 }
 
@@ -48,15 +52,21 @@ type Rating {
 	score: String!
 }
 
-input SearchMovieInput {
-	contentRating: String! = ""
-	genres: String! = ""
-	releaseYear: String! = ""
-	userRating: String! = ""
-	title: String! = ""
-	pages: Int! = 1
+input RatingInput {
+	source: String!
+	score: Float!
 }
 
+input SearchMovieInput {
+	contentRating: [String!]
+	director: String
+	genres: [String!]
+	ratings: [RatingInput!]
+	releaseYear: String
+	title: String!
+	pages: Int
+	writers: [String!]
+}
 
 """
 The `_Any` scalar is used to pass representations of entities from external
