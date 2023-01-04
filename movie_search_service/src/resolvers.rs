@@ -21,7 +21,7 @@ impl Query {
         &self,
         #[graphql(key)] title: String,
     ) -> MovieTrailers {
-        MovieTrailers { title }
+        MovieTrailers::new(title)
     }
 }
 
@@ -36,6 +36,7 @@ impl Request for reqwest::Client {
         let results = self.get(url).send().await?.json::<T>().await?;
         Ok(results)
     }
+    
     /// Concurrently send GET requests that deserialize to the same type, and return the results
     async fn send_many_get_requests<T: for<'de> serde::Deserialize<'de> + std::marker::Send>(
         &self,
@@ -203,7 +204,7 @@ impl Search<OMDbMovie> for SearchMovieInput {
                 .for_each(|result| {
                     println!("Filtering results...");
                     match result {
-                        // Filter out error responses
+                        // Handle Error responses and apply search filters
                         Ok(movie) => match self.match_filters(&movie) {
                             Ok(bool) => {
                                 if bool {

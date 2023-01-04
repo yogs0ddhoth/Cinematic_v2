@@ -1,7 +1,7 @@
 use super::*;
 use crate::resolvers::{
-    graph::{RatingInput, SearchMovieInput},
-    models::{OMDbMovie, OMDbSearchData, OMDbSearchResult},
+    graph::{Actor, Genre, Movie, MovieTrailers, Rating, RatingInput, SearchMovieInput},
+    models::{OMDbMovie, OMDbSearchData, OMDbRating, OMDbSearchResult},
 };
 use dotenvy::dotenv;
 use tokio;
@@ -81,7 +81,7 @@ async fn get_requests_work() {
 }
 
 #[tokio::test]
-async fn many_get_requests_with_filters_work() {
+async fn many_get_requests_work() {
     dotenv().ok();
 
     let test_search_movie_input = SearchMovieInput {
@@ -163,7 +163,7 @@ async fn many_get_requests_with_filters_work() {
             .into_iter()
             .for_each(|result| {
                 match result {
-                    // Filter out error responses
+                    // Handle Error responses and apply search filters
                     Ok(movie) => match test_search_movie_input.match_filters(&movie) {
                         Ok(bool) => {
                             if bool {
@@ -227,4 +227,76 @@ async fn match_filters_works() {
         Ok(bool) => assert!(bool),
         Err(err) => panic!("Error parsing fields: {:#?}", err),
     }
+}
+
+#[test]
+fn check_for_null_works() {
+    let test_movie = Movie {
+        title: "Test".to_string(),
+        imdb_id: Some("Test".to_string()),
+        year: None,
+        released: None,
+        content_rating: None,
+        runtime: None,
+        director: None,
+        writers: None,
+        actors: None,
+        plot: None,
+        genres: None,
+        language: None,
+        country: None,
+        awards: None,
+        image: None,
+        trailers: MovieTrailers { title: "Test".to_string() },
+        ratings: None,
+        imdb_votes: None,
+        box_office: None,
+        production: None,
+    };
+    if let Some(field) = Movie::check_for_null(test_movie.imdb_id) {
+        assert_eq!("Test", field);
+    } else {
+        panic!("Movie::check_for_null returned None");
+    }
+}
+
+#[test]
+fn from_works() {
+    let test_omdb_movie = OMDbMovie {
+        imdb_id: "tt0080684".to_string(),
+        title: "Star Wars: Episode V - The Empire Strikes Back".to_string(),
+        year: None,
+        released: None,
+        rated: None,
+        runtime: None,
+        director: None,
+        writer: Some("Leigh Brackett, Lawrence Kasdan, George Lucas".to_string()),
+        actors: Some("Mark Hamill, Harrison Ford, Carrie Fisher".to_string()),
+        plot: None,
+        genre: Some("Action, Adventure, Fantasy".to_string()),
+        language: None,
+        country: None,
+        awards: None,
+        poster: None,
+        ratings: Some(vec![
+            OMDbRating {
+                source: "Internet Movie Database".to_string(),
+                value: "8.7/10".to_string(),
+            },
+            OMDbRating {
+                source: "Rotten Tomatoes".to_string(),
+                value: "94%".to_string(),
+            },
+            OMDbRating {
+                source: "Metacritic".to_string(),
+                value: "82/100".to_string(),
+            }
+        ]),
+        metascore: None,
+        imdb_rating: None,
+        imdb_votes: None,
+        box_office: None,
+        production: None,
+        response: "True".to_string(),
+    };
 }
