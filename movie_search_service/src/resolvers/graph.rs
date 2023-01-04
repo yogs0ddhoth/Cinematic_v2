@@ -233,7 +233,6 @@ pub struct SearchMovieInput {
     #[graphql(default)]
     pub release_year: String,
 
-    #[graphql(default)]
     pub title: String,
 
     #[graphql(default = 1)]
