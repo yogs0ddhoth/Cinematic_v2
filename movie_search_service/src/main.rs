@@ -14,8 +14,8 @@ use serde;
 pub mod resolvers;
 use resolvers::Query;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 pub trait FormatUrl {
     fn fmt_omdb_url(&self) -> String;

@@ -5,7 +5,7 @@ use super::{async_trait, reqwest, FormatUrl, ParseFloatError, Request, Search};
 use async_graphql::Object;
 use futures::{stream, StreamExt};
 use graph::{Movie, MovieTrailers, RatingInput, SearchMovieInput};
-use models::{OMDbMovie, OMDbRating, OMDbSearchData};
+use models::{OMDbMovie, OMDbSearchData};
 use std::collections::{HashMap, HashSet};
 
 pub struct Query;
@@ -36,7 +36,7 @@ impl Request for reqwest::Client {
         let results = self.get(url).send().await?.json::<T>().await?;
         Ok(results)
     }
-    
+
     /// Concurrently send GET requests that deserialize to the same type, and return the results
     async fn send_many_get_requests<T: for<'de> serde::Deserialize<'de> + std::marker::Send>(
         &self,
@@ -65,17 +65,9 @@ impl Request for reqwest::Client {
 impl Search<OMDbMovie> for SearchMovieInput {
     /// Apply search filters, if defined, to movie
     /// Returns true if the movie matches filters
-    fn match_filters(
-        &self,
-        OMDbMovie {
-            rated,
-            genre,
-            ratings,
-            ..
-        }: &OMDbMovie,
-    ) -> Result<bool, ParseFloatError> {
+    fn match_filters(&self, movie: &OMDbMovie) -> Result<bool, ParseFloatError> {
         if let Some(content_rating) = &self.content_rating {
-            match rated {
+            match movie.rated() {
                 Some(rated) => {
                     let mut rating_list = HashSet::new();
                     for rating in content_rating {
@@ -89,7 +81,7 @@ impl Search<OMDbMovie> for SearchMovieInput {
             }
         }
         if let Some(genre_filters) = &self.genres {
-            match genre {
+            match movie.genre() {
                 Some(genre) => {
                     let genre_list: HashSet<&str> = genre.split(", ").collect();
 
@@ -103,11 +95,11 @@ impl Search<OMDbMovie> for SearchMovieInput {
             }
         }
         if let Some(ratings_filter) = &self.ratings {
-            match ratings {
+            match movie.ratings() {
                 Some(ratings) => {
                     let mut ratings_map: HashMap<String, String> = HashMap::new();
-                    for OMDbRating { source, value } in ratings {
-                        ratings_map.insert(source.to_string(), value.to_string());
+                    for rating in ratings {
+                        ratings_map.insert(rating.source().to_string(), rating.value().to_string());
                     }
 
                     for RatingInput { source, score } in ratings_filter {
@@ -178,13 +170,13 @@ impl Search<OMDbMovie> for SearchMovieInput {
                     // Filter out error responses, convert search_results to omdb_url Strings, and push to id_urls
                     println!("Filtering results...");
                     match results {
-                        Ok(data) => match &data.search {
+                        Ok(data) => match data.search() {
                             Some(result_page) => {
                                 for result in result_page {
                                     id_urls.push(result.fmt_omdb_url())
                                 }
                             }
-                            None => match &data.error {
+                            None => match data.error() {
                                 Some(err) => println!("Found an Error: {}", err),
                                 None => (),
                             },

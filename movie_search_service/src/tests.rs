@@ -1,7 +1,7 @@
 use super::*;
 use crate::resolvers::{
-    graph::{Actor, Genre, Movie, MovieTrailers, Rating, RatingInput, SearchMovieInput},
-    models::{OMDbMovie, OMDbSearchData, OMDbRating, OMDbSearchResult},
+    graph::{Movie, RatingInput, SearchMovieInput},
+    models::{OMDbMovie, OMDbMovieBuilder, OMDbRatingBuilder, OMDbSearchData, OMDbSearchResult},
 };
 use dotenvy::dotenv;
 use tokio;
@@ -16,13 +16,10 @@ fn fmt_omdb_url_works() {
         content_rating: None,
         genres: None,
     };
-    let test_omdb_search_result = OMDbSearchResult {
-        imdb_id: String::from("tt0076759"),
-    };
+    let test_omdb_search_result = OMDbSearchResult::new("tt0076759".to_string());
+
     let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
     let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
-    // println!("{test_omdb_search_url}");
-    // println!("{test_search_movie_url}");
 
     assert_eq!(
         "https://www.omdbapi.com/?apikey=NO_KEY&s=Star%20Wars&y=",
@@ -48,9 +45,7 @@ async fn get_requests_work() {
     };
     let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
 
-    let test_omdb_search_result = OMDbSearchResult {
-        imdb_id: String::from("tt0076759"),
-    };
+    let test_omdb_search_result = OMDbSearchResult::new("tt0076759".to_string());
     let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
 
     let client = reqwest::Client::new();
@@ -62,8 +57,8 @@ async fn get_requests_work() {
 
     match (omdb_results_1, omdb_results_2) {
         (Ok(result_1), Ok(result_2)) => {
-            assert!(result_1.search.is_some());
-            assert!(result_2.imdb_id == "tt0076759");
+            assert!(result_1.search().is_some());
+            assert!(result_2.imdb_id() == "tt0076759");
         }
         (Ok(_), Err(err)) => {
             println!("Caught Error: {:#?}", err);
@@ -132,13 +127,13 @@ async fn many_get_requests_work() {
             .for_each(|results| {
                 // Filter out error responses and convert search_results into imdb ids of type String and push to id_urls
                 match results {
-                    Ok(data) => match &data.search {
+                    Ok(data) => match data.search() {
                         Some(result_page) => {
                             for result in result_page {
                                 id_urls.push(result.fmt_omdb_url())
                             }
                         }
-                        None => match &data.error {
+                        None => match data.error() {
                             Some(err) => {
                                 panic!("Found a Request Error: {:#?}", err);
                             }
@@ -214,9 +209,8 @@ async fn match_filters_works() {
             String::from("Fantasy"),
         ]),
     };
-    let test_omdb_search_result = OMDbSearchResult {
-        imdb_id: String::from("tt0080684"),
-    };
+    let test_omdb_search_result = OMDbSearchResult::new("tt0080684".to_string());
+
     let client = reqwest::Client::new();
     let omdb_movie = client
         .send_get_request::<OMDbMovie>(&test_omdb_search_result.fmt_omdb_url())
@@ -231,72 +225,62 @@ async fn match_filters_works() {
 
 #[test]
 fn check_for_null_works() {
-    let test_movie = Movie {
-        title: "Test".to_string(),
-        imdb_id: Some("Test".to_string()),
-        year: None,
-        released: None,
-        content_rating: None,
-        runtime: None,
-        director: None,
-        writers: None,
-        actors: None,
-        plot: None,
-        genres: None,
-        language: None,
-        country: None,
-        awards: None,
-        image: None,
-        trailers: MovieTrailers { title: "Test".to_string() },
-        ratings: None,
-        imdb_votes: None,
-        box_office: None,
-        production: None,
-    };
-    if let Some(field) = Movie::check_for_null(test_movie.imdb_id) {
+    let test_field = &Some("Test".to_string());
+
+    if let Some(field) = Movie::check_string_for_null(test_field) {
         assert_eq!("Test", field);
     } else {
-        panic!("Movie::check_for_null returned None");
+        panic!("Returned None for {:#?}", test_field);
     }
+
+    let test_null_field = &Some("N/A".to_string());
+    let should_be_none = Movie::check_string_for_null(test_null_field);
+    assert_eq!(None, should_be_none);
+
+    let should_also_be_none = Movie::check_string_for_null(&None);
+    assert_eq!(None, should_also_be_none);
 }
 
 #[test]
 fn from_works() {
-    let test_omdb_movie = OMDbMovie {
-        imdb_id: "tt0080684".to_string(),
-        title: "Star Wars: Episode V - The Empire Strikes Back".to_string(),
-        year: None,
-        released: None,
-        rated: None,
-        runtime: None,
-        director: None,
-        writer: Some("Leigh Brackett, Lawrence Kasdan, George Lucas".to_string()),
-        actors: Some("Mark Hamill, Harrison Ford, Carrie Fisher".to_string()),
-        plot: None,
-        genre: Some("Action, Adventure, Fantasy".to_string()),
-        language: None,
-        country: None,
-        awards: None,
-        poster: None,
-        ratings: Some(vec![
-            OMDbRating {
-                source: "Internet Movie Database".to_string(),
-                value: "8.7/10".to_string(),
-            },
-            OMDbRating {
-                source: "Rotten Tomatoes".to_string(),
-                value: "94%".to_string(),
-            },
-            OMDbRating {
-                source: "Metacritic".to_string(),
-                value: "82/100".to_string(),
-            }
-        ]),
-        metascore: None,
-        imdb_rating: None,
-        imdb_votes: None,
-        box_office: None,
-        production: None,
-        response: "True".to_string(),
-    };
+    let mut builder = OMDbMovieBuilder::default();
+
+    builder
+        .set_imdb_id("tt0080684".to_string())
+        .set_title("Star Wars: Episode V - The Empire Strikes Back".to_string())
+        .set_released(Some("20 Jun 1980".to_string()))
+        .set_writer(Some(
+            "Leigh Brackett, Lawrence Kasdan, George Lucas".to_string(),
+        ))
+        .set_actors(Some(
+            "Mark Hamill, Harrison Ford, Carrie Fisher".to_string(),
+        ))
+        .set_genre(Some("Action, Adventure, Fantasy".to_string()))
+        .set_ratings(Some(vec![
+            OMDbRatingBuilder::default()
+                .set_source("Internet Movie Database".to_string())
+                .set_value("8.7/10".to_string())
+                .build(),
+            OMDbRatingBuilder::default()
+                .set_source("Rotten Tomatoes".to_string())
+                .set_value("94%".to_string())
+                .build(),
+            OMDbRatingBuilder::default()
+                .set_source("Metacritic".to_string())
+                .set_value("82/100".to_string())
+                .build(),
+        ]))
+        .set_production(Some("N/A".to_string()))
+        .set_response("True".to_string());
+
+    let test_omdb_movie = builder.build();
+
+    let test_movie = Movie::from(test_omdb_movie);
+
+    assert!(test_movie.get_released().unwrap() > 0);
+    assert_eq!(3, test_movie.get_writers().unwrap());
+    assert_eq!(3, test_movie.get_actors().unwrap());
+    assert_eq!(3, test_movie.get_genres().unwrap());
+    assert_eq!(3, test_movie.get_ratings().unwrap());
+    assert_eq!(None, test_movie.get_production());
 }
