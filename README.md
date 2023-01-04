@@ -8,6 +8,8 @@ A backend for third-party API calls, data persistance, and user auth, incorporat
             - ~~&check;fetch ImDB API~~ &check;Subgraph Federated
             - &check; migrate from imdb to OmDB API to accommodate more robust api usage 
             - &check; refactor graph and schemas on MovieDB
+            - &check; configure for Federation and publish subgraph
+            - TODO: rewrite unit tests
         - **MovieDB** - dir path: ./server 
             - &check;MongoDB, ~~Prisma ORM,~~ &check;refactor server
             - &check; implement services for &check;User, &check;Genre, &check;Actor, &check;Movie
@@ -18,8 +20,9 @@ A backend for third-party API calls, data persistance, and user auth, incorporat
             - add genre(GenreInput): Genre, actor(ActorInput): Actor resolvers
             - write unit tests for AppService
         - **Trailer Search** - 
-            - implement microservice to query Youtube API for movie trailers &check; and filter results for relevance
-            - respond with selected list of url paths 
+            - &check; implement microservice to query Youtube API for movie trailers &check; and filter results for relevance
+            - &check; respond with selected list of url paths 
+            - &check; configure for Federation and publish subgraph
     - Configure supergraph and apollo router
 * **Fill out Client**:
     - replace legacy jquery rendering with angular/ngx-bootstrap rendering
