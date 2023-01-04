@@ -1,9 +1,8 @@
 use super::{
-    client::{OMDbMovie, OMDbRating, Search},
-    Filter, FormatUrl,
+    super::FormatUrl,
+    models::{OMDbMovie, OMDbRating},
 };
-use async_graphql::{InputObject, Object, SimpleObject};
-use std::collections::{HashMap, HashSet};
+use async_graphql::{InputObject, SimpleObject};
 
 #[derive(Debug, SimpleObject)]
 pub struct Genre {
@@ -61,8 +60,8 @@ pub struct Movie {
 #[derive(Debug, InputObject)]
 #[graphql(rename_fields = "camelCase")]
 pub struct SearchMovieInput {
-    pub content_rating: Option<String>,
-    pub genres: Option<String>,
+    pub content_rating: Option<Vec<String>>,
+    pub genres: Option<Vec<String>>,
     pub ratings: Option<Vec<RatingInput>>,
 
     #[graphql(default)]
@@ -93,109 +92,13 @@ impl FormatUrl for SearchMovieInput {
     }
 }
 
-impl Filter<OMDbMovie> for SearchMovieInput {
-    /// Apply filters, if defined, to movie
-    /// Returns true if the movie matches filters
-    fn match_filters(
-        &self,
-        OMDbMovie {
-            rated,
-            genre,
-            ratings,
-            ..
-        }: &OMDbMovie,
-    ) -> bool {
-        if let Some(content_rating) = &self.content_rating {
-            match rated {
-                Some(rated) => {
-                    if !(content_rating == rated) {
-                        return false;
-                    }
-                }
-                None => return false,
-            }
-        }
-        if let Some(genre_filters) = &self.genres {
-            match genre {
-                Some(genre) => {
-                    let mut genre_list: HashSet<&str> = HashSet::new();
-                    for genre_name in genre.split(", ") {
-                        genre_list.insert(genre_name);
-                    }
-
-                    for filter in genre_filters.split(", ") {
-                        if !genre_list.contains(filter) {
-                            return false;
-                        }
-                    }
-                }
-                None => return false,
-            }
-        }
-        if let Some(ratings_filter) = &self.ratings {
-            match ratings {
-                Some(ratings) => {
-                    let mut ratings_map: HashMap<String, String> = HashMap::new();
-                    for OMDbRating { source, value } in ratings {
-                        ratings_map.insert(source.to_string(), value.to_string());
-                    }
-
-                    for RatingInput { source, score } in ratings_filter {
-                        match ratings_map.contains_key(source) {
-                            true => match source.as_str() {
-                                // TODO: ADD ERROR HANDLING AND TEST
-                                "Internet Movie Database" | "Metacritic" => {
-                                    let rating_value = ratings_map
-                                        .get(source)
-                                        .unwrap()
-                                        .trim()
-                                        .split("/")
-                                        .next()
-                                        .unwrap()
-                                        .parse::<f64>()
-                                        .unwrap();
-                                    if score > &rating_value {
-                                        return false;
-                                    }
-                                }
-                                "Rotten Tomatoes" => {
-                                    let rating_value = ratings_map
-                                        .get(source)
-                                        .unwrap()
-                                        .trim()
-                                        .split("%")
-                                        .next()
-                                        .unwrap()
-                                        .parse::<f64>()
-                                        .unwrap();
-                                    println!("{score} {rating_value}");
-                                    if score > &rating_value {
-                                        return false;
-                                    }
-                                }
-                                _ => {
-                                    println!("Invalid Rating Source: {}", source);
-                                    continue;
-                                }
-                            },
-                            false => return false,
-                        }
-                    }
-                }
-                None => return false,
-            }
-        }
-        true
-    }
-}
-
 impl Movie {
     /// Check String, and if "N/A", return None
     fn check_for_null(field: Option<String>) -> Option<String> {
         match field {
             Some(data) => match data.as_str() {
                 "N/A" => None,
-                _ => Some(data.to_string()),
+                _ => Some(data),
             },
             None => None,
         }
@@ -269,22 +172,5 @@ impl From<OMDbMovie> for Movie {
             box_office: Self::check_for_null(t.box_office),
             production: Self::check_for_null(t.production),
         }
-    }
-}
-
-pub struct Query;
-#[Object]
-impl Query {
-    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
-        let movies = OMDbMovie::get_omdb_movies(search_movie_input).await;
-        movies.into_iter().map(|movie| Movie::from(movie)).collect()
-    }
-
-    #[graphql(entity)]
-    async fn find_movie_trailers_by_title<'a>(
-        &self,
-        #[graphql(key)] title: String,
-    ) -> MovieTrailers {
-        MovieTrailers { title }
     }
 }

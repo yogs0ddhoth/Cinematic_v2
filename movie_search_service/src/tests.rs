@@ -1,6 +1,8 @@
 use super::*;
-use crate::client::{OMDbMovie, OMDbSearchData, OMDbSearchResult};
-use crate::schema::{SearchMovieInput, RatingInput};
+use crate::resolvers::{
+    graph::{RatingInput, SearchMovieInput},
+    models::{OMDbMovie, OMDbSearchData, OMDbSearchResult},
+};
 use dotenvy::dotenv;
 use tokio;
 
@@ -85,25 +87,27 @@ async fn many_get_requests_with_filters_work() {
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
-        ratings: Some(
-            vec![
-                RatingInput {
-                    source: String::from("Metacritic"),
-                    score: 60.0,
-                },
-                RatingInput {
-                    source: String::from("Internet Movie Database"),
-                    score: 6.0,
-                },
-                RatingInput {
-                    source: String::from("Rotten Tomatoes"),
-                    score: 60.0,
-                }
-            ]
-        ),
+        ratings: Some(vec![
+            RatingInput {
+                source: String::from("Metacritic"),
+                score: 60.0,
+            },
+            RatingInput {
+                source: String::from("Internet Movie Database"),
+                score: 6.0,
+            },
+            RatingInput {
+                source: String::from("Rotten Tomatoes"),
+                score: 60.0,
+            },
+        ]),
         pages: 3,
-        content_rating: Some(String::from("PG")),
-        genres: Some(String::from("Action")),
+        content_rating: Some(vec![String::from("PG"), String::from("PG-13")]),
+        genres: Some(vec![
+            String::from("Action"),
+            String::from("Adventure"),
+            String::from("Fantasy"),
+        ]),
     };
     let client = reqwest::Client::new();
 
@@ -136,15 +140,13 @@ async fn many_get_requests_with_filters_work() {
                         }
                         None => match &data.error {
                             Some(err) => {
-                                println!("Found an Error: {}", err);
-                                panic!("Request Errors");
+                                panic!("Found a Request Error: {:#?}", err);
                             }
                             None => panic!("Request Errors: No Result found."),
                         },
                     },
                     Err(err) => {
-                        println!("Found an Error: {:#?}", err);
-                        panic!("Request Errors");
+                        panic!("Found a Request Error: {:#?}", err);
                     }
                 }
             });
@@ -162,23 +164,19 @@ async fn many_get_requests_with_filters_work() {
             .for_each(|result| {
                 match result {
                     // Filter out error responses
-                    Ok(movie) => {
-                        
-                        if test_search_movie_input.match_filters(&movie) {
-                            println!("{:#?}", movie);
-                            assert_eq!(movie.rated, test_search_movie_input.content_rating);
-                            if let Some(genre) = &movie.genre {
-                                assert!(genre.contains("PG"));
-                            } else {
-                                panic!("match_filters failed to filter out None values")
+                    Ok(movie) => match test_search_movie_input.match_filters(&movie) {
+                        Ok(bool) => {
+                            if bool {
+                                println!("{:#?}", movie);
+                                movies.push(movie)
                             }
-                            
-                            movies.push(movie)
                         }
-                    }
+                        Err(err) => {
+                            println!("Error parsing fields: {:#?}", err);
+                        }
+                    },
                     Err(err) => {
-                        println!("Found an Error: {:#?}", err);
-                        panic!("Request Errors");
+                        panic!("Found a Request Error: {:#?}", err);
                     }
                 }
             });
@@ -194,31 +192,39 @@ async fn match_filters_works() {
     let test_search_movie_input = SearchMovieInput {
         title: String::new(),
         release_year: String::new(),
-        ratings: Some(
-            vec![
-                RatingInput {
-                    source: String::from("Metacritic"),
-                    score: 80.0,
-                },
-                RatingInput {
-                    source: String::from("Internet Movie Database"),
-                    score: 8.0,
-                },
-                RatingInput {
-                    source: String::from("Rotten Tomatoes"),
-                    score: 80.0,
-                }
-            ]
-        ),
+        ratings: Some(vec![
+            RatingInput {
+                source: String::from("Metacritic"),
+                score: 80.0,
+            },
+            RatingInput {
+                source: String::from("Internet Movie Database"),
+                score: 8.0,
+            },
+            RatingInput {
+                source: String::from("Rotten Tomatoes"),
+                score: 80.0,
+            },
+        ]),
         pages: 1,
-        content_rating: Some(String::from("PG")),
-        genres: Some(String::from("Action")),
+        content_rating: Some(vec![String::from("PG"), String::from("PG-13")]),
+        genres: Some(vec![
+            String::from("Action"),
+            String::from("Adventure"),
+            String::from("Fantasy"),
+        ]),
     };
     let test_omdb_search_result = OMDbSearchResult {
         imdb_id: String::from("tt0080684"),
     };
     let client = reqwest::Client::new();
-    let omdb_movie = client.send_get_request::<OMDbMovie>(&test_omdb_search_result.fmt_omdb_url()).await.unwrap();
+    let omdb_movie = client
+        .send_get_request::<OMDbMovie>(&test_omdb_search_result.fmt_omdb_url())
+        .await
+        .unwrap();
     println!("{:#?}", omdb_movie);
-    assert!(test_search_movie_input.match_filters(&omdb_movie));
+    match test_search_movie_input.match_filters(&omdb_movie) {
+        Ok(bool) => assert!(bool),
+        Err(err) => panic!("Error parsing fields: {:#?}", err),
+    }
 }

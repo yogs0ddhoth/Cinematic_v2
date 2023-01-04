@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{env, fs, num::ParseFloatError};
 
 use actix_web::{guard, web, App, HttpResponse, HttpServer};
 use async_graphql::{
@@ -9,17 +9,13 @@ use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use async_trait::async_trait;
 use dotenvy::dotenv;
 use reqwest;
-use schema::Query;
 use serde;
 
-pub mod client;
-pub mod schema;
+pub mod resolvers;
+use resolvers::Query;
+
 #[cfg(test)]
 mod tests;
-
-pub trait Filter<T: for<'de> serde::Deserialize<'de>> {
-    fn match_filters(&self, object: &T) -> bool;
-}
 
 pub trait FormatUrl {
     fn fmt_omdb_url(&self) -> String;
@@ -46,6 +42,12 @@ trait Request {
         &self,
         urls: Vec<String>,
     ) -> Vec<Result<T, reqwest::Error>>;
+}
+
+#[async_trait]
+pub trait Search<T: for<'de> serde::Deserialize<'de>> {
+    fn match_filters(&self, object: &T) -> Result<bool, ParseFloatError>;
+    async fn search_movies(&self) -> Vec<T>;
 }
 
 async fn index(
