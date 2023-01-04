@@ -11,6 +11,7 @@ import (
 	"os"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
@@ -37,11 +38,26 @@ func (r *Resolver) getMovieTrailers(title string) (*model.MovieTrailers, error) 
 		return nil, err
 	}
 
-	var trailers []string
+	// filter trailer response videos common on youtube
+	filters := []string{"Honest Trailers", "Trailer Breakdown"}
+
+	trailersSet := mapset.NewSet[string]()
 	for _, item := range response.Items {
-		if strings.Contains(item.Snippet.Title, title) && strings.Contains(item.Snippet.Title, "Official Trailer") {
-			trailers = append(trailers, item.Id.VideoId)
+		title := item.Snippet.Title
+		// match title
+		if strings.Contains(title, title) && strings.Contains(title, "Trailer") {
+
+			// apply filters
+			for _, filter := range filters {
+				if !strings.Contains(title, filter) && !trailersSet.Contains(item.Id.VideoId) {
+					trailersSet.Add(item.Id.VideoId)
+				}
+			}
 		}
+	}
+	var trailers []string
+	for trailer := range trailersSet.Iterator().C {
+		trailers = append(trailers, trailer)
 	}
 	printIDs("videos", trailers)
 
