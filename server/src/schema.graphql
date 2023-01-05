@@ -2,7 +2,19 @@ type Actor {
   name: String!
   movies: [Movie!]
 }
+type Director {
+  name: String!
+  movies: [Movie!]
+}
 type Genre {
+  name: String!
+  movies: [Movie!]
+}
+type Trailers {
+  title: String!
+  trailers: [String!]
+}
+type Writer {
   name: String!
   movies: [Movie!]
 }
@@ -16,8 +28,8 @@ type Movie { # as stored in DB and queried by client
   contentRating: String
   runtime: String
 
-  director: String
-  writer: String
+  director: Director
+  writers: [Writer!]
   actors: [Actor!]
 
   plot: String
@@ -27,7 +39,7 @@ type Movie { # as stored in DB and queried by client
   country: String
   awards: String
   image: String
-  trailers: [String]
+  trailers: Trailers
 
   ratings: [Rating!]
   imdbVotes: String
@@ -69,7 +81,14 @@ input RatingInput {
   source: String!
   score: String!
 }
-input CreateMovieInput { # output of movie_search_service && input to DB service
+input TrailersInput {
+  title: String!
+  trailers: [String!]
+}
+input WriterInput {
+  name: String!
+}
+input CreateMovieInput { # output of movie_search_service & trailer-search-service subgraphs
   imdbID: String
 
   title: String!
@@ -79,7 +98,7 @@ input CreateMovieInput { # output of movie_search_service && input to DB service
   runtime: String
 
   director: String
-  writer: String
+  writers: [WriterInput!]
   actors: [ActorInput!]
 
   plot: String
@@ -89,7 +108,7 @@ input CreateMovieInput { # output of movie_search_service && input to DB service
   country: String
   awards: String
   image: String
-  trailers: [String!]
+  trailers: TrailersInput
 
   ratings: [RatingInput!]
   imdbVotes: String
@@ -119,6 +138,7 @@ input UpdateMovieInput { # unlikely to use
   country: String
   awards: String
   image: String
+  trailers: TrailersInput
 
   ratings: [RatingInput!]
   imdbVotes: String

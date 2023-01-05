@@ -4,6 +4,9 @@ import * as mongoose from 'mongoose';
 import { Genre } from './genre.schema';
 import { Actor } from './actor.schema';
 import { Rating, RatingSchema } from './rating.schema';
+import { Director } from './director.schema';
+import { Writer } from './writer.schema';
+import { Trailers, TrailersSchema } from './trailers.schema';
 
 @Schema()
 export class Movie {
@@ -25,11 +28,17 @@ export class Movie {
   @Prop()
   runtime: string;
 
-  @Prop()
-  director: string;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    ref: 'Director',
+  })
+  director: Director;
 
-  @Prop()
-  writer: string;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    ref: 'Writer',
+  })
+  writers: Writer[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId }],
@@ -58,8 +67,10 @@ export class Movie {
   @Prop()
   image: string;
 
-  @Prop()
-  trailers: string[];
+  @Prop({
+    type: TrailersSchema,
+  })
+  trailers: Trailers;
 
   @Prop({
     type: [RatingSchema],
