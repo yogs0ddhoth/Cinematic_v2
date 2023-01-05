@@ -23,10 +23,10 @@ export class AppService {
   ) {}
 
   /**
-   * Query database for the Genre, and create one if it doesn't exist
-   * @param CreateGenre
-   * @returns Promise: the associated Genre ID as a Mongoose ObjectId
-   * @type {CreateGenre} { name: string }
+   * Query database for the referenced Genre and add Movie reference if doesn't exist, create one if doesn't exist
+   * @param CreateGenre - { name: string }
+   * @returns the associated Genre ID as a Mongoose ObjectId
+   * @throws {Error} if upsert is unsuccessful, or returns null
    */
   async addGenre({
     name,
@@ -53,7 +53,14 @@ export class AppService {
         // catch null return values
         throw new Error('Error: findOneAndUpdate returned null', {
           cause: {
-            value: { genre: name, movieID, upsert: true },
+            value: {
+              movieID,
+              filter: name,
+              options: {
+                new: true,
+                upsert: true,
+              },
+            },
           },
         });
       return genre._id; // return the document ID
@@ -63,10 +70,10 @@ export class AppService {
   }
 
   /**
-   * Query database for the Actor, and create one if it doesn't exist
-   * @param CreateActor
-   * @returns Promise: the found Actor ID as a Mongoose ObjectId
-   * @type {CreateActor} { name: string }
+   * Query database for the referenced Actor and add Movie reference if doesn't exist, create one if doesn't exist
+   * @param CreateActor - { name: string }
+   * @returns the associated Actor ID as a Mongoose ObjectId
+   * @throws {Error} if upsert is unsuccessful, or returns null
    */
   async addActor({
     name,
@@ -91,7 +98,14 @@ export class AppService {
         // catch null return values
         throw new Error('Error: findOneAndUpdate returned null', {
           cause: {
-            value: { actor: name, movieID, upsert: true },
+            value: {
+              movieID,
+              filter: name,
+              options: {
+                new: true,
+                upsert: true,
+              },
+            },
           },
         });
       return actor._id; // return the document ID
@@ -101,12 +115,13 @@ export class AppService {
   }
 
   /**
-   * Query database for the associated movie, and create one if it doesn't exist
-   * @param {CreateMovie} movie type: CreateMovie
-   * @param genreIDs type mongoose.Types.ObjectId document references
-   * @param actorIDs type mongoose.Types.ObjectId document references
-   * @returns Promise: the associated Movie ID as a Mongoose ObjectId
+   * Query database for the associated movie, and create one if doesn't exist
+   * @param genres - Array<{ name: string }>
+   * @param actors - Array<{ name: string }>
+   * @param movie type: CreateMovie
    * @type {CreateMovie} see './models/movie/dto/create-movie.dto.ts'
+   * @returns the associated Movie ID as a Mongoose ObjectId
+   * @throws {Error} if MongooseError, or update returns null
    */
   async addMovie({
     genres,
@@ -198,10 +213,10 @@ export class AppService {
   }
 
   /**
-   * Add Movies to database if they do not exist
-   * @param {CreateMovieInput[]} movies type: CreateMovieInput[]
-   * @returns Promise: an array of the associated Movie IDs as Mongoose ObjectIds
+   * Add Movies and references to database if they do not exist
+   * @param {CreateMovieInput[]} movies an array of movies to add
    * @type {CreateMovieInput} see graphql.ts
+   * @returns an array of the associated Movie IDs as Mongoose ObjectIds
    */
   async addMovies(
     movies: CreateMovieInput[],
@@ -233,6 +248,7 @@ export class AppService {
    * @param id _id of the user
    * @param movies an array of type CreateMovieInput to be added the Database as Movie subdocuments if they don't exist, and attached to the User document
    * @returns Promise: the associated User ID as a string
+   * @throws {Error} if update returns null
    */
   async addMoviesToUser(
     id: string,
