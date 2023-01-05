@@ -17,7 +17,13 @@ export class ActorService {
     @InjectModel(Actor.name) private readonly ActorModel: Model<ActorDocument>,
   ) {}
 
-  async create(doc: CreateActor) {
+  /**
+   * create a new Actor document or array of documents
+   * @param {CreateActor} doc document/documents to be created
+   * @type {CreateActor}  name: string, movieID?: Types.ObjectId | null }
+   * @returns created document or documents
+   */
+  async create(doc: CreateActor | CreateActor[]) {
     return this.ActorModel.create(doc);
   }
 
@@ -30,6 +36,13 @@ export class ActorService {
     return this.ActorModel.findOne(filter, projection, options).exec();
   }
 
+  /**
+   * Mongoose Model.findOneAndUpdate(): atomically find the first document that matches filter and apply update
+   * @param filter fields to search by
+   * @param update field update(s)
+   * @param options update options - see docs
+   * @returns updated document, or null if none is found (and upsert = false)
+   */
   async update(params: {
     filter: FilterQuery<ActorDocument>;
     update: UpdateQuery<ActorDocument>;
