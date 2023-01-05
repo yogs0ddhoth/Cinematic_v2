@@ -6,10 +6,6 @@ type Auth {
   access_token: String!
 }
 
-extend type Query {
-  getUser(id: String!): User!
-}
-
 type Mutation {
   signup(email: String!, password: String!): Auth!
   login(email: String!, password: String!): Auth!

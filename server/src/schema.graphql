@@ -1,25 +1,24 @@
-type Actor {
+type ActorDoc {
   name: String!
-  movies: [Movie!]
+  movies: [MovieDoc!]
 }
-type Director {
+type DirectorDoc {
   name: String!
-  movies: [Movie!]
+  movies: [MovieDoc!]
 }
-type Genre {
+type GenreDoc {
   name: String!
-  movies: [Movie!]
+  movies: [MovieDoc!]
 }
-type Trailers {
+type MovieTrailersDoc {
   title: String!
   trailers: [String!]
 }
-type Writer {
+type WriterDoc {
   name: String!
-  movies: [Movie!]
+  movies: [MovieDoc!]
 }
-type Movie { # as stored in DB and queried by client
-  id: String!
+type MovieDoc { # as stored in DB and queried by client
   imdbID: String
 
   title: String!
@@ -28,46 +27,45 @@ type Movie { # as stored in DB and queried by client
   contentRating: String
   runtime: String
 
-  director: Director
-  writers: [Writer!]
-  actors: [Actor!]
+  director: DirectorDoc
+  writers: [WriterDoc!]
+  actors: [ActorDoc!]
 
   plot: String
-  genres: [Genre!]
+  genres: [GenreDoc!]
 
   language: String
   country: String
   awards: String
   image: String
-  trailers: Trailers
+  trailers: MovieTrailersDoc
 
-  ratings: [Rating!]
+  ratings: [RatingDoc!]
   imdbVotes: String
 
   boxOffice: String
   production: String
 }
 
-type User @key(fields: "id") {
-  id: ID! @external
-  movies: [Movie!]
-}
-
-type Rating {
+type RatingDoc {
   source: String!
   score: String!
 }
 
+type User @key(fields: "id") {
+  id: String!
+  movies: [MovieDoc!]
+}
+
 type Query {
   movies: User
-  movie(id: String!): Movie!
-  genre(genre: GenreInput): Genre
-  actor(actor: ActorInput): Actor
+  movie(id: String!): MovieDoc!
+  genre(genre: GenreInput): GenreDoc
+  actor(actor: ActorInput): ActorDoc
 }
 
 type Mutation {
   addMovies(movies: [CreateMovieInput!]!): User
-  updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
   removeMovie(id: String!): User
 }
 
@@ -88,7 +86,7 @@ input TrailersInput {
 input WriterInput {
   name: String!
 }
-input CreateMovieInput { # output of movie_search_service & trailer-search-service subgraphs
+input CreateMovieInput { # output of movie_search_service & trailer-search-servicesubgraphs
   imdbID: String
 
   title: String!

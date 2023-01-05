@@ -37,6 +37,11 @@ type Movie {
 	boxOffice: String
 }
 
+type Rating {
+	source: String!
+	score: String!
+}
+
 type MovieTrailers @key(fields: "title") {
 	title: String!
 }
@@ -47,12 +52,7 @@ type Query {
 	_entities(representations: [_Any!]!): [_Entity]!
 }
 
-type Rating {
-	source: String!
-	score: String!
-}
-
-input RatingInput {
+input SearchRatingInput {
 	source: String!
 	score: Float!
 }
@@ -61,7 +61,7 @@ input SearchMovieInput {
 	contentRating: [String!]
 	director: String
 	genres: [String!]
-	ratings: [RatingInput!]
+	ratings: [SearchRatingInput!]
 	releaseYear: String
 	title: String!
 	pages: Int
