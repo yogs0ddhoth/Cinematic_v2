@@ -11,10 +11,12 @@ fn fmt_omdb_url_works() {
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
-        ratings: None,
         pages: 1,
         content_rating: None,
+        director: None,
         genres: None,
+        ratings: None,
+        writers: None,
     };
     let test_omdb_search_result = OMDbSearchResult::new("tt0076759".to_string());
 
@@ -41,7 +43,9 @@ async fn get_requests_work() {
         ratings: None,
         pages: 1,
         content_rating: None,
+        director: None,
         genres: None,
+        writers: None,
     };
     let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
 
@@ -98,11 +102,13 @@ async fn many_get_requests_work() {
         ]),
         pages: 3,
         content_rating: Some(vec![String::from("PG"), String::from("PG-13")]),
+        director: None,
         genres: Some(vec![
             String::from("Action"),
             String::from("Adventure"),
             String::from("Fantasy"),
         ]),
+        writers: None,
     };
     let client = reqwest::Client::new();
 
@@ -189,34 +195,69 @@ async fn match_filters_works() {
         release_year: String::new(),
         ratings: Some(vec![
             RatingInput {
-                source: String::from("Metacritic"),
+                source: "Metacritic".to_string(),
                 score: 80.0,
             },
             RatingInput {
-                source: String::from("Internet Movie Database"),
+                source: "Internet Movie Database".to_string(),
                 score: 8.0,
             },
             RatingInput {
-                source: String::from("Rotten Tomatoes"),
+                source: "Rotten Tomatoes".to_string(),
                 score: 80.0,
             },
         ]),
         pages: 1,
-        content_rating: Some(vec![String::from("PG"), String::from("PG-13")]),
+        content_rating: Some(vec![
+            "PG".to_string(), 
+            "PG-13".to_string(),
+        ]),
+        director: Some("George Lucas".to_string()),
         genres: Some(vec![
-            String::from("Action"),
-            String::from("Adventure"),
-            String::from("Fantasy"),
+            "Action".to_string(),
+            "Adventure".to_string(),
+            "Fantasy".to_string()
+        ]),
+        writers: Some(vec![
+            "George Lucas".to_string(),
+            "Leigh Brackett".to_string(),
+            "Lawrence Kasdan".to_string()
         ]),
     };
-    let test_omdb_search_result = OMDbSearchResult::new("tt0080684".to_string());
 
-    let client = reqwest::Client::new();
-    let omdb_movie = client
-        .send_get_request::<OMDbMovie>(&test_omdb_search_result.fmt_omdb_url())
-        .await
-        .unwrap();
-    println!("{:#?}", omdb_movie);
+    let mut builder = OMDbMovieBuilder::default();
+
+    builder
+        .set_imdb_id("tt0080684".to_string())
+        .set_title("Star Wars: Episode V - The Empire Strikes Back".to_string())
+        .set_rated(Some("PG".to_string()))
+        .set_director(Some("George Lucas".to_string()))
+        .set_writer(Some(
+            "Leigh Brackett, Lawrence Kasdan, George Lucas".to_string(),
+        ))
+        .set_actors(Some(
+            "Mark Hamill, Harrison Ford, Carrie Fisher".to_string(),
+        ))
+        .set_genre(Some("Action, Adventure, Fantasy".to_string()))
+        .set_ratings(Some(vec![
+            OMDbRatingBuilder::default()
+                .set_source("Internet Movie Database".to_string())
+                .set_value("8.7/10".to_string())
+                .build(),
+            OMDbRatingBuilder::default()
+                .set_source("Rotten Tomatoes".to_string())
+                .set_value("94%".to_string())
+                .build(),
+            OMDbRatingBuilder::default()
+                .set_source("Metacritic".to_string())
+                .set_value("82/100".to_string())
+                .build(),
+        ]))
+        .set_production(Some("N/A".to_string()))
+        .set_response("True".to_string());
+    
+    let omdb_movie = builder.build();
+
     match test_search_movie_input.match_filters(&omdb_movie) {
         Ok(bool) => assert!(bool),
         Err(err) => panic!("Error parsing fields: {:#?}", err),
@@ -248,7 +289,6 @@ fn from_works() {
     builder
         .set_imdb_id("tt0080684".to_string())
         .set_title("Star Wars: Episode V - The Empire Strikes Back".to_string())
-        .set_released(Some("20 Jun 1980".to_string()))
         .set_writer(Some(
             "Leigh Brackett, Lawrence Kasdan, George Lucas".to_string(),
         ))
