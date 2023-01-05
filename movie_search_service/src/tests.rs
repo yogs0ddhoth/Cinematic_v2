@@ -1,6 +1,6 @@
 use super::*;
 use crate::resolvers::{
-    graph::{Movie, RatingInput, SearchMovieInput},
+    graph::{Movie, SearchRatingInput, SearchMovieInput},
     models::{OMDbMovie, OMDbMovieBuilder, OMDbRatingBuilder, OMDbSearchData, OMDbSearchResult},
 };
 use dotenvy::dotenv;
@@ -87,15 +87,15 @@ async fn many_get_requests_work() {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
         ratings: Some(vec![
-            RatingInput {
+            SearchRatingInput {
                 source: String::from("Metacritic"),
                 score: 60.0,
             },
-            RatingInput {
+            SearchRatingInput {
                 source: String::from("Internet Movie Database"),
                 score: 6.0,
             },
-            RatingInput {
+            SearchRatingInput {
                 source: String::from("Rotten Tomatoes"),
                 score: 60.0,
             },
@@ -194,15 +194,15 @@ async fn match_filters_works() {
         title: String::new(),
         release_year: String::new(),
         ratings: Some(vec![
-            RatingInput {
+            SearchRatingInput {
                 source: "Metacritic".to_string(),
                 score: 80.0,
             },
-            RatingInput {
+            SearchRatingInput {
                 source: "Internet Movie Database".to_string(),
                 score: 8.0,
             },
-            RatingInput {
+            SearchRatingInput {
                 source: "Rotten Tomatoes".to_string(),
                 score: 80.0,
             },

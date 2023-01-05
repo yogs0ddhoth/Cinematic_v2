@@ -4,7 +4,7 @@ pub mod models;
 use super::{async_trait, reqwest, FormatUrl, ParseFloatError, Request, Search};
 use async_graphql::Object;
 use futures::{stream, StreamExt};
-use graph::{Movie, MovieTrailers, RatingInput, SearchMovieInput};
+use graph::{Movie, MovieTrailers, SearchRatingInput, SearchMovieInput};
 use models::{OMDbMovie, OMDbSearchData};
 use std::collections::{HashMap, HashSet};
 
@@ -112,7 +112,7 @@ impl Search<OMDbMovie> for SearchMovieInput {
                         ratings_map.insert(rating.source().to_string(), rating.value().to_string());
                     }
 
-                    for RatingInput { source, score } in ratings_filter {
+                    for SearchRatingInput { source, score } in ratings_filter {
                         match ratings_map.contains_key(source) {
                             true => match source.as_str() {
                                 "Internet Movie Database" | "Metacritic" => {

@@ -243,7 +243,7 @@ pub struct SearchMovieInput {
     pub content_rating: Option<Vec<String>>,
     pub director: Option<String>,
     pub genres: Option<Vec<String>>,
-    pub ratings: Option<Vec<RatingInput>>,
+    pub ratings: Option<Vec<SearchRatingInput>>,
     pub writers: Option<Vec<String>>,
 
     #[graphql(default)]
@@ -267,7 +267,7 @@ impl FormatUrl for SearchMovieInput {
 
 #[derive(Debug, InputObject)]
 #[graphql(rename_fields = "camelCase")]
-pub struct RatingInput {
+pub struct SearchRatingInput {
     pub source: String,
     pub score: f64,
 }
