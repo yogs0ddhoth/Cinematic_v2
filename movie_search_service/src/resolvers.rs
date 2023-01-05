@@ -80,6 +80,16 @@ impl Search<OMDbMovie> for SearchMovieInput {
                 None => return Ok(false),
             }
         }
+        if let Some(director_filter) = &self.director {
+            match movie.director() {
+                Some(director) => {
+                    if director != director_filter {
+                        return Ok(false)
+                    }
+                }
+                None => return Ok(false),
+            }
+        }
         if let Some(genre_filters) = &self.genres {
             match movie.genre() {
                 Some(genre) => {
@@ -137,6 +147,20 @@ impl Search<OMDbMovie> for SearchMovieInput {
                                 }
                             },
                             false => return Ok(false),
+                        }
+                    }
+                }
+                None => return Ok(false),
+            }
+        }
+        if let Some(writer_filters) = &self.writers {
+            match movie.writer() {
+                Some(writer) => {
+                    let writer_list: HashSet<&str> = writer.split(", ").collect();
+
+                    for filter in writer_filters {
+                        if !writer_list.contains(filter.as_str()) {
+                            return Ok(false);
                         }
                     }
                 }
