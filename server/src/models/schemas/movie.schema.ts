@@ -6,7 +6,7 @@ import { Actor } from './actor.schema';
 import { Rating, RatingSchema } from './rating.schema';
 import { Director } from './director.schema';
 import { Writer } from './writer.schema';
-import { Trailers, TrailersSchema } from './trailers.schema';
+import { MovieTrailers, MovieTrailersSchema } from './movie-trailers.schema';
 
 @Schema()
 export class Movie {
@@ -68,9 +68,9 @@ export class Movie {
   image: string;
 
   @Prop({
-    type: TrailersSchema,
+    type: MovieTrailersSchema,
   })
-  trailers: Trailers;
+  trailers: MovieTrailers;
 
   @Prop({
     type: [RatingSchema],
