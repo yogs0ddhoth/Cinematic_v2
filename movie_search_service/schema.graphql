@@ -14,31 +14,42 @@ type Writer {
 	name: String!
 }
 
+type MovieTrailers @key(fields: "title") {
+	title: String!
+}
+
 type Movie {
 	imdbID: String
+
 	title: String!
 	year: String
 	released: String
 	contentRating: String
 	runtime: String
+
 	director: Director
 	writers: [Writer!]
 	actors: [Actor!]
+
 	plot: String
 	genres: [Genre!]
+	
 	language: String
 	country: String
 	awards: String
 	image: String
 	trailers: MovieTrailers!
+
 	ratings: [Rating!]
 	imdbVotes: String
-	production: String
+
 	boxOffice: String
+	production: String
 }
 
-type MovieTrailers @key(fields: "title") {
-	title: String!
+type Rating {
+	source: String!
+	score: String!
 }
 
 type Query {
@@ -47,12 +58,7 @@ type Query {
 	_entities(representations: [_Any!]!): [_Entity]!
 }
 
-type Rating {
-	source: String!
-	score: String!
-}
-
-input RatingInput {
+input SearchRatingInput {
 	source: String!
 	score: Float!
 }
@@ -61,7 +67,7 @@ input SearchMovieInput {
 	contentRating: [String!]
 	director: String
 	genres: [String!]
-	ratings: [RatingInput!]
+	ratings: [SearchRatingInput!]
 	releaseYear: String
 	title: String!
 	pages: Int

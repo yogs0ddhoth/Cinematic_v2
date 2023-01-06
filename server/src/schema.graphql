@@ -1,25 +1,24 @@
 type Actor {
   name: String!
-  movies: [Movie!]
 }
+
 type Director {
   name: String!
-  movies: [Movie!]
 }
+
 type Genre {
   name: String!
-  movies: [Movie!]
 }
-type Trailers {
+
+type MovieTrailers {
   title: String!
   trailers: [String!]
 }
+
 type Writer {
   name: String!
-  movies: [Movie!]
 }
 type Movie { # as stored in DB and queried by client
-  id: String!
   imdbID: String
 
   title: String!
@@ -39,7 +38,7 @@ type Movie { # as stored in DB and queried by client
   country: String
   awards: String
   image: String
-  trailers: Trailers
+  trailers: MovieTrailers
 
   ratings: [Rating!]
   imdbVotes: String
@@ -49,7 +48,7 @@ type Movie { # as stored in DB and queried by client
 }
 
 type User @key(fields: "id") {
-  id: ID! @external
+  id: String! 
   movies: [Movie!]
 }
 
@@ -59,7 +58,7 @@ type Rating {
 }
 
 type Query {
-  movies: User
+  movies: [Movie!]
   movie(id: String!): Movie!
   genre(genre: GenreInput): Genre
   actor(actor: ActorInput): Actor
@@ -67,27 +66,31 @@ type Query {
 
 type Mutation {
   addMovies(movies: [CreateMovieInput!]!): User
-  updateMovie(updateMovieInput: UpdateMovieInput!): Movie!
-  removeMovie(id: String!): User
+  removeMovieFromUser(imdbID: String!): User
 }
 
 input GenreInput {
   name: String!
 }
+
 input ActorInput {
   name: String!
 }
+
 input RatingInput {
   source: String!
   score: String!
 }
+
 input TrailersInput {
   title: String!
   trailers: [String!]
 }
+
 input WriterInput {
   name: String!
 }
+
 input CreateMovieInput { # output of movie_search_service & trailer-search-service subgraphs
   imdbID: String
 
@@ -99,36 +102,6 @@ input CreateMovieInput { # output of movie_search_service & trailer-search-servi
 
   director: String
   writers: [WriterInput!]
-  actors: [ActorInput!]
-
-  plot: String
-  genres: [GenreInput!]
-
-  language: String
-  country: String
-  awards: String
-  image: String
-  trailers: TrailersInput
-
-  ratings: [RatingInput!]
-  imdbVotes: String
-
-  boxOffice: String
-  production: String
-}
-
-input UpdateMovieInput { # unlikely to use
-  id: String!
-  imdbID: String
-
-  title: String
-  year: String
-  released: String
-  contentRating: String
-  runtime: String
-
-  director: String
-  writer: String
   actors: [ActorInput!]
 
   plot: String
