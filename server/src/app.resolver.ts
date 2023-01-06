@@ -1,17 +1,132 @@
 import { UseGuards } from '@nestjs/common';
-import { Resolver, Query, Mutation, Args, ResolveField } from '@nestjs/graphql';
-import { CreateMovieInput, UpdateMovieInput } from 'src/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import {
+  ActorInput,
+  CreateMovieInput,
+  DirectorInput,
+  GenreInput,
+  WriterInput,
+} from 'src/graphql';
 import { AppService } from './app.service';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// interface used as arg type for @CurrentUser decorator
 import { userAuth } from './auth/dto/user-auth.dto';
 import { CurrentUser, GqlJwtAuthGuard } from './auth/jwt-auth.guard';
 
+/**
+ * TODO: add documentation
+ */
 @Resolver('Movie')
 export class AppResolver {
   constructor(private readonly appService: AppService) {}
 
+  /**
+   * TODO: add documentation
+   * @param actors
+   * @returns
+   */
+  @Query('actors')
+  async actors(@Args('actors') actors: ActorInput[]) {
+    try {
+      return await this.appService.getActors({
+        actors,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  /** TODO: add documentation
+   *  @param directors
+   *  @returns
+   */
+  @Query('directors')
+  async directors(@Args('directors') directors: DirectorInput[]) {
+    try {
+      return await this.appService.getDirectors({
+        directors,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  /**
+   * TODO: add documentation
+   * @param genres
+   * @returns
+   */
+  @Query('genres')
+  async genres(@Args('genres') genres: GenreInput[]) {
+    try {
+      return await this.appService.getGenres({
+        genres,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  /**
+   * TODO: add documentation
+   * @returns
+   */
   @Query('movies')
+  async movies() {
+    try {
+      return await this.appService.getMovies({
+        populate: 'genres directors writers actors',
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  /**
+   * TODO: add documentation
+   * @param writers
+   * @returns
+   */
+  @Query('writers')
+  async writers(@Args('writers') writers: WriterInput[]) {
+    try {
+      return await this.appService.getWriters({
+        writers,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+  /**
+   * TODO: add documentation
+   * @param userAuth
+   * @returns
+   */
+  @Query('userMovies')
   @UseGuards(GqlJwtAuthGuard)
-  async movies(
+  async userMovies(
     @CurrentUser()
     userAuth: userAuth,
   ) {
@@ -25,16 +140,12 @@ export class AppResolver {
     }
   }
 
-  @Query('movie')
-  async movie(@Args('id') id: string) {
-    try {
-      // return await this.appService.getMovieByID(id);
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
-
+  /**
+   * TODO: add documentation
+   * @param userAuth
+   * @param movies
+   * @returns
+   */
   @Mutation('addMovies')
   @UseGuards(GqlJwtAuthGuard)
   async addMovies(
@@ -53,19 +164,13 @@ export class AppResolver {
     }
   }
 
-  // unlikely to use
-  // @Mutation('updateMovie')
-  // async updateMovie(
-  //   @Args('updateMovieInput') updateMovieInput: UpdateMovieInput,
-  // ) {
-  //   try {
-  //   } catch (error) {
-  //     console.log(error);
-  //     return error;
-  //   }
-  // }
-
-  @Mutation('removeMovie')
+  /**
+   * TODO: add documentation
+   * @param userAuth
+   * @param id
+   * @returns
+   */
+  @Mutation('removeMovieFromUser')
   @UseGuards(GqlJwtAuthGuard)
   async remove(@CurrentUser() userAuth: userAuth, @Args('id') id: string) {
     try {
@@ -78,6 +183,4 @@ export class AppResolver {
       return error;
     }
   }
-
-  // @ResolveField('')
 }
