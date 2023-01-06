@@ -1,22 +1,26 @@
 type Actor {
   name: String!
+  movies: [Movie!]
 }
 
 type Director {
   name: String!
+  movies: [Movie!]
 }
 
 type Genre {
   name: String!
+  movies: [Movie!]
 }
 
 type MovieTrailers {
   title: String!
-  trailers: [String!]
+  trailers: [String!] 
 }
 
 type Writer {
   name: String!
+  movies: [Movie!]
 }
 type Movie {
   imdbID: String
@@ -60,8 +64,10 @@ type Rating {
 type Query {
   movies: [Movie!]
   userMovies: User
-  actor(actor: ActorInput): Actor
-  genre(genre: GenreInput): Genre
+  actors(actors: [ActorInput!]!): [Actor!]
+  directors(directors: [DirectorInput!]!): [Director!]
+  genres(genres: [GenreInput!]!): [Genre!]
+  writers(writers: [WriterInput!]!): [Writer!]
 }
 
 type Mutation {
@@ -69,11 +75,15 @@ type Mutation {
   removeMovieFromUser(imdbID: String!): User
 }
 
-input GenreInput {
+input ActorInput {
   name: String!
 }
 
-input ActorInput {
+input DirectorInput {
+  name: String!
+}
+
+input GenreInput {
   name: String!
 }
 
@@ -100,7 +110,7 @@ input CreateMovieInput { # output of movie_search_service & trailer-search-servi
   contentRating: String
   runtime: String
 
-  director: String
+  director: DirectorInput
   writers: [WriterInput!]
   actors: [ActorInput!]
 

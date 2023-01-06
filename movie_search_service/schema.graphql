@@ -1,17 +1,21 @@
 type Actor {
 	name: String!
+	movies: [Movie!] # always resolve null for this subgraph
 }
 
 type Director {
-  name: String!
+  	name: String!
+	movies: [Movie!] # always resolve null for this subgraph
 }
 
 type Genre {
 	name: String!
+	movies: [Movie!] # always resolve null for this subgraph
 }
 
 type Writer {
 	name: String!
+	movies: [Movie!] # always resolve null for this subgraph
 }
 
 type MovieTrailers @key(fields: "title") {
