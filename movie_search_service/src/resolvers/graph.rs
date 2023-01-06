@@ -7,44 +7,48 @@ use async_graphql::{InputObject, SimpleObject};
 #[derive(Debug, SimpleObject)]
 pub struct Genre {
     name: String,
+    movies: Option<Vec<Movie>>
 }
 impl Genre {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Genre { name: value }
+        Genre { name: value, movies: None }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Director {
     name: String,
+    movies: Option<Vec<Movie>>
 }
 impl Director {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Director { name: value }
+        Director { name: value, movies: None }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Actor {
     name: String,
+    movies: Option<Vec<Movie>>
 }
 impl Actor {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Actor { name: value }
+        Actor { name: value, movies: None }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Writer {
     name: String,
+    movies: Option<Vec<Movie>>
 }
 impl Writer {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Writer { name: value }
+        Writer { name: value, movies: None }
     }
 }
 
