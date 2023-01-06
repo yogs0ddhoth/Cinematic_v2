@@ -22,13 +22,22 @@ export class MovieService {
     return this.MovieModel.create(docs);
   }
 
-  async get(params: {
+  async find(params: {
     filter: FilterQuery<MovieDocument>;
     projection?: ProjectionType<MovieDocument>;
     options?: QueryOptions<MovieDocument>;
   }) {
     const { filter, projection, options } = params;
     return this.MovieModel.findOne(filter, projection, options).exec();
+  }
+
+  async get(params: {
+    filter: FilterQuery<MovieDocument>;
+    projection?: ProjectionType<MovieDocument>;
+    options?: QueryOptions<MovieDocument>;
+  }) {
+    const { filter, projection, options } = params;
+    return this.MovieModel.find(filter, projection, options).exec();
   }
 
   async update(params: {

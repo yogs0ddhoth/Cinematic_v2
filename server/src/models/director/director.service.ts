@@ -28,13 +28,32 @@ export class DirectorService {
     return this.DirectorModel.create(doc);
   }
 
-  async get(params: {
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
+  async find(params: {
     filter: FilterQuery<DirectorDocument>;
     projection?: ProjectionType<DirectorDocument>;
     options?: QueryOptions<DirectorDocument>;
   }) {
     const { filter, projection, options } = params;
     return this.DirectorModel.findOne(filter, projection, options).exec();
+  }
+
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
+  async get(params: {
+    filter: FilterQuery<DirectorDocument>;
+    projection?: ProjectionType<DirectorDocument>;
+    options?: QueryOptions<DirectorDocument>;
+  }) {
+    const { filter, projection, options } = params;
+    return this.DirectorModel.find(filter, projection, options).exec();
   }
 
   /**
@@ -53,6 +72,11 @@ export class DirectorService {
     return this.DirectorModel.findOneAndUpdate(filter, update, options).exec();
   }
 
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
   async delete(params: { id: string }) {
     const { id } = params;
     return this.DirectorModel.findByIdAndDelete(id).exec();

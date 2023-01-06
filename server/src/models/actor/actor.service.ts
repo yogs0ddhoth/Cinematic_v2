@@ -27,13 +27,32 @@ export class ActorService {
     return this.ActorModel.create(doc);
   }
 
-  async get(params: {
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
+  async find(params: {
     filter: FilterQuery<ActorDocument>;
     projection?: ProjectionType<ActorDocument>;
     options?: QueryOptions<ActorDocument>;
   }) {
     const { filter, projection, options } = params;
     return this.ActorModel.findOne(filter, projection, options).exec();
+  }
+
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
+  async get(params: {
+    filter: FilterQuery<ActorDocument>;
+    projection?: ProjectionType<ActorDocument>;
+    options?: QueryOptions<ActorDocument>;
+  }) {
+    const { filter, projection, options } = params;
+    return this.ActorModel.find(filter, projection, options).exec();
   }
 
   /**
@@ -51,7 +70,11 @@ export class ActorService {
     const { filter, update, options } = params;
     return this.ActorModel.findOneAndUpdate(filter, update, options).exec();
   }
-
+  /**
+   * TODO: add documentation
+   * @param params
+   * @returns
+   */
   async delete(params: { id: string }) {
     const { id } = params;
     return this.ActorModel.findByIdAndDelete(id).exec();
