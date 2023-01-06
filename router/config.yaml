@@ -1,0 +1,9 @@
+#
+# supergraph: Configuration of the Supergraph server
+#
+supergraph:
+  headers:
+  all: # Header rules for all subgraphs
+    request:
+      - propagate:
+          matching: ^Authorization
