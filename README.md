@@ -1,5 +1,6 @@
 # Cinematic_v2
 A backend for third-party API calls data processing,persistance, and user auth; incorporating microservice architecture; built for the previous [Cinematic Movie Finder](https://github.com/yogs0ddhoth/Cinematic-Film-Finder) Client refactored for Angular.
+A backend for third-party API calls data processing,persistance, and user auth; incorporating microservice architecture; built for the previous [Cinematic Movie Finder](https://github.com/yogs0ddhoth/Cinematic-Film-Finder) Client refactored for Angular.
 ## State of Progress - TODOS:
 * Implementing microservice architecture on the backend
     * **Subgraph-Services**:
@@ -23,6 +24,7 @@ A backend for third-party API calls data processing,persistance, and user auth; 
             - &check; implement microservice to query Youtube API for movie trailers &check; and filter results for relevance
             - &check; respond with selected list of url paths 
             - &check; configure for Federation and publish subgraph
+    - &check; Configure supergraph and apollo router
     - &check; Configure supergraph and apollo router
 * **Fill out Client**:
     - replace legacy jquery rendering with angular/ngx-bootstrap rendering

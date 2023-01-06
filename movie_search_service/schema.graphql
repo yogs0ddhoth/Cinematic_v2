@@ -49,6 +49,7 @@ type Movie {
 
 	boxOffice: String
 	production: String
+	boxOffice: String
 }
 
 type Rating {
