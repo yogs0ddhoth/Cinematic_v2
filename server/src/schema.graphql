@@ -18,7 +18,7 @@ type MovieTrailers {
 type Writer {
   name: String!
 }
-type Movie { # as stored in DB and queried by client
+type Movie {
   imdbID: String
 
   title: String!
@@ -59,9 +59,9 @@ type Rating {
 
 type Query {
   movies: [Movie!]
-  movie(id: String!): Movie!
-  genre(genre: GenreInput): Genre
+  userMovies: User
   actor(actor: ActorInput): Actor
+  genre(genre: GenreInput): Genre
 }
 
 type Mutation {
