@@ -8,22 +8,24 @@ import {
   WriterInput,
 } from 'src/graphql';
 import { AppService } from './app.service';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 // interface used as arg type for @CurrentUser decorator
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { userAuth } from './auth/dto/user-auth.dto';
 import { CurrentUser, GqlJwtAuthGuard } from './auth/jwt-auth.guard';
 
 /**
- * TODO: add documentation
+ * CLass containing resolvers for the movieDB subgraph
  */
-@Resolver('Movie')
+@Resolver('AppResolver')
 export class AppResolver {
   constructor(private readonly appService: AppService) {}
 
   /**
-   * TODO: add documentation
-   * @param actors
-   * @returns
+   * Query for actors by name, and return, with their referenced movies populated
+   * @param actors ActorInput[] - an array of actors to search for
+   * @type {ActorInput} {name: string}
+   * @returns Actor[] - an array of actors, with their movies, and references populated
    */
   @Query('actors')
   async actors(@Args('actors') actors: ActorInput[]) {
@@ -41,9 +43,10 @@ export class AppResolver {
     }
   }
 
-  /** TODO: add documentation
-   *  @param directors
-   *  @returns
+  /** Query for directors by name, and return, with their referenced movies populated
+   *  @param directors DirectorInput[] - an array of directors to search for
+   *  @type {DirectorInput} {name: string}
+   *  @returns Director[] - an array of directors, with their movies, and references populated
    */
   @Query('directors')
   async directors(@Args('directors') directors: DirectorInput[]) {
@@ -62,9 +65,10 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @param genres
-   * @returns
+   * Query for genres by name, and return, with their referenced movies populated
+   * @param genres GenreInput[] - an array of genres to search for
+   * @type {GenreInput} {name: string}
+   * @returns Genre[] - an array of genres, with their movies, and references populated
    */
   @Query('genres')
   async genres(@Args('genres') genres: GenreInput[]) {
@@ -83,14 +87,14 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @returns
+   * Get all movies, and populate their references
+   * @returns Movie[] - an array of movies, with their references populated
    */
   @Query('movies')
   async movies() {
     try {
       return await this.appService.getMovies({
-        populate: 'genres directors writers actors',
+        populate: 'genres directors writers actors trailers',
       });
     } catch (error) {
       console.log(error);
@@ -99,9 +103,10 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @param writers
-   * @returns
+   * Query for writers by name, and return, with their referenced movies populated
+   * @param writers WriterInput[] - an array of writers to search for
+   * @type {WriterInput} {name: string}
+   * @returns Writer[] - an array of writers, with their movies, and references populated
    */
   @Query('writers')
   async writers(@Args('writers') writers: WriterInput[]) {
@@ -120,9 +125,10 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @param userAuth
-   * @returns
+   * Query single User by Auth, and return, with their referenced movies populated
+   * @param userAuth userAuth - the userAuth object containing the user's id and username
+   * @type {userAuth} {id: string}
+   * @returns User - a user, with their movies, and references populated
    */
   @Query('userMovies')
   @UseGuards(GqlJwtAuthGuard)
@@ -141,10 +147,10 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @param userAuth
-   * @param movies
-   * @returns
+   * Add movies, with references, to a user's list, creating those that don't exist
+   * @param userAuth userAuth - the userAuth object containing the user's id and username
+   * @param movies createMovieInput[] - an array of movies to add to the user's list
+   * @returns User - a user, with their movies, and references populated
    */
   @Mutation('addMovies')
   @UseGuards(GqlJwtAuthGuard)
@@ -165,10 +171,10 @@ export class AppResolver {
   }
 
   /**
-   * TODO: add documentation
-   * @param userAuth
-   * @param id
-   * @returns
+   * Remove a movie from a user's list
+   * @param userAuth userAuth - the userAuth object containing the user's id and username
+   * @param id string - the id of the movie to remove
+   * @returns User - updated user, with their movies, and references populated
    */
   @Mutation('removeMovieFromUser')
   @UseGuards(GqlJwtAuthGuard)
