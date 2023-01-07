@@ -13,7 +13,7 @@ export class Movie {
   @Prop({ unique: true })
   imdbID: string;
 
-  @Prop()
+  @Prop({ unique: true })
   title: string;
 
   @Prop()
