@@ -42,10 +42,11 @@ export class AppService {
   ) {}
 
   /**
-   * Query database for the referenced Actor and add Movie reference if doesn't exist, create one if doesn't exist
-   * @param CreateActor - { name: string }
-   * @returns the associated Actor ID as a Mongoose ObjectId
-   * @throws {Error} if upsert is unsuccessful, or returns null
+   * Find Actor document by name, and add Movie reference if doesn't exist; create one if doesn't exist
+   * @param CreateActor CreateActor: the unique name of the actor to find or create, and the movie ID to add to their movies array
+   * @type {CreateActor} - { name: string; movieID?: Types.ObjectId | null; }
+   * @returns Promise: the associated Actor ID as a Mongoose ObjectId
+   * @throws {Error} if update throws Error, or returns null
    */
   async addActor({
     name,
@@ -87,9 +88,11 @@ export class AppService {
   }
 
   /**
-   * Query database for the referenced Director and add Movie reference if doesn't exist, create one if doesn't exist
-   * @param param0
-   * @returns
+   * Find Director document by name, and add Movie reference if doesn't exist; create one if doesn't exist
+   * @param CreateDirector CreateDirector: the unique name of the director to find or create, and the movie ID to add to their movies array
+   * @type {CreateDirector} - { name: string; movieID?: Types.ObjectId | null; }
+   * @returns Promise: the associated Director ID as a Mongoose ObjectId
+   * @throws {Error} if update throws Error, or returns null
    */
   async addDirector({
     name,
@@ -133,10 +136,11 @@ export class AppService {
   }
 
   /**
-   * Query database for the referenced Genre and add Movie reference if doesn't exist, create one if doesn't exist
-   * @param CreateGenre - { name: string }
-   * @returns the associated Genre ID as a Mongoose ObjectId
-   * @throws {Error} if upsert is unsuccessful, or returns null
+   * Find Genre document by name, and add Movie reference if doesn't exist; create one if doesn't exist
+   * @param CreateGenre CreateGenre: the unique name of the genre to find or create, and the movie ID to add to their movies array
+   * @type {CreateGenre} - { name: string; movieID?: Types.ObjectId | null; }
+   * @returns Promise: the associated Genre ID as a Mongoose ObjectId
+   * @throws {Error} if update throws Error, or returns null
    */
   async addGenre({
     name,
@@ -180,9 +184,11 @@ export class AppService {
   }
 
   /**
-   * TODO: add documentation
-   * @param param0
-   * @returns
+   * Find Writer document by name, and add Movie reference if doesn't exist; create one if doesn't exist
+   * @param CreateWriter CreateWriter: the unique name of the writer to find or create, and the movie ID to add to their movies array
+   * @type {CreateWriter} - { name: string; movieID?: Types.ObjectId | null; }
+   * @returns Promise: the associated Writer ID as a Mongoose ObjectId
+   * @throws {Error} if update throws Error, or returns null
    */
   async addWriter({
     name,
@@ -226,12 +232,18 @@ export class AppService {
   }
 
   /**
-   * Query database for the associated movie, and create one if doesn't exist
-   * @param genres - Array<{ name: string }>
-   * @param actors - Array<{ name: string }>
-   * @param movie type: CreateMovie
-   * @type {CreateMovie} see './models/movie/dto/create-movie.dto.ts'
-   * @returns the associated Movie ID as a Mongoose ObjectId
+   * Find Movie document by unique imdbID or name, and add Actor, Director, Genre, and Writer references if they don't exist; create any documents that don't exist
+   * @param movie CreateMovieInput: - the movie data
+   * @param actors - ActorInput[]: the unique name of the actor to find or create
+   * @param director - DirectorInput: the unique name of the director to find or create
+   * @param genres - GenreInput[]: the unique name of the genre to find or create
+   * @param writers - WritersInput[]: the unique name of the writer to find or create
+   * @type {CreateMovieInput} see 'src/models/movie/dto/create-movie.dto.ts'
+   * @type {ActorInput} { name: string; } see 'graphql.ts'
+   * @type {DirectorInput} { name: string; } see 'graphql.ts'
+   * @type {GenreInput} { name: string; } see 'graphql.ts'
+   * @type {WriterInput} { name: string; } see 'graphql.ts'
+   * @returns Promise: the associated Movie ID as a Mongoose ObjectId
    * @throws {Error} if MongooseError, or update returns null
    */
   async addMovie({
@@ -356,10 +368,10 @@ export class AppService {
   }
 
   /**
-   * Add Movies and references to database if they do not exist
-   * @param {CreateMovieInput[]} movies an array of movies to add
-   * @type {CreateMovieInput} see graphql.ts
-   * @returns an array of the associated Movie IDs as Mongoose ObjectIds
+   * Add Movies and their references, if they don't exist
+   * @param movies - CreateMovieInput[]: an array of movies to add
+   * @type {CreateMovieInput} see 'graphql.ts'
+   * @returns Promise: an array of the associated Movie IDs as Mongoose ObjectIds
    */
   async addMovies(
     movies: CreateMovieInput[],
@@ -387,21 +399,21 @@ export class AppService {
   }
 
   /**
-   * Query Movie documents, creating those that don't exist, and add reference to the User by id
-   * @param id _id of the user
-   * @param movies an array of type CreateMovieInput to be added the Database as Movie subdocuments if they don't exist, and attached to the User document
+   * Find Movie documents, creating those that don't exist, and add references to the User if they don't exist
+   * @param userID _id of the user
+   * @param movies  CreateMovieInput[]: an array of Movies to create if they don't exist, and add to the User
    * @returns Promise: the associated User ID as a string
    * @throws {Error} if update returns null
    */
   async addMoviesToUser(
-    id: string,
+    userID: string,
     movies: CreateMovieInput[],
   ): Promise<string> {
     const movieIDs = await this.addMovies(movies); // query Movie document IDs, creating documents if they don't exist
 
     // Update User document with the Movie references
     const updatedUser = await this.userService.update({
-      id,
+      id: userID,
       update: {
         $addToSet: {
           movies: { $each: movieIDs },
@@ -416,17 +428,18 @@ export class AppService {
       // catch possible null return value
       throw new Error('Error: findByIdAndUpdate returned null', {
         cause: {
-          value: { id, movieIDs },
+          value: { userID, movieIDs },
         },
       });
     return updatedUser._id;
   }
 
   /**
-   * TODO: add documentation
-   * @param actors
-   * @param populate
-   * @returns
+   * Find Actor documents by unique name
+   * @param actors ActorInput[]: an array of ActorInput objects
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
+   * @type {ActorInput} { name: string }
+   * @returns Promise: an array of Actor documents
    */
   async getActors(params: {
     actors: ActorInput[];
@@ -457,10 +470,11 @@ export class AppService {
   }
 
   /**
-   * TODO: add documentation
-   * @param directors
-   * @param populate
-   * @returns
+   * Find Director documents by unique name
+   * @param directors DirectorInput[]: an array of DirectorInput objects
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
+   * @type {DirectorInput} { name: string }
+   * @returns Promise: an array of Director documents
    */
   async getDirectors(params: {
     directors: DirectorInput[];
@@ -491,10 +505,11 @@ export class AppService {
   }
 
   /**
-   * TODO: add documentation
-   * @param genres
-   * @param populate
-   * @returns
+   * Find Genre documents by unique name
+   * @param genres GenreInput[]: an array of GenreInput objects
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
+   * @type {GenreInput} { name: string }
+   * @returns Promise: an array of Genre documents
    */
   async getGenres(params: {
     genres: GenreInput[];
@@ -525,7 +540,8 @@ export class AppService {
   }
 
   /**
-   * Query database for all Movie documents
+   * Get all Movie documents
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
    * @returns Promise: an array of all Movie documents
    */
   async getMovies(params: {
@@ -553,9 +569,11 @@ export class AppService {
   }
 
   /**
-   * TODO: add documentation
-   * @param params
-   * @returns
+   * Find Writer documents by unique name
+   * @param writers WriterInput[]: an array of WriterInput objects
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
+   * @type {WriterInput} { name: string }
+   * @returns Promise: an array of Writer documents
    */
   async getWriters(params: {
     writers: WriterInput[];
@@ -586,10 +604,10 @@ export class AppService {
   }
 
   /**
-   * Query database for associated User document, creating one if it doesn't exist
-   * @param userAuth the user information
-   * @returns Promise: the associated User ID as a string
+   * Find User document by unique_id field; create one if it doesn't exist
+   * @param userAuth - userAuth: user information
    * @type {userAuth} { id: string, username: string }
+   * @returns Promise: the associated User ID as a string
    */
   async getUser(userAuth: userAuth): Promise<string> {
     const { id, username } = userAuth;
@@ -611,15 +629,23 @@ export class AppService {
   }
 
   /**
-   * Query User document, and return with populated references
-   *
-   * @param id User ID as string
-   * @returns Promise: UserDocument - the user id, username, and a nested array of Movie subdocuments
+   * Find User document by unique id, with nested Movie documents and references populated
+   * @param userID User ID as string
+   * @param populate fields to populate, see https://mongoosejs.com/docs/populate.html
+   * @returns Promise: user document
    * @error this method is only intended for existing User documents, and will throw an error if one does not exist
    */
-  async getUserMovies(id: string): Promise<UserDocument> {
+  async getUserMovies(params: {
+    userID: string;
+    populate?:
+      | string
+      | string[]
+      | mongoose.PopulateOptions
+      | mongoose.PopulateOptions[];
+  }): Promise<UserDocument> {
+    const { userID, populate } = params;
     const foundUser = await this.userService.get({
-      id,
+      id: userID,
       options: {
         populate: {
           path: 'movies',
@@ -630,12 +656,27 @@ export class AppService {
     if (!foundUser)
       // throw error if document does not exist
       throw new Error('Error: could not findOne User by id filter', {
-        cause: { value: id },
+        cause: { value: userID },
       });
     return foundUser;
   }
 
-  async removeMoviefromUser(userID: string, movieID: string) {
+  /**
+   * Remove a Movie reference from a User's movies array
+   * @param userID the User ID as a string
+   * @param movieID the Movie reference to remore from the User's movies array
+   * @returns the updated User document
+   */
+  async removeMoviefromUser(params: {
+    userID: string;
+    movieID: string;
+    populate?:
+      | string
+      | string[]
+      | mongoose.PopulateOptions
+      | mongoose.PopulateOptions[];
+  }) {
+    const { userID, movieID, populate } = params;
     return await this.userService.update({
       id: userID,
       update: {
@@ -644,10 +685,8 @@ export class AppService {
         },
       },
       options: {
-        populate: {
-          path: 'movies',
-          populate: 'genres directors writers actors',
-        },
+        new: true,
+        populate,
       },
     });
   }

@@ -25,7 +25,7 @@ export class AppResolver {
    * Query for actors by name, and return, with their referenced movies populated
    * @param actors ActorInput[] - an array of actors to search for
    * @type {ActorInput} {name: string}
-   * @returns Actor[] - an array of actors, with their movies, and references populated
+   * @returns gql'[Actor!]' - an array of actors, with their movies, and references populated
    */
   @Query('actors')
   async actors(@Args('actors') actors: ActorInput[]) {
@@ -46,7 +46,7 @@ export class AppResolver {
   /** Query for directors by name, and return, with their referenced movies populated
    *  @param directors DirectorInput[] - an array of directors to search for
    *  @type {DirectorInput} {name: string}
-   *  @returns Director[] - an array of directors, with their movies, and references populated
+   *  @returns gql'[Director!]' - an array of directors, with their movies, and references populated
    */
   @Query('directors')
   async directors(@Args('directors') directors: DirectorInput[]) {
@@ -68,7 +68,7 @@ export class AppResolver {
    * Query for genres by name, and return, with their referenced movies populated
    * @param genres GenreInput[] - an array of genres to search for
    * @type {GenreInput} {name: string}
-   * @returns Genre[] - an array of genres, with their movies, and references populated
+   * @returns gql'[Genre!]' - an array of genres, with their movies, and references populated
    */
   @Query('genres')
   async genres(@Args('genres') genres: GenreInput[]) {
@@ -88,7 +88,7 @@ export class AppResolver {
 
   /**
    * Get all movies, and populate their references
-   * @returns Movie[] - an array of movies, with their references populated
+   * @returns gql'[Movie!]' an array of movies, with their references populated
    */
   @Query('movies')
   async movies() {
@@ -103,10 +103,10 @@ export class AppResolver {
   }
 
   /**
-   * Query for writers by name, and return, with their referenced movies populated
+   * Query for writers by name, and return found documents, with their referenced movies populated
    * @param writers WriterInput[] - an array of writers to search for
    * @type {WriterInput} {name: string}
-   * @returns Writer[] - an array of writers, with their movies, and references populated
+   * @returns gql`[Writer!]` - an array of writer documents, with their movies, and references populated
    */
   @Query('writers')
   async writers(@Args('writers') writers: WriterInput[]) {
@@ -128,7 +128,7 @@ export class AppResolver {
    * Query single User by Auth, and return, with their referenced movies populated
    * @param userAuth userAuth - the userAuth object containing the user's id and username
    * @type {userAuth} {id: string}
-   * @returns User - a user, with their movies, and references populated
+   * @returns gql'User' - a user, with their movies, and references populated
    */
   @Query('userMovies')
   @UseGuards(GqlJwtAuthGuard)
@@ -138,8 +138,14 @@ export class AppResolver {
   ) {
     try {
       console.log(userAuth);
-      const user = await this.appService.getUser(userAuth);
-      return await this.appService.getUserMovies(user);
+      const userID = await this.appService.getUser(userAuth);
+      return await this.appService.getUserMovies({
+        userID,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
     } catch (error) {
       console.log(error);
       return error;
@@ -150,7 +156,7 @@ export class AppResolver {
    * Add movies, with references, to a user's list, creating those that don't exist
    * @param userAuth userAuth - the userAuth object containing the user's id and username
    * @param movies createMovieInput[] - an array of movies to add to the user's list
-   * @returns User - a user, with their movies, and references populated
+   * @returns gql'User' - a user, with their movies, and references populated
    */
   @Mutation('addMovies')
   @UseGuards(GqlJwtAuthGuard)
@@ -162,9 +168,13 @@ export class AppResolver {
       console.log(userAuth);
       const userID = await this.appService.getUser(userAuth);
 
-      return await this.appService.getUserMovies(
-        await this.appService.addMoviesToUser(userID, movies),
-      );
+      return await this.appService.getUserMovies({
+        userID: await this.appService.addMoviesToUser(userID, movies),
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -174,14 +184,21 @@ export class AppResolver {
    * Remove a movie from a user's list
    * @param userAuth userAuth - the userAuth object containing the user's id and username
    * @param id string - the id of the movie to remove
-   * @returns User - updated user, with their movies, and references populated
+   * @returns gql'User' - updated user, with their movies, and references populated
    */
   @Mutation('removeMovieFromUser')
   @UseGuards(GqlJwtAuthGuard)
   async remove(@CurrentUser() userAuth: userAuth, @Args('id') id: string) {
     try {
       console.log(id);
-      const user = await this.appService.removeMoviefromUser(userAuth.id, id);
+      const user = await this.appService.removeMoviefromUser({
+        userID: userAuth.id,
+        movieID: id,
+        populate: {
+          path: 'movies',
+          populate: 'genres directors writers actors',
+        },
+      });
       console.log(user);
       return user;
     } catch (error) {
