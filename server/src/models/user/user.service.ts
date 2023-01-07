@@ -5,16 +5,32 @@ import { Model, ProjectionType, QueryOptions, UpdateQuery } from 'mongoose';
 import { User, UserDocument } from '../schemas/user.schema';
 import { CreateUser } from './dto/create-user.dto';
 
+/**
+ * Class containing Mongoose CRUD methods for User documents
+ */
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly UserModel: Model<UserDocument>,
   ) {}
 
+  /**
+   * Mongoose Model.create(): create a new User document or array of documents
+   * @param doc - CreateUser | CreateUser[] document/documents to be created
+   * @type {CreateUser} { _id: string, username: string }
+   * @returns created document or documents
+   */
   async create(doc: CreateUser) {
     return this.UserModel.create(doc);
   }
 
+  /**
+   * Mongoose.Model.findById(): finds a single document by its _id field. findById(id) is almost* equivalent to findOne({ _id: id }). If you want to query by a document's _id, use findById() instead of findOne().
+   * @param id { string } the id of the document to find
+   * @param projections fields to include or exclude
+   * @param options query options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
+   * @returns a single document, or null if none is found
+   */
   async get(params: {
     id: string;
     projection?: ProjectionType<UserDocument>;
@@ -24,6 +40,12 @@ export class UserService {
     return this.UserModel.findById(id, projection, options).exec();
   }
 
+  /**
+   * Mongoose Model.findByIdAndUpdate(): atomically find the document by id and apply update
+   * @param id { string } the id of the document to update
+   * @param update field update(s)
+   * @param options update options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
+   */
   async update(params: {
     id: string;
     update: UpdateQuery<UserDocument>;
@@ -33,6 +55,11 @@ export class UserService {
     return this.UserModel.findByIdAndUpdate(id, update, options).exec();
   }
 
+  /**
+   * Mongoose Model.findByIdAndDelete(): atomically find the document by id and delete it
+   * @param params { id: string }
+   * @returns a document containing a boolean acknowledged as true if the operation ran with write concern or false if write concern was disabled, and deletedCount containing the number of deleted documents; or null if none is found
+   */
   async delete(params: { id: string }) {
     const { id } = params;
     return this.UserModel.findByIdAndDelete(id).exec();

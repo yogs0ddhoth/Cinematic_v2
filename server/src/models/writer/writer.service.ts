@@ -12,7 +12,7 @@ import { Writer, WriterDocument } from '../schemas/writer.schema';
 import { CreateWriter } from './dto/create-writer.dto';
 
 /**
- * Class containing Mongoose CRUD methods for interacting with the Writer collection
+ * Class containing Mongoose CRUD methods for Writer documents
  */
 @Injectable()
 export class WriterService {
@@ -24,8 +24,8 @@ export class WriterService {
   /**
    * Mongoose.Model.create(): create a new Writer document or array of documents
    * @param {CreateWriter} doc document/documents to be created
-   * @type {CreateWriter}  name: string, movieID?: Types.ObjectId | null }
-   * @returns created document or array documents
+   * @type {CreateWriter} { name: string, movieID?: Types.ObjectId | null }
+   * @returns created document or array of documents
    */
   async create(doc: CreateWriter | CreateWriter[]) {
     return this.WriterModel.create(doc);
@@ -34,8 +34,8 @@ export class WriterService {
   /**
    * Mongoose Model.findOne(): gets a single document that matches filter
    * @param filter fields to search by
-   * @param projection fields to return
-   * @param options query options - see docs
+   * @param projection fields to include or exclude
+   * @param options query options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
    * @returns a single document, or null if none is found
    */
   async find(params: {
@@ -50,8 +50,8 @@ export class WriterService {
   /**
    * Mongoose Model.find(): gets a list of documents that match filter
    * @param filter fields to search by
-   * @param projection fields to return
-   * @param options query options - see docs
+   * @param projection fields to include or exclude
+   * @param options query options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
    * @returns a single document, array of documents, or null if none is found
    */
   async get(params: {
@@ -67,7 +67,7 @@ export class WriterService {
    * Mongoose Model.findOneAndUpdate(): atomically find the first document that matches filter and apply update
    * @param filter fields to search by
    * @param update field update(s)
-   * @param options update options - see docs
+   * @param options update options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
    * @returns updated document, or null if none is found (and upsert = false)
    */
   async update(params: {

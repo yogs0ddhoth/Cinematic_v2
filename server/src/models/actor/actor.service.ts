@@ -11,6 +11,9 @@ import {
 import { Actor, ActorDocument } from '../schemas/actor.schema';
 import { CreateActor } from './dto/create-actor.dto';
 
+/**
+ * Class containing Mongoose CRUD methods for Actor documents
+ */
 @Injectable()
 export class ActorService {
   constructor(
@@ -18,19 +21,21 @@ export class ActorService {
   ) {}
 
   /**
-   * create a new Actor document or array of documents
-   * @param {CreateActor} doc document/documents to be created
-   * @type {CreateActor}  name: string, movieID?: Types.ObjectId | null }
-   * @returns created document or documents
+   * Mongoose.Model.create(): create a new Actor document or array of documents
+   * @param doc CreateActor | CreateActor[] document/documents to be created
+   * @type {CreateActor} { name: string, movieID?: Types.ObjectId | null }
+   * @returns created document or array of documents
    */
   async create(doc: CreateActor | CreateActor[]) {
     return this.ActorModel.create(doc);
   }
 
   /**
-   * TODO: add documentation
-   * @param params
-   * @returns
+   * Mongoose Model.findOne(): gets a single document that matches filter
+   * @param filter fields to search by
+   * @param projection fields to include or exclude
+   * @param options query options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
+   * @returns a single document, or null if none is found
    */
   async find(params: {
     filter: FilterQuery<ActorDocument>;
@@ -42,9 +47,11 @@ export class ActorService {
   }
 
   /**
-   * TODO: add documentation
-   * @param params
-   * @returns
+   * Mongoose Model.find(): gets a list of documents that match filter
+   * @param filter fields to search by
+   * @param projection fields to include or exclude
+   * @param options query options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
+   * @returns a single document, array of documents, or null if none is found
    */
   async get(params: {
     filter: FilterQuery<ActorDocument>;
@@ -59,7 +66,7 @@ export class ActorService {
    * Mongoose Model.findOneAndUpdate(): atomically find the first document that matches filter and apply update
    * @param filter fields to search by
    * @param update field update(s)
-   * @param options update options - see docs
+   * @param options update options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
    * @returns updated document, or null if none is found (and upsert = false)
    */
   async update(params: {
@@ -70,10 +77,11 @@ export class ActorService {
     const { filter, update, options } = params;
     return this.ActorModel.findOneAndUpdate(filter, update, options).exec();
   }
+
   /**
-   * TODO: add documentation
-   * @param params
-   * @returns
+   * Mongoose Model.findByIdAndDelete(): atomically find the document by id and delete it
+   * @param params { id: string }
+   * @returns a document containing a boolean acknowledged as true if the operation ran with write concern or false if write concern was disabled, and deletedCount containing the number of deleted documents; or null if none is found
    */
   async delete(params: { id: string }) {
     const { id } = params;
