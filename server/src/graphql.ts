@@ -8,17 +8,30 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export interface GenreInput {
+export interface ActorInput {
     name: string;
 }
 
-export interface ActorInput {
+export interface DirectorInput {
+    name: string;
+}
+
+export interface GenreInput {
     name: string;
 }
 
 export interface RatingInput {
     source: string;
     score: string;
+}
+
+export interface TrailersInput {
+    title: string;
+    trailers?: Nullable<string[]>;
+}
+
+export interface WriterInput {
+    name: string;
 }
 
 export interface CreateMovieInput {
@@ -28,8 +41,8 @@ export interface CreateMovieInput {
     released?: Nullable<string>;
     contentRating?: Nullable<string>;
     runtime?: Nullable<string>;
-    director?: Nullable<string>;
-    writer?: Nullable<string>;
+    director?: Nullable<DirectorInput>;
+    writers?: Nullable<WriterInput[]>;
     actors?: Nullable<ActorInput[]>;
     plot?: Nullable<string>;
     genres?: Nullable<GenreInput[]>;
@@ -37,29 +50,7 @@ export interface CreateMovieInput {
     country?: Nullable<string>;
     awards?: Nullable<string>;
     image?: Nullable<string>;
-    ratings?: Nullable<RatingInput[]>;
-    imdbVotes?: Nullable<string>;
-    boxOffice?: Nullable<string>;
-    production?: Nullable<string>;
-}
-
-export interface UpdateMovieInput {
-    id: string;
-    imdbID?: Nullable<string>;
-    title?: Nullable<string>;
-    year?: Nullable<string>;
-    released?: Nullable<string>;
-    contentRating?: Nullable<string>;
-    runtime?: Nullable<string>;
-    director?: Nullable<string>;
-    writer?: Nullable<string>;
-    actors?: Nullable<ActorInput[]>;
-    plot?: Nullable<string>;
-    genres?: Nullable<GenreInput[]>;
-    language?: Nullable<string>;
-    country?: Nullable<string>;
-    awards?: Nullable<string>;
-    image?: Nullable<string>;
+    trailers?: Nullable<TrailersInput>;
     ratings?: Nullable<RatingInput[]>;
     imdbVotes?: Nullable<string>;
     boxOffice?: Nullable<string>;
@@ -68,22 +59,38 @@ export interface UpdateMovieInput {
 
 export interface Actor {
     name: string;
+    movies?: Nullable<Movie[]>;
+}
+
+export interface Director {
+    name: string;
+    movies?: Nullable<Movie[]>;
 }
 
 export interface Genre {
     name: string;
+    movies?: Nullable<Movie[]>;
+}
+
+export interface MovieTrailers {
+    title: string;
+    trailers?: Nullable<string[]>;
+}
+
+export interface Writer {
+    name: string;
+    movies?: Nullable<Movie[]>;
 }
 
 export interface Movie {
-    id: string;
     imdbID?: Nullable<string>;
     title: string;
     year?: Nullable<string>;
     released?: Nullable<string>;
     contentRating?: Nullable<string>;
     runtime?: Nullable<string>;
-    director?: Nullable<string>;
-    writer?: Nullable<string>;
+    director?: Nullable<Director>;
+    writers?: Nullable<Writer[]>;
     actors?: Nullable<Actor[]>;
     plot?: Nullable<string>;
     genres?: Nullable<Genre[]>;
@@ -91,10 +98,16 @@ export interface Movie {
     country?: Nullable<string>;
     awards?: Nullable<string>;
     image?: Nullable<string>;
+    trailers?: Nullable<MovieTrailers>;
     ratings?: Nullable<Rating[]>;
     imdbVotes?: Nullable<string>;
     boxOffice?: Nullable<string>;
     production?: Nullable<string>;
+}
+
+export interface User {
+    id: string;
+    movies?: Nullable<Movie[]>;
 }
 
 export interface Rating {
@@ -103,19 +116,17 @@ export interface Rating {
 }
 
 export interface IQuery {
-    movies(): Nullable<User> | Promise<Nullable<User>>;
-    movie(id: string): Movie | Promise<Movie>;
+    movies(): Nullable<Movie[]> | Promise<Nullable<Movie[]>>;
+    userMovies(): Nullable<User> | Promise<Nullable<User>>;
+    actors(actors: ActorInput[]): Nullable<Actor[]> | Promise<Nullable<Actor[]>>;
+    directors(directors: DirectorInput[]): Nullable<Director[]> | Promise<Nullable<Director[]>>;
+    genres(genres: GenreInput[]): Nullable<Genre[]> | Promise<Nullable<Genre[]>>;
+    writers(writers: WriterInput[]): Nullable<Writer[]> | Promise<Nullable<Writer[]>>;
 }
 
 export interface IMutation {
     addMovies(movies: CreateMovieInput[]): Nullable<User> | Promise<Nullable<User>>;
-    updateMovie(updateMovieInput: UpdateMovieInput): Movie | Promise<Movie>;
-    removeMovie(id: string): Nullable<User> | Promise<Nullable<User>>;
-}
-
-export interface User {
-    id: string;
-    movies?: Nullable<Movie[]>;
+    removeMovieFromUser(imdbID: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
 type Nullable<T> = T | null;
