@@ -1,11 +1,5 @@
 // import { UseGuards } from '@nestjs/common';
-import {
-  Args,
-  Mutation,
-  Query,
-  Resolver,
-  ResolveReference,
-} from '@nestjs/graphql';
+import { Args, Mutation, Resolver, ResolveReference } from '@nestjs/graphql';
 // import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user/user.service';
@@ -17,20 +11,6 @@ export class AppResolver {
     private readonly authService: AuthService,
   ) {}
 
-  @Query()
-  getUser(
-    @Args('id') id: string,
-    // @Args('email') email: string
-  ) {
-    try {
-      return this.userService.user({ id });
-      // return this.userService.user({ email });
-    } catch (error) {
-      console.log(error);
-      return error;
-    }
-  }
-
   /** Login endpoint */
   @Mutation()
   async login(
@@ -39,9 +19,14 @@ export class AppResolver {
   ) {
     try {
       const user = await this.authService.validateUser(email, password);
-      if (!user) {
-        throw new Error('Invalid Login Credentials');
-      }
+
+      if (!user)
+        throw new Error('Invalid Login Credentials', {
+          cause: {
+            value: { email, password },
+          },
+        });
+
       return this.authService.login(user);
     } catch (error) {
       console.log(error);
@@ -57,6 +42,7 @@ export class AppResolver {
   ) {
     try {
       const hash = await this.authService.validatePassword(password);
+
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...user } = await this.userService.createUser({
         id: this.authService.generateUserId(email),
