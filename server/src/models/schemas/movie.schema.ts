@@ -29,7 +29,7 @@ export class Movie {
   runtime: string;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId }],
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Director',
   })
   director: Director;
