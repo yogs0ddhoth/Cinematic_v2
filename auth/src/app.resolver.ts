@@ -33,10 +33,22 @@ export class AppResolver {
     }
   }
 
+  /**
+   * Entity resolvers
+   */
   @ResolveReference()
-  async resolveReference({ id }: { __typename: string; id: string }) {
+  async resolveReference({
+    key,
+    __typename,
+  }: {
+    __typename: string;
+    key: string;
+  }) {
     try {
-      return await this.appService.resolveUser(id);
+      if (__typename === 'User') {
+        // Resolve 'User' entity
+        return await this.appService.findUserByID(key);
+      }
     } catch (error) {
       console.log(error);
     }
