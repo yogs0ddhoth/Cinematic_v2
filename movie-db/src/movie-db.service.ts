@@ -32,7 +32,7 @@ import { UserDocument } from './models/schemas/user.schema';
  * Class containing services for movieDB
  */
 @Injectable()
-export class AppService {
+export class MovieDbService {
   constructor(
     private readonly actorService: ActorService,
     private readonly directorService: DirectorService,

@@ -9,8 +9,8 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { mongodbURL } from './constants';
 import { join } from 'path';
 
-import { AppResolver } from './app.resolver';
-import { AppService } from './app.service';
+import { MovieDbResolver } from './movie-db.resolver';
+import { MovieDbService } from './movie-db.service';
 import { ModelsModule } from './models/models.module';
 import { AuthModule } from './auth/auth.module';
 
@@ -29,6 +29,6 @@ import { AuthModule } from './auth/auth.module';
     ModelsModule,
     AuthModule,
   ],
-  providers: [AppService, AppResolver],
+  providers: [MovieDbService, MovieDbResolver],
 })
-export class AppModule {}
+export class MovieDbModule {}

@@ -7,7 +7,7 @@ import {
   GenreInput,
   WriterInput,
 } from 'src/graphql';
-import { AppService } from './app.service';
+import { MovieDbService } from './movie-db.service';
 
 // interface used as arg type for @CurrentUser decorator
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,9 +17,9 @@ import { CurrentUser, GqlJwtAuthGuard } from './auth/jwt-auth.guard';
 /**
  * CLass containing resolvers for the movieDB subgraph
  */
-@Resolver('AppResolver')
-export class AppResolver {
-  constructor(private readonly appService: AppService) {}
+@Resolver()
+export class MovieDbResolver {
+  constructor(private readonly movieDbService: MovieDbService) {}
 
   /**
    * Query for actors by name, and return, with their referenced movies populated
@@ -30,7 +30,7 @@ export class AppResolver {
   @Query('actors')
   async actors(@Args('actors') actors: ActorInput[]) {
     try {
-      return await this.appService.getActors({
+      return await this.movieDbService.getActors({
         actors,
         populate: {
           path: 'movies',
@@ -50,7 +50,7 @@ export class AppResolver {
   @Query('directors')
   async directors(@Args('directors') directors: DirectorInput[]) {
     try {
-      return await this.appService.getDirectors({
+      return await this.movieDbService.getDirectors({
         directors,
         populate: {
           path: 'movies',
@@ -71,7 +71,7 @@ export class AppResolver {
   @Query('genres')
   async genres(@Args('genres') genres: GenreInput[]) {
     try {
-      return await this.appService.getGenres({
+      return await this.movieDbService.getGenres({
         genres,
         populate: {
           path: 'movies',
@@ -90,7 +90,7 @@ export class AppResolver {
   @Query('movies')
   async movies() {
     try {
-      return await this.appService.getMovies({
+      return await this.movieDbService.getMovies({
         populate: 'genres director writers actors trailers',
       });
     } catch (error) {
@@ -107,7 +107,7 @@ export class AppResolver {
   @Query('writers')
   async writers(@Args('writers') writers: WriterInput[]) {
     try {
-      return await this.appService.getWriters({
+      return await this.movieDbService.getWriters({
         writers,
         populate: {
           path: 'movies',
@@ -133,8 +133,8 @@ export class AppResolver {
   ) {
     try {
       console.log(userAuth);
-      const userID = await this.appService.getUser(userAuth);
-      return await this.appService.getUserMovies({
+      const userID = await this.movieDbService.getUser(userAuth);
+      return await this.movieDbService.getUserMovies({
         userID,
         populate: {
           path: 'movies',
@@ -160,11 +160,10 @@ export class AppResolver {
   ) {
     try {
       console.log(userAuth);
-      console.log('test');
-      const userID = await this.appService.getUser(userAuth);
+      const userID = await this.movieDbService.getUser(userAuth);
 
-      return await this.appService.getUserMovies({
-        userID: await this.appService.addMoviesToUser(userID, movies),
+      return await this.movieDbService.getUserMovies({
+        userID: await this.movieDbService.addMoviesToUser(userID, movies),
         populate: {
           path: 'movies',
           populate: 'genres director writers actors',
@@ -186,7 +185,7 @@ export class AppResolver {
   async remove(@CurrentUser() userAuth: userAuth, @Args('id') id: string) {
     try {
       console.log(id);
-      const user = await this.appService.removeMoviefromUser({
+      const user = await this.movieDbService.removeMoviefromUser({
         userID: userAuth.id,
         movieID: id,
         populate: {

@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { MovieDbModule } from './movie-db.module';
 
 async function bootstrap() {
   const PORT = 4002;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(MovieDbModule);
 
   await app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);

@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+
+import { Actor, ActorSchema } from './schemas/actor.schema';
+import { Director, DirectorSchema } from './schemas/director.schema';
 import { Genre, GenreSchema } from './schemas/genre.schema';
 import { Movie, MovieSchema } from './schemas/movie.schema';
-import { Actor, ActorSchema } from './schemas/actor.schema';
 import { User, UserSchema } from './schemas/user.schema';
-import { Director, DirectorSchema } from './schemas/director.schema';
 import { Writer, WriterSchema } from './schemas/writer.schema';
 
+import { ActorService } from './actor/actor.service';
+import { DirectorService } from './director/director.service';
 import { GenreService } from './genre/genre.service';
 import { MovieService } from './movie/movie.service';
-import { ActorService } from './actor/actor.service';
 import { UserService } from './user/user.service';
 import { WriterService } from './writer/writer.service';
-import { DirectorService } from './director/director.service';
 
 @Module({
   imports: [

@@ -14,7 +14,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "rover:publish": "rover subgraph publish Cinematicv2@current --name movieDB --schema ./src/schema.graphql --routing-url http://localhost:4002/graphql",
+    "rover:publish": "rover subgraph publish Cinematicv2@current --name movie-db --schema ./src/schema.graphql --routing-url http://localhost:4002/graphql",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
