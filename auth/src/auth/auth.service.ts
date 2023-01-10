@@ -52,12 +52,26 @@ export class AuthService {
     }
   }
 
+  /**
+   * Validate password meets requirements and encrypt
+   * @param password string: the password to validate
+   * @returns Promise: the encrypted data as a string
+   */
   async validatePassword(password: string): Promise<string> {
-    /** TODO: create cryptographically strong password requirements
-     *   - length, characters
-     *   - regex verification
-     *   - throw an error for passwords that fail
+    /**
+     * Password String requirements:
+     * @(?=.*[a-z]) - at least one lowercase letter
+     * @(?=.*[A-Z]) - at least one uppercase letter
+     * @(?=.*?[#?!@$%^&*\(\)\-+=]) - at least one special character
+     * @[A-Za-z\d#?!@$%^&*\(\)\-+=] - only alphanumeric characters and special characters
+     * @{8,} - at least 8 characters
      */
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*\(\)\-+=])[A-Za-z\d#?!@$%^&*\(\)\-+=]{8,}$/;
+    if (regex.test(password) == false)
+      throw new Error(
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one of the following special characters: "#?!@$%^&*()-+="',
+      );
     return this.#bcrypt.hash(password, 12);
   }
 
