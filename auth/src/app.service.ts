@@ -14,6 +14,13 @@ export class AppService {
     private readonly authService: AuthService,
   ) {}
 
+  /**
+   * Attempt to login User
+   * @param email the User email address
+   * @param password the User password
+   * @returns Promise: JWT Auth
+   * @type Auth: { access_token: string }
+   */
   async login(email: string, password: string): Promise<Auth> {
     try {
       const user = await this.authService.validateUser(email, password);
@@ -24,6 +31,13 @@ export class AppService {
     }
   }
 
+  /**
+   * Attempt to create a new User
+   * @param email the User email address
+   * @param password the User password
+   * @returns Promise: JWT Auth
+   * @type Auth: { access_token: string }
+   */
   async signup(email: string, password: string): Promise<Auth> {
     try {
       await this.authService.validateEmail(email);
@@ -43,7 +57,14 @@ export class AppService {
     }
   }
 
-  async resolveUser(id: string): Promise<User> {
+  /**
+   * Find User by ID
+   * @param id the User id key
+   * @returns Promise User
+   * @type User: { id: string; email: string }
+   * @throws {Error} if User not found
+   */
+  async findUserByID(id: string): Promise<User> {
     try {
       const user = await this.userService.user({ id });
 
