@@ -79,9 +79,8 @@ export class ActorService {
   }
 
   /**
-   * Mongoose Model.findByIdAndDelete(): atomically find the document by id and delete it
-   * @param params { id: string }
-   * @returns a document containing a boolean acknowledged as true if the operation ran with write concern or false if write concern was disabled, and deletedCount containing the number of deleted documents; or null if none is found
+   * Mongoose Model.findByIdAndDelete(): delete document by the given _id
+   * @param id _id of document to delete
    */
   async delete(params: { id: string }) {
     const { id } = params;

@@ -80,11 +80,8 @@ export class DirectorService {
   }
 
   /**
-   * Mongoose Model.findOneAndUpdate(): atomically find the first document that matches filter and apply update
-   * @param filter fields to search by
-   * @param update field update(s)
-   * @param options update options - see https://mongoosejs.com/docs/api/query.html#query_Query-setOptions
-   * @returns updated document, or null if none is found (and upsert = false)
+   * Mongoose Model.findByIdAndDelete(): delete document by the given _id
+   * @param id _id of document to delete
    */
   async delete(params: { id: string }) {
     const { id } = params;
