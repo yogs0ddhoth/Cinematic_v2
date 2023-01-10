@@ -1,12 +1,12 @@
 // import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 // import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { AppService } from './app.service';
+import { UserAuthService } from './user-auth.service';
 import { Auth } from './graphql';
 
 @Resolver()
-export class AppResolver {
-  constructor(private readonly appService: AppService) {}
+export class UserAuthResolver {
+  constructor(private readonly userAuthService: UserAuthService) {}
 
   /** Login endpoint */
   @Query()
@@ -15,7 +15,7 @@ export class AppResolver {
     @Args('password') password: string,
   ): Promise<Auth | undefined> {
     try {
-      return await this.appService.login(email, password);
+      return await this.userAuthService.login(email, password);
     } catch (error) {
       console.log(error);
     }
@@ -28,7 +28,7 @@ export class AppResolver {
     @Args('password') password: string,
   ): Promise<Auth | undefined> {
     try {
-      return await this.appService.signup(email, password);
+      return await this.userAuthService.signup(email, password);
     } catch (error) {
       console.log(error);
     }

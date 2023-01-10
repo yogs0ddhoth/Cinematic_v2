@@ -1,5 +1,5 @@
 {
-  "name": "auth",
+  "name": "user-auth",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "rover:publish": "rover subgraph publish Cinematicv2@current --name auth --schema ./src/schema.graphql --routing-url http://localhost:4001/graphql",
+    "rover:publish": "rover subgraph publish Cinematicv2@current --name user-auth --schema ./src/schema.graphql --routing-url http://localhost:4001/graphql",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",

@@ -17,9 +17,12 @@ export interface Auth {
     access_token: string;
 }
 
+export interface IQuery {
+    login(email: string, password: string): Auth | Promise<Auth>;
+}
+
 export interface IMutation {
     signup(email: string, password: string): Auth | Promise<Auth>;
-    login(email: string, password: string): Auth | Promise<Auth>;
 }
 
 type Nullable<T> = T | null;

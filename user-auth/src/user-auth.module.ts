@@ -6,8 +6,8 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { join } from 'path';
 
-import { AppResolver } from './app.resolver';
-import { AppService } from './app.service';
+import { UserAuthResolver } from './user-auth.resolver';
+import { UserAuthService } from './user-auth.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 
@@ -23,6 +23,6 @@ import { UserModule } from './user/user.module';
     AuthModule,
     UserModule,
   ],
-  providers: [AppService, AppResolver],
+  providers: [UserAuthService, UserAuthResolver],
 })
-export class AppModule {}
+export class UserAuthModule {}

@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { UserAuthModule } from './user-auth.module';
 
 async function bootstrap() {
   const PORT = 4001;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(UserAuthModule);
 
   await app.listen(PORT, () => {
     console.log(`API server running on port ${PORT}!`);

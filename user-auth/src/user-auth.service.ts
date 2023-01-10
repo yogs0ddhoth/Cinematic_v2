@@ -8,7 +8,7 @@ import { UserService } from './user/user.service';
  * Class containing services for Auth
  */
 @Injectable()
-export class AppService {
+export class UserAuthService {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
