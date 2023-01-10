@@ -34,12 +34,11 @@ export class AppResolver {
         actors,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -55,12 +54,11 @@ export class AppResolver {
         directors,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -77,12 +75,11 @@ export class AppResolver {
         genres,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -94,11 +91,10 @@ export class AppResolver {
   async movies() {
     try {
       return await this.appService.getMovies({
-        populate: 'genres directors writers actors trailers',
+        populate: 'genres director writers actors trailers',
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -115,12 +111,11 @@ export class AppResolver {
         writers,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -143,12 +138,11 @@ export class AppResolver {
         userID,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
       console.log(error);
-      return error;
     }
   }
 
@@ -166,13 +160,14 @@ export class AppResolver {
   ) {
     try {
       console.log(userAuth);
+      console.log('test');
       const userID = await this.appService.getUser(userAuth);
 
       return await this.appService.getUserMovies({
         userID: await this.appService.addMoviesToUser(userID, movies),
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
     } catch (error) {
@@ -196,14 +191,13 @@ export class AppResolver {
         movieID: id,
         populate: {
           path: 'movies',
-          populate: 'genres directors writers actors',
+          populate: 'genres director writers actors',
         },
       });
       console.log(user);
       return user;
     } catch (error) {
-      // console.log(error);
-      return error;
+      console.log(error);
     }
   }
 }
