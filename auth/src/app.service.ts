@@ -18,13 +18,6 @@ export class AppService {
     try {
       const user = await this.authService.validateUser(email, password);
 
-      if (!user)
-        throw new Error('Invalid Login Credentials', {
-          cause: {
-            value: { email, password },
-          },
-        });
-
       return this.authService.login(user);
     } catch (error) {
       throw error;
