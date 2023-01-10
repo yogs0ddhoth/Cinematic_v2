@@ -11,7 +11,7 @@ A backend for third-party API calls data processing,persistance, and user auth; 
             - &check; refactor graph and schemas on MovieDB
             - &check; configure for Federation and publish subgraph
             - TODO: rewrite unit tests
-        - **MovieDB** - dir path: ./server 
+        - **Movie-DB** - dir path: ./server 
             - &check;MongoDB, ~~Prisma ORM,~~ &check;refactor server
             - &check; implement services for &check;User, &check;Genre, &check;Actor, &check;Movie
             - &check; integrate JWT Auth for User
@@ -25,8 +25,8 @@ A backend for third-party API calls data processing,persistance, and user auth; 
             - &check; respond with selected list of url paths 
             - &check; configure for Federation and publish subgraph
     - &check; Configure supergraph and apollo router
-    - &check; Configure supergraph and apollo router
 * **Fill out Client**:
+    - &check; generate gql types
     - replace legacy jquery rendering with angular/ngx-bootstrap rendering
     - create user authentication (login/logout forms) and profile components
     - create navbar components to link homepage, profile, and auth
