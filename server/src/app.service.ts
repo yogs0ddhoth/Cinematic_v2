@@ -8,11 +8,11 @@ import {
   GenreInput,
   WriterInput,
 } from './graphql';
-import { CreateGenre } from './models/genre/dto/create-genre.dto';
 import { CreateActor } from './models/actor/dto/create-actor.dto';
+import { CreateGenre } from './models/genre/dto/create-genre.dto';
+import { CreateDirector } from './models/director/dto/create-director.dto';
+import { CreateWriter } from './models/writer/dto/create-writer.dto';
 import { userAuth } from './auth/dto/user-auth.dto';
-
-import { UserDocument } from './models/schemas/user.schema';
 
 import { ActorService } from './models/actor/actor.service';
 import { DirectorService } from './models/director/director.service';
@@ -26,10 +26,11 @@ import { DirectorDocument } from './models/schemas/director.schema';
 import { GenreDocument } from './models/schemas/genre.schema';
 import { MovieDocument } from './models/schemas/movie.schema';
 import { WriterDocument } from './models/schemas/writer.schema';
+import { UserDocument } from './models/schemas/user.schema';
 
-import { CreateDirector } from './models/director/dto/create-director.dto';
-import { CreateWriter } from './models/writer/dto/create-writer.dto';
-
+/**
+ * Class containing services for movieDB
+ */
 @Injectable()
 export class AppService {
   constructor(
@@ -647,10 +648,7 @@ export class AppService {
     const foundUser = await this.userService.get({
       id: userID,
       options: {
-        populate: {
-          path: 'movies',
-          populate: 'genres directors writers actors',
-        },
+        populate,
       },
     });
     if (!foundUser)
