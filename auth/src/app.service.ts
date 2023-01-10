@@ -25,7 +25,7 @@ export class AppService {
     try {
       const user = await this.authService.validateUser(email, password);
 
-      return this.authService.login(user);
+      return await this.authService.login(user);
     } catch (error) {
       throw error;
     }
