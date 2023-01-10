@@ -8,12 +8,12 @@ const userData: Prisma.UserCreateInput[] = [
   {
     id: uuidv5('asdf@prisma.io', namespace),
     email: 'asdf@prisma.io',
-    password: bcrypt.hashSync('asdfasdf', 12),
+    password: bcrypt.hashSync('asdfASDF1234!@#$', 12),
   },
   {
     id: uuidv5('qwer@mail.com', namespace),
     email: 'qwer@mail.com',
-    password: bcrypt.hashSync('qwerqwer', 12),
+    password: bcrypt.hashSync('qwerQWER5678%^&*', 12),
   },
 ];
 
