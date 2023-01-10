@@ -17,8 +17,8 @@ A backend for third-party API calls data processing,persistance, and user auth; 
             - &check; integrate JWT Auth for User
             - &check; Migrate to Mongoose as a more performant longterm solution to [WriteConflicts raised by concurrent MongoDB transactions used by Prisma's ORM](https://github.com/prisma/prisma/issues/12814) (a short term workaround would have been to implement retry middleware)
             - &check; ~~handle errors caused by possible concurrent write to subdocument~~ not an issue with mongoose upsert
-            - update &check;models and services according to schema changes
-            - configure resolvers
+            - &check; update &check;models and services according to schema changes
+            - &check; configure resolvers
             - write unit tests for AppService
         - **Trailer Search** - 
             - &check; implement microservice to query Youtube API for movie trailers &check; and filter results for relevance
