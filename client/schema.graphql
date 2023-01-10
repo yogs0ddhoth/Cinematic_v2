@@ -1,0 +1,149 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Actor {
+  name: String!
+  movies: [Movie!]
+}
+
+input ActorInput {
+  name: String!
+}
+
+type Auth {
+  access_token: String!
+}
+
+input CreateMovieInput {
+  imdbID: String
+  title: String!
+  year: String
+  released: String
+  contentRating: String
+  runtime: String
+  director: DirectorInput
+  writers: [WriterInput!]
+  actors: [ActorInput!]
+  plot: String
+  genres: [GenreInput!]
+  language: String
+  country: String
+  awards: String
+  image: String
+  trailers: TrailersInput
+  ratings: [RatingInput!]
+  imdbVotes: String
+  boxOffice: String
+  production: String
+}
+
+type Director {
+  name: String!
+  movies: [Movie!]
+}
+
+input DirectorInput {
+  name: String!
+}
+
+type Genre {
+  name: String!
+  movies: [Movie!]
+}
+
+input GenreInput {
+  name: String!
+}
+
+type Movie {
+  imdbID: String
+  title: String!
+  year: String
+  released: String
+  contentRating: String
+  runtime: String
+  director: Director
+  writers: [Writer!]
+  actors: [Actor!]
+  plot: String
+  genres: [Genre!]
+  language: String
+  country: String
+  awards: String
+  image: String
+  trailers: MovieTrailers
+  ratings: [Rating!]
+  imdbVotes: String
+  boxOffice: String
+  production: String
+}
+
+type MovieTrailers {
+  title: String!
+  trailers: [String!]
+}
+
+type Mutation {
+  addMovies(movies: [CreateMovieInput!]!): User
+  removeMovieFromUser(imdbID: String!): User
+  signup(email: String!, password: String!): Auth!
+}
+
+type Query {
+  movies: [Movie!]
+  userMovies: User
+  actors(actors: [ActorInput!]!): [Actor!]
+  directors(directors: [DirectorInput!]!): [Director!]
+  genres(genres: [GenreInput!]!): [Genre!]
+  writers(writers: [WriterInput!]!): [Writer!]
+  searchMovies(searchMovieInput: SearchMovieInput!): [Movie!]!
+  login(email: String!, password: String!): Auth!
+}
+
+type Rating {
+  source: String!
+  score: String!
+}
+
+input RatingInput {
+  source: String!
+  score: String!
+}
+
+input SearchMovieInput {
+  contentRating: [String!]
+  director: String
+  genres: [String!]
+  ratings: [SearchRatingInput!]
+  releaseYear: String
+  title: String!
+  pages: Int
+  writers: [String!]
+}
+
+input SearchRatingInput {
+  source: String!
+  score: Float!
+}
+
+input TrailersInput {
+  title: String!
+  trailers: [String!]
+}
+
+type User {
+  id: String!
+  movies: [Movie!]
+  email: String!
+}
+
+type Writer {
+  name: String!
+  movies: [Movie!]
+}
+
+input WriterInput {
+  name: String!
+}
