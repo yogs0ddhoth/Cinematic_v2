@@ -1,9 +1,7 @@
-#
-# supergraph: Configuration of the Supergraph server
-#
-supergraph:
-  headers:
+headers:
   all: # Header rules for all subgraphs
     request:
       - propagate:
-          matching: ^Authorization
+          matching: ^* # Propagate all headers
+include_subgraph_errors:
+  all: true # Propagate errors from all subgraphs
