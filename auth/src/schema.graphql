@@ -6,7 +6,10 @@ type Auth {
   access_token: String!
 }
 
+type Query {
+  login(email: String!, password: String!): Auth!
+}
+
 type Mutation {
   signup(email: String!, password: String!): Auth!
-  login(email: String!, password: String!): Auth!
 }

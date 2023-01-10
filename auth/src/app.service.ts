@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { AuthService } from './auth/auth.service';
-import { Auth, User } from './graphql';
+import { Auth } from './graphql';
 import { UserService } from './user/user.service';
 
 /**
@@ -52,29 +52,6 @@ export class AppService {
       });
 
       return this.authService.login(user);
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Find User by ID
-   * @param id the User id key
-   * @returns Promise User
-   * @type User: { id: string; email: string }
-   * @throws {Error} if User not found
-   */
-  async findUserByID(id: string): Promise<User> {
-    try {
-      const user = await this.userService.user({ id });
-
-      if (!user)
-        throw new Error('User not found', {
-          cause: {
-            value: { id },
-          },
-        });
-      return user;
     } catch (error) {
       throw error;
     }
