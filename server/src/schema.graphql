@@ -1,16 +1,16 @@
-type ActorDoc {
+type Actor {
   name: String!
-  movies: [MovieDoc!]
+  movies: [Movie!]
 }
 
 type Director {
   name: String!
-  movies: [MovieDoc!]
+  movies: [Movie!]
 }
 
 type Genre {
   name: String!
-  movies: [MovieDoc!]
+  movies: [Movie!]
 }
 
 type MovieTrailers {
@@ -20,7 +20,7 @@ type MovieTrailers {
 
 type Writer {
   name: String!
-  movies: [MovieDoc!]
+  movies: [Movie!]
 }
 type Movie {
   imdbID: String
@@ -31,12 +31,12 @@ type Movie {
   contentRating: String
   runtime: String
 
-  director: DirectorDoc
-  writers: [WriterDoc!]
-  actors: [ActorDoc!]
+  director: Director
+  writers: [Writer!]
+  actors: [Actor!]
 
   plot: String
-  genres: [GenreDoc!]
+  genres: [Genre!]
 
   language: String
   country: String
@@ -44,7 +44,7 @@ type Movie {
   image: String
   trailers: MovieTrailers
 
-  ratings: [RatingDoc!]
+  ratings: [Rating!]
   imdbVotes: String
 
   boxOffice: String
@@ -59,11 +59,6 @@ type User @key(fields: "id") {
 type Rating {
   source: String!
   score: String!
-}
-
-type User @key(fields: "id") {
-  id: String!
-  movies: [MovieDoc!]
 }
 
 type Query {
