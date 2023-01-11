@@ -1,0 +1,87 @@
+mutation AddMovies($movies: [CreateMovieInput!]!) {
+  addMovies(movies: $movies) {
+    email
+    movies {
+      imdbID
+      title
+      year
+      released
+      contentRating
+      runtime
+      director {
+        name
+      }
+      writers {
+        name
+      }
+      actors {
+        name
+      }
+      plot
+      genres {
+        name
+      }
+      language
+      country
+      awards
+      image
+      trailers {
+        trailers
+      }
+      ratings {
+        source
+        score
+      }
+      imdbVotes
+      boxOffice
+      production
+    }
+  }
+}
+
+mutation RemoveMovieFromUser($imdbId: String!) {
+  removeMovieFromUser(imdbID: $imdbId) {
+    email
+    movies {
+      imdbID
+      title
+      year
+      released
+      contentRating
+      runtime
+      director {
+        name
+      }
+      writers {
+        name
+      }
+      actors {
+        name
+      }
+      plot
+      genres {
+        name
+      }
+      language
+      country
+      awards
+      image
+      trailers {
+        trailers
+      }
+      ratings {
+        source
+        score
+      }
+      imdbVotes
+      boxOffice
+      production
+    }
+  }
+}
+
+mutation Signup($email: String!, $password: String!) {
+  signup(email: $email, password: $password) {
+    access_token
+  }
+}

@@ -1,0 +1,84 @@
+query Login($email: String!, $password: String!) {
+  login(email: $email, password: $password) {
+    access_token
+  }
+}
+
+query SearchMovies($searchMovieInput: SearchMovieInput!) {
+  searchMovies(searchMovieInput: $searchMovieInput) {
+    imdbID
+    title
+    year
+    released
+    contentRating
+    runtime
+    director {
+      name
+    }
+    writers {
+      name
+    }
+    actors {
+      name
+    }
+    plot
+    genres {
+      name
+    }
+    language
+    country
+    awards
+    image
+    trailers {
+      trailers
+    }
+    ratings {
+      source
+      score
+    }
+    imdbVotes
+    boxOffice
+    production
+  }
+}
+
+query UserMovies {
+  userMovies {
+    email
+    movies {
+      imdbID
+      title
+      year
+      released
+      contentRating
+      runtime
+      director {
+        name
+      }
+      writers {
+        name
+      }
+      actors {
+        name
+      }
+      plot
+      genres {
+        name
+      }
+      language
+      country
+      awards
+      image
+      trailers {
+        trailers
+      }
+      ratings {
+        source
+        score
+      }
+      imdbVotes
+      boxOffice
+      production
+    }
+  }
+}
