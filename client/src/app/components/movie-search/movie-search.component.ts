@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Movie } from 'src/app/graphql/graphql.generated';
+import { map, Observable } from 'rxjs';
+import { SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graphql/generated';
 
 @Component({
   selector: 'app-movie-search',
@@ -7,17 +8,12 @@ import { Movie } from 'src/app/graphql/graphql.generated';
   styleUrls: ['./movie-search.component.css']
 })
 export default class MovieSearchComponent implements OnInit {
-  movies: Movie[];
-  constructor() { 
-    this.movies = [
-      {
-        imdbID: "imdbID",
-        title: "Title",
-      }
-    ]
-  }
+  movies?: Observable<SearchMoviesQuery['searchMovies']>;
+  constructor(private readonly searchMovies: SearchMoviesGQL) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
 
+  #searchMovies() {
+    this.movies = this.searchMovies.watch().valueChanges.pipe(map(result => result.data.searchMovies));
+  }
 }

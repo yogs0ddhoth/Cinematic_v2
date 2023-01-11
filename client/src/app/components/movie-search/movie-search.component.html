@@ -6,7 +6,7 @@
       </div>
     </form>
     
-    <div *ngFor="let movie of movies">
+    <div *ngFor="let movie of movies | async">
       <app-movie-display *ngIf="movie" [movie]="movie"></app-movie-display>
     </div>
 </div>
