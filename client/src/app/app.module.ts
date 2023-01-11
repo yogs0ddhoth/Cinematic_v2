@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { GraphQLModule } from './graphql/graphql.module';
+import { CoreModule } from './core/core.module';
 import { HttpClientModule } from '@angular/common/http';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -12,7 +12,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 // import { ImdbTestComponent } from './imdb-test/imdb-test.component';
 
 import AppComponent from './app.component';
-import BannerComponent from './components/banner';
+import BannerComponent from './components/banner/banner.component';
 import MovieDisplayComponent from './components/movie-display/movie-display.component';
 import MovieSearchComponent from './components/movie-search/movie-search.component';
 
@@ -29,7 +29,7 @@ import MovieSearchComponent from './components/movie-search/movie-search.compone
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    GraphQLModule,
+    CoreModule,
     // HttpClientModule,
     ModalModule.forRoot(),
   ],
