@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Movie } from 'src/graphql';
+import { Movie } from 'src/app/graphql/graphql.generated';
 
 @Component({
   selector: 'app-movie-search',
   templateUrl: './movie-search.component.html',
   styleUrls: ['./movie-search.component.css']
 })
-export class MovieSearchComponent implements OnInit {
+export default class MovieSearchComponent implements OnInit {
   movies: Movie[];
   constructor() { 
     this.movies = [

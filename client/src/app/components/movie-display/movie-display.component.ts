@@ -1,13 +1,13 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { Actor, Genre, Movie, Rating } from 'src/graphql';
+import { Actor, Genre, Movie, Rating } from 'src/app/graphql/graphql.generated';
 
 @Component({
   selector: 'app-movie-display',
   templateUrl: './movie-display.component.html',
   styleUrls: ['./movie-display.component.css'],
 })
-export class MovieDisplayComponent implements OnInit {
+export default class MovieDisplayComponent implements OnInit {
   modalRef?: BsModalRef;
   @Input() movie!: Movie;
   genres?: Genre[];
@@ -25,7 +25,7 @@ export class MovieDisplayComponent implements OnInit {
     if (actors) this.actors = actors;
     if (ratings) this.ratings = ratings;
     if (image) this.image = image;
-    if (trailers) this.trailers = trailers;
+    if (trailers?.trailers?.length) this.trailers = trailers.trailers;
 
     this.movie = movie;
   }
