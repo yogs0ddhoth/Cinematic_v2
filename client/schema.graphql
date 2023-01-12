@@ -81,7 +81,7 @@ type Movie {
 }
 
 type MovieTrailers {
-  title: String!
+  title: String
   trailers: [String!]
 }
 
