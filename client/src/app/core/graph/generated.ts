@@ -99,7 +99,7 @@ export type Movie = {
 
 export type MovieTrailers = {
   __typename?: 'MovieTrailers';
-  title: Scalars['String'];
+  title?: Maybe<Scalars['String']>;
   trailers?: Maybe<Array<Scalars['String']>>;
 };
 
