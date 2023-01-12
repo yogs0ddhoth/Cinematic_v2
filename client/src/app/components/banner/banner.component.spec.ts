@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BannerComponent } from '.';
+import { BannerComponent } from './banner.component';
 
 describe('LayoutComponent', () => {
   let component: BannerComponent;
