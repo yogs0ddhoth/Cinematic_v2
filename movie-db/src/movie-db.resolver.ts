@@ -159,7 +159,6 @@ export class MovieDbResolver {
     @Args('movies') movies: CreateMovieInput[],
   ) {
     try {
-      console.log(userAuth);
       const userID = await this.movieDbService.getUser(userAuth);
 
       return await this.movieDbService.getUserMovies({
@@ -184,7 +183,6 @@ export class MovieDbResolver {
   @UseGuards(GqlJwtAuthGuard)
   async remove(@CurrentUser() userAuth: userAuth, @Args('id') id: string) {
     try {
-      console.log(id);
       const user = await this.movieDbService.removeMoviefromUser({
         userID: userAuth.id,
         movieID: id,
@@ -193,7 +191,6 @@ export class MovieDbResolver {
           populate: 'genres director writers actors',
         },
       });
-      console.log(user);
       return user;
     } catch (error) {
       console.log(error);

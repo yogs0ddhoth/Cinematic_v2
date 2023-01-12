@@ -611,7 +611,7 @@ export class MovieDbService {
    * @returns Promise: the associated User ID as a string
    */
   async getUser(userAuth: userAuth): Promise<string> {
-    const { id, username } = userAuth;
+    const { id } = userAuth;
     const user = await this.userService.get({
       id,
       options: {
@@ -624,7 +624,7 @@ export class MovieDbService {
       : // create document if it doesn't exist
         await this.userService.create({
           _id: id,
-          username: username,
+          // username: username,
         });
     return _id; // return document ID
   }
@@ -673,9 +673,9 @@ export class MovieDbService {
       | string[]
       | mongoose.PopulateOptions
       | mongoose.PopulateOptions[];
-  }) {
+  }): Promise<UserDocument> {
     const { userID, movieID, populate } = params;
-    return await this.userService.update({
+    const user = await this.userService.update({
       id: userID,
       update: {
         $pull: {
@@ -687,5 +687,11 @@ export class MovieDbService {
         populate,
       },
     });
+
+    if (!user)
+      throw new Error('Error: findOne returned null', {
+        cause: { value: userID },
+      });
+    return user;
   }
 }
