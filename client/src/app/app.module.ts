@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CoreModule } from './core/core.module';
+import { GraphQLModule } from './core/graph/graphql.module';
 import { HttpClientModule } from '@angular/common/http';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -15,6 +15,7 @@ import AppComponent from './app.component';
 import BannerComponent from './components/banner/banner.component';
 import MovieDisplayComponent from './components/movie-display/movie-display.component';
 import MovieSearchComponent from './components/movie-search/movie-search.component';
+import LoginComponent from './components/login/login.component';
 
 @NgModule({
   declarations: [
@@ -24,13 +25,14 @@ import MovieSearchComponent from './components/movie-search/movie-search.compone
     BannerComponent,
     MovieDisplayComponent,
     MovieSearchComponent,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    CoreModule,
-    // HttpClientModule,
+    GraphQLModule,
+    HttpClientModule,
     ModalModule.forRoot(),
   ],
   providers: [],
