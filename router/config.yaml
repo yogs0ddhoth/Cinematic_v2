@@ -5,3 +5,7 @@ headers:
           matching: ^* # Propagate all headers
 include_subgraph_errors:
   all: true # Propagate errors from all subgraphs
+
+cors:
+  # TODO: Specify production origins
+  allow_any_origin: true # for development
