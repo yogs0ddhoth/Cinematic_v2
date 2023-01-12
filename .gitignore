@@ -2,3 +2,7 @@ node_modules
 # Keep environment variables out of version control
 .env
 dist
+
+# Keep keys out of version control
+*.key
+*.key.pub

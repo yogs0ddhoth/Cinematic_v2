@@ -60,11 +60,16 @@ export class AuthService {
   async validatePassword(password: string): Promise<string> {
     /**
      * Password String requirements:
-     * @(?=.*[a-z]) - at least one lowercase letter
-     * @(?=.*[A-Z]) - at least one uppercase letter
-     * @(?=.*?[#?!@$%^&*\(\)\-+=]) - at least one special character
-     * @[A-Za-z\d#?!@$%^&*\(\)\-+=] - only alphanumeric characters and special characters
-     * @{8,} - at least 8 characters
+     *
+     * (?=.*[a-z]) - at least one lowercase letter
+     *
+     * (?=.*[A-Z]) - at least one uppercase letter
+     *
+     * (?=.*?[#?!@$%^&*\(\)\-+=]) - at least one special character
+     *
+     * [A-Za-z\d#?!@$%^&*\(\)\-+=] - only alphanumeric characters and special characters
+     *
+     * {8,} - at least 8 characters
      */
     const regex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*\(\)\-+=])[A-Za-z\d#?!@$%^&*\(\)\-+=]{8,}$/;
