@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graphql/generated';
+import { SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graph/generated';
 
 @Component({
   selector: 'app-movie-search',

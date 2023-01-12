@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
-import { Actor, Genre, Movie, Rating } from 'src/app/graphql/graphql.generated';
+import { Actor, Genre, Movie, Rating } from 'src/app/core/graph/generated';
 
 @Component({
   selector: 'app-movie-display',
