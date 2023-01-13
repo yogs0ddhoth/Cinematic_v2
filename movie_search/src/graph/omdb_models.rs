@@ -12,7 +12,7 @@ use getset::{Getters, Setters};
 #[getset(get = "pub")]
 pub struct OMDbSearchData {
     search: Option<Vec<OMDbSearchResult>>,
-    response: String,
+    // response: String,
     error: Option<String>,
 }
 
@@ -23,8 +23,9 @@ pub struct OMDbSearchResult {
     #[serde(rename = "imdbID")]
     imdb_id: String,
 }
+#[allow(dead_code)]
 impl OMDbSearchResult {
-    /// Constructor Method
+    /// Constructor Method, used in testing
     pub fn new(value: String) -> Self {
         OMDbSearchResult { imdb_id: value }
     }
@@ -37,12 +38,16 @@ pub struct OMDbRating {
     source: String,
     value: String,
 }
+
+/// Builder Pattern for OMDbRating, used in testing
+#[allow(dead_code)]
 #[derive(Clone, Debug, Default, Setters)]
 #[getset(set = "pub")]
 pub struct OMDbRatingBuilder {
     source: String,
     value: String,
 }
+#[allow(dead_code)]
 impl OMDbRatingBuilder {
     pub fn build(&self) -> OMDbRating {
         OMDbRating {
@@ -78,9 +83,9 @@ pub struct OMDbMovie {
     poster: Option<String>,
 
     ratings: Option<Vec<OMDbRating>>,
-    metascore: Option<String>,
-    #[serde(rename = "imdbRating")]
-    imdb_rating: Option<String>,
+    // metascore: Option<String>,
+    // #[serde(rename = "imdbRating")]
+    // imdb_rating: Option<String>,
     #[serde(rename = "imdbVotes")]
     imdb_votes: Option<String>,
 
@@ -88,10 +93,11 @@ pub struct OMDbMovie {
     production: Option<String>,
 
     // api specific information
-    response: String,
+    // response: String,
 }
 
 /// Builder Pattern for OMDbMovie, used in testing
+#[allow(dead_code)]
 #[derive(Debug, Default, Setters)]
 #[getset(set = "pub")]
 pub struct OMDbMovieBuilder {
@@ -116,18 +122,18 @@ pub struct OMDbMovieBuilder {
     poster: Option<String>,
 
     ratings: Option<Vec<OMDbRating>>,
-    metascore: Option<String>,
-    imdb_rating: Option<String>,
+    // metascore: Option<String>,
+    // imdb_rating: Option<String>,
     imdb_votes: Option<String>,
 
     box_office: Option<String>,
     production: Option<String>,
 
     // api specific information
-    response: String,
+    // response: String,
 }
+#[allow(dead_code)]
 impl OMDbMovieBuilder {
-    /// Implementation of the Builder Pattern for OMDbMovie, used in testing
     pub fn build(self) -> OMDbMovie {
         OMDbMovie {
             imdb_id: self.imdb_id.clone(),
@@ -146,12 +152,12 @@ impl OMDbMovieBuilder {
             awards: self.awards.clone(),
             poster: self.poster.clone(),
             ratings: self.ratings,
-            metascore: self.metascore.clone(),
-            imdb_rating: self.imdb_rating.clone(),
+            // metascore: self.metascore.clone(),
+            // imdb_rating: self.imdb_rating.clone(),
             imdb_votes: self.imdb_votes.clone(),
             box_office: self.box_office.clone(),
             production: self.production.clone(),
-            response: self.response.clone(),
+            // response: self.response.clone(),
         }
     }
 }

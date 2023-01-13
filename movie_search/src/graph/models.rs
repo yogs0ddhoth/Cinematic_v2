@@ -123,6 +123,7 @@ pub struct Movie {
     production: Option<String>,
     box_office: Option<String>,
 }
+#[allow(dead_code)]
 impl Movie {
     /// Check String, and if "N/A", return None
     pub fn check_string_for_null(field: &Option<String>) -> Option<String> {
