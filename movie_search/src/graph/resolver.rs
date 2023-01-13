@@ -1,29 +1,17 @@
-pub mod graph;
-pub mod models;
-
-use super::{async_trait, reqwest, FormatUrl, ParseFloatError, Request, Search};
-use async_graphql::Object;
-use futures::{stream, StreamExt};
-use graph::{Movie, MovieTrailers, SearchRatingInput, SearchMovieInput};
-use models::{OMDbMovie, OMDbSearchData};
 use std::collections::{HashMap, HashSet};
 
-pub struct Query;
-#[Object]
-impl Query {
-    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
-        let movies = search_movie_input.search_movies().await;
-        movies.into_iter().map(|movie| Movie::from(movie)).collect()
-    }
+use super::{
+    // std lib
+    ParseFloatError,
+    // local modules:
+    models::*, omdb_models::*,
+    // traits:
+    FormatUrl, Request, Resolver,
+    // external crates:
+    async_trait, reqwest,
+};
 
-    #[graphql(entity)]
-    async fn find_movie_trailers_by_title<'a>(
-        &self,
-        #[graphql(key)] title: String,
-    ) -> MovieTrailers {
-        MovieTrailers::new(title)
-    }
-}
+use futures::{stream, StreamExt};
 
 #[async_trait]
 impl Request for reqwest::Client {
@@ -62,7 +50,7 @@ impl Request for reqwest::Client {
 }
 
 #[async_trait]
-impl Search<OMDbMovie> for SearchMovieInput {
+impl Resolver<OMDbMovie> for SearchMovieInput {
     /// Apply search filters, if defined, to movie
     /// Returns true if the movie matches filters
     fn match_filters(&self, movie: &OMDbMovie) -> Result<bool, ParseFloatError> {
@@ -84,7 +72,7 @@ impl Search<OMDbMovie> for SearchMovieInput {
             match movie.director() {
                 Some(director) => {
                     if director != director_filter {
-                        return Ok(false)
+                        return Ok(false);
                     }
                 }
                 None => return Ok(false),

@@ -1,54 +1,69 @@
 use super::{
-    super::FormatUrl,
-    models::{OMDbMovie, OMDbRating},
+    // local modules:
+    omdb_models::*,
+    // traits:
+    FormatUrl,
+    // external crates:
+    InputObject, SimpleObject, // from async_graphql
 };
-use async_graphql::{InputObject, SimpleObject};
 
 #[derive(Debug, SimpleObject)]
 pub struct Genre {
     name: String,
-    movies: Option<Vec<Movie>>
+    movies: Option<Vec<Movie>>,
 }
 impl Genre {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Genre { name: value, movies: None }
+        Genre {
+            name: value,
+            movies: None,
+        }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Director {
     name: String,
-    movies: Option<Vec<Movie>>
+    movies: Option<Vec<Movie>>,
 }
 impl Director {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Director { name: value, movies: None }
+        Director {
+            name: value,
+            movies: None,
+        }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Actor {
     name: String,
-    movies: Option<Vec<Movie>>
+    movies: Option<Vec<Movie>>,
 }
 impl Actor {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Actor { name: value, movies: None }
+        Actor {
+            name: value,
+            movies: None,
+        }
     }
 }
 
 #[derive(Debug, SimpleObject)]
 pub struct Writer {
     name: String,
-    movies: Option<Vec<Movie>>
+    movies: Option<Vec<Movie>>,
 }
 impl Writer {
     /// Constructor Method
     pub fn new(value: String) -> Self {
-        Writer { name: value, movies: None }
+        Writer {
+            name: value,
+            movies: None,
+        }
     }
 }
 
@@ -168,7 +183,7 @@ impl From<OMDbMovie> for Movie {
         Movie {
             imdb_id: Some(movie.imdb_id().to_string()),
             title: String::from(movie.title().to_string()),
-            
+
             year: Self::check_string_for_null(movie.year()),
             released: Self::check_string_for_null(movie.released()),
             content_rating: Self::check_string_for_null(movie.rated()),
@@ -176,7 +191,7 @@ impl From<OMDbMovie> for Movie {
 
             director: match Self::check_string_for_null(movie.director()) {
                 Some(director) => Some(Director::new(director)),
-                None => None
+                None => None,
             },
             writers: match Self::check_string_for_null(movie.writer()) {
                 Some(writers) => match writers.len() > 0 {

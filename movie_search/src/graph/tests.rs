@@ -1,8 +1,4 @@
-use super::*;
-use crate::resolvers::{
-    graph::{Movie, SearchRatingInput, SearchMovieInput},
-    models::{OMDbMovie, OMDbMovieBuilder, OMDbRatingBuilder, OMDbSearchData, OMDbSearchResult},
-};
+use super::{omdb_models::*, *};
 use dotenvy::dotenv;
 use tokio;
 
@@ -208,20 +204,17 @@ async fn match_filters_works() {
             },
         ]),
         pages: 1,
-        content_rating: Some(vec![
-            "PG".to_string(), 
-            "PG-13".to_string(),
-        ]),
+        content_rating: Some(vec!["PG".to_string(), "PG-13".to_string()]),
         director: Some("George Lucas".to_string()),
         genres: Some(vec![
             "Action".to_string(),
             "Adventure".to_string(),
-            "Fantasy".to_string()
+            "Fantasy".to_string(),
         ]),
         writers: Some(vec![
             "George Lucas".to_string(),
             "Leigh Brackett".to_string(),
-            "Lawrence Kasdan".to_string()
+            "Lawrence Kasdan".to_string(),
         ]),
     };
 
@@ -255,7 +248,7 @@ async fn match_filters_works() {
         ]))
         .set_production(Some("N/A".to_string()))
         .set_response("True".to_string());
-    
+
     let omdb_movie = builder.build();
 
     match test_search_movie_input.match_filters(&omdb_movie) {

@@ -1,4 +1,10 @@
-use crate::{serde, FormatUrl};
+use super::{
+    // traits:
+    FormatUrl,
+    // external crates:
+    serde
+};
+
 use getset::{Getters, Setters};
 
 #[derive(Getters, serde::Deserialize, Debug)]
@@ -84,6 +90,8 @@ pub struct OMDbMovie {
     // api specific information
     response: String,
 }
+
+/// Builder Pattern for OMDbMovie, used in testing
 #[derive(Debug, Default, Setters)]
 #[getset(set = "pub")]
 pub struct OMDbMovieBuilder {
@@ -119,7 +127,7 @@ pub struct OMDbMovieBuilder {
     response: String,
 }
 impl OMDbMovieBuilder {
-    /// Implementation of the Builder Pattern for OMDbMovie
+    /// Implementation of the Builder Pattern for OMDbMovie, used in testing
     pub fn build(self) -> OMDbMovie {
         OMDbMovie {
             imdb_id: self.imdb_id.clone(),
