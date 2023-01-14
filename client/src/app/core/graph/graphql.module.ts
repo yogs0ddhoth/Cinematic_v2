@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 
-import {ApolloClientOptions, InMemoryCache} from '@apollo/client/core';
-import { setContext } from '@apollo/client/link/context';
+import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
+import { HttpLink } from 'apollo-angular/http';
 
-import {ApolloModule, APOLLO_OPTIONS} from 'apollo-angular';
-import {HttpLink} from 'apollo-angular/http';
+import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 import { ApolloLink } from '@apollo/client/link/core';
+import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
 
 const uri = 'http://localhost:4000/'; 
 export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
@@ -23,6 +24,16 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
             Authorization: token ? `Bearer ${token}` : ''
           }
         };
+      }),
+      onError(({ graphQLErrors }) => {
+        if (graphQLErrors) {
+          graphQLErrors.forEach(({ message, extensions }) => {
+            if (extensions?.['code'] === 'UNAUTHENTICATED') {
+              console.log(message);
+              localStorage.removeItem('token');
+            }
+          });
+        }
       }),
       httpLink.create({uri}),
     ]),
