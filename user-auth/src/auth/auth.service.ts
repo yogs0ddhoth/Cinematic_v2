@@ -5,6 +5,7 @@ import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { namespace } from './constants';
 import { Auth, User } from 'src/graphql';
+import { ValidateError } from './dto/errors.dto';
 
 @Injectable()
 export class AuthService {
@@ -43,12 +44,12 @@ export class AuthService {
    * Validate email is not already in use
    * @param email string: the email address to validate
    * @returns void
-   * @throws {Error} if email is already in use
+   * @throws {ValidateError} if email is already in use
    */
   async validateEmail(email: string) {
     const user = await this.userService.user({ email });
     if (user) {
-      throw new Error('Email already in use');
+      throw new ValidateError('Email already in use');
     }
   }
 
@@ -74,7 +75,7 @@ export class AuthService {
     const regex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*?[#?!@$%^&*\(\)\-+=])[A-Za-z\d#?!@$%^&*\(\)\-+=]{8,}$/;
     if (regex.test(password) == false)
-      throw new Error(
+      throw new ValidateError(
         'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one of the following special characters: "#?!@$%^&*()-+="',
       );
     return this.#bcrypt.hash(password, 12);
@@ -86,17 +87,17 @@ export class AuthService {
    * @param password string: the password of the user
    * @returns Promise: the validated User
    * @type User: { id: string; email: string }
-   * @throws {Error} if user does not exist or password is invalid
+   * @throws {ValidateError} if user does not exist or password is invalid
    */
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userService.user({ email });
     if (!user) {
-      throw new Error('User does not Exist.');
+      throw new ValidateError('User does not Exist.');
     }
     const { password: hash, ...userInfo } = user;
 
     if ((await this.verifyUser(password, hash)) == false) {
-      throw new Error('Invalid Credentials!');
+      throw new ValidateError('Invalid Credentials!');
     }
 
     return userInfo;

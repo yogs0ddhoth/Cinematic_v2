@@ -18,6 +18,9 @@ export class UserAuthResolver {
       return await this.userAuthService.login(email, password);
     } catch (error) {
       console.log(error);
+      if (error.name === 'ValidateError') {
+        return error.message;
+      }
     }
   }
 
@@ -31,6 +34,9 @@ export class UserAuthResolver {
       return await this.userAuthService.signup(email, password);
     } catch (error) {
       console.log(error);
+      if (error.name === 'ValidateError') {
+        return error.message;
+      }
     }
   }
 }

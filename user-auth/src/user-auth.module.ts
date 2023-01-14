@@ -10,6 +10,7 @@ import { UserAuthResolver } from './user-auth.resolver';
 import { UserAuthService } from './user-auth.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { GraphQLError } from 'graphql';
 
 @Module({
   imports: [
@@ -19,6 +20,8 @@ import { UserModule } from './user/user.module';
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },
+      // remove sensitive and unnecessary information from the error message
+      formatError: (error) => new GraphQLError(error.message),
     }),
     AuthModule,
     UserModule,
