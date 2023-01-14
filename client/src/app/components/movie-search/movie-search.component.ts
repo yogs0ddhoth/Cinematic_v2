@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 import { map, Observable } from 'rxjs';
-import { SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graph/generated';
+import { SearchMovieInput, SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graph/generated';
 
 @Component({
   selector: 'app-movie-search',
@@ -9,11 +10,28 @@ import { SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graph/generated
 })
 export default class MovieSearchComponent implements OnInit {
   movies?: Observable<SearchMoviesQuery['searchMovies']>;
+
+  searchForm = new FormGroup({
+    title: new FormControl<string>(''),
+  });
   constructor(private readonly searchMovies: SearchMoviesGQL) { }
 
   ngOnInit(): void { }
 
-  #searchMovies() {
-    this.movies = this.searchMovies.watch().valueChanges.pipe(map(result => result.data.searchMovies));
+  #getSearchInput(): SearchMovieInput {
+    const title = this.searchForm.get('title')?.value;
+    const searchInput: SearchMovieInput = {
+      title: title ? title : '',
+    };
+    return searchInput;
+  };
+  onSubmit() {
+    this.movies = this.searchMovies.watch({
+      searchMovieInput: this.#getSearchInput(),
+    })
+      .valueChanges
+      .pipe(map(result => result.data.searchMovies));
   }
+
+
 }
