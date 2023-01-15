@@ -4,12 +4,30 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
+use getset::Getters;
 use dotenvy::dotenv;
 
 mod auth;
-use auth::{Auth, Env};
+use auth::Auth;
 mod graph;
 use graph::Query;
+
+#[derive(Debug, Getters)]
+pub struct Env {
+    #[getset(get = "pub")]
+    secret_key: String,
+
+    #[getset(get = "pub")]
+    omdb_key: String,
+}
+impl Env {
+    pub fn new() -> Self {
+        Env {
+            secret_key: std::env::var("SECRET_KEY").unwrap(),
+            omdb_key: std::env::var("OMDB_KEY").unwrap(),
+        }
+    }
+}
 
 async fn graphql_playground() -> HttpResponse {
     HttpResponse::Ok()

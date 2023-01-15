@@ -10,6 +10,8 @@ use async_trait::async_trait;
 use reqwest;
 use serde;
 
+use crate::auth::JwtGuard;
+
 #[cfg(test)]
 mod tests;
 
@@ -54,7 +56,8 @@ pub struct Query;
 #[Object]
 impl Query {
     /// resolver for searchMovies
-    async fn search_movies(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
+    #[graphql(guard = "JwtGuard {}")]
+    async fn search_movies<'ctx>(&self, search_movie_input: SearchMovieInput) -> Vec<Movie> {
         let movies = search_movie_input.search_movies().await;
         movies.into_iter().map(|movie| Movie::from(movie)).collect()
     }
