@@ -1,4 +1,4 @@
-use actix_web::{guard, web, App, HttpResponse, HttpServer};
+use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer};
 use async_graphql::{
     http::{playground_source, GraphQLPlaygroundConfig},
     EmptyMutation, EmptySubscription, Schema,
@@ -6,15 +6,10 @@ use async_graphql::{
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use dotenvy::dotenv;
 
+mod auth;
+use auth::{Auth, Env};
 mod graph;
 use graph::Query;
-
-async fn index(
-    schema: web::Data<Schema<Query, EmptyMutation, EmptySubscription>>,
-    request: GraphQLRequest,
-) -> GraphQLResponse {
-    schema.execute(request.into_inner()).await.into()
-}
 
 async fn graphql_playground() -> HttpResponse {
     HttpResponse::Ok()
@@ -22,11 +17,33 @@ async fn graphql_playground() -> HttpResponse {
         .body(playground_source(GraphQLPlaygroundConfig::new("/")))
 }
 
+fn get_auth_token(req: &HttpRequest) -> Option<String> {
+    let auth_header = req
+        .headers()
+        .get("Authorization")?
+        .to_str()
+        .ok()?
+        .trim_start_matches("Bearer ");
+    Some(auth_header.to_string())
+}
+
+async fn index(
+    schema: web::Data<Schema<Query, EmptyMutation, EmptySubscription>>,
+    req: HttpRequest,
+    gql_req: GraphQLRequest,
+) -> GraphQLResponse {
+    let mut request = gql_req.into_inner();
+    request = request.data(Auth::new(get_auth_token(&req)));
+
+    schema.execute(request).await.into()
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
     /* Build Schema */
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
+        .data(Env::new())
         .enable_federation()
         .finish();
 
