@@ -4,15 +4,19 @@ use async_graphql::{
     EmptyMutation, EmptySubscription, Schema,
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use getset::Getters;
-use dotenvy::dotenv;
+use dotenvy;
+use futures::{self, StreamExt};
+use getset;
+use reqwest;
+use serde;
 
 mod auth;
 use auth::Auth;
+
 mod graph;
 use graph::Query;
 
-#[derive(Debug, Getters)]
+#[derive(Debug, getset::Getters)]
 pub struct Env {
     #[getset(get = "pub")]
     secret_key: String,
@@ -29,12 +33,62 @@ impl Env {
     }
 }
 
+/// trait for sending http requests
+#[async_trait::async_trait]
+pub trait Request {
+    async fn send_get_request<T: for<'de> serde::Deserialize<'de>>(
+        &self,
+        url: &String,
+    ) -> Result<T, reqwest::Error>;
+
+    async fn send_many_get_requests<T: for<'de> serde::Deserialize<'de> + std::marker::Send>(
+        &self,
+        urls: Vec<String>,
+    ) -> Vec<Result<T, reqwest::Error>>;
+}
+#[async_trait::async_trait]
+impl Request for reqwest::Client {
+    /// Build and send GET request to url, deserialize response to type parameter, propogate error, and return results
+    async fn send_get_request<T: for<'de> serde::Deserialize<'de>>(
+        &self,
+        url: &String,
+    ) -> Result<T, reqwest::Error> {
+        println!("Fetching {:#?}...", url);
+        let results = self.get(url).send().await?.json::<T>().await?;
+        Ok(results)
+    }
+
+    /// Concurrently send GET requests that deserialize to the same type, and return the results
+    async fn send_many_get_requests<T: for<'de> serde::Deserialize<'de> + std::marker::Send>(
+        &self,
+        urls: Vec<String>,
+    ) -> Vec<Result<T, reqwest::Error>> {
+        // maximum number of concurrent requests
+        const MAX_CONCURRENT_REQUESTS: usize = 50;
+
+        futures::stream::iter(
+            // convert the iterator of futures into a stream
+            urls.into_iter().map(|url| async move {
+                match self.send_get_request::<T>(&url).await {
+                    Ok(result) => Ok(result),
+                    Err(err) => Err(err),
+                }
+            }),
+        )
+        // buffer the max number of concurrent requests at a time to prevent resource overload
+        .buffer_unordered(MAX_CONCURRENT_REQUESTS)
+        .collect::<Vec<Result<T, reqwest::Error>>>()
+        .await
+    }
+}
+
 async fn graphql_playground() -> HttpResponse {
     HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
         .body(playground_source(GraphQLPlaygroundConfig::new("/")))
 }
 
+/// Extracts the Authorization header from the request and returns the token
 fn get_auth_token(req: &HttpRequest) -> Option<String> {
     let auth_header = req
         .headers()
@@ -45,6 +99,7 @@ fn get_auth_token(req: &HttpRequest) -> Option<String> {
     Some(auth_header.to_string())
 }
 
+/// GraphQL endpoint
 async fn index(
     schema: web::Data<Schema<Query, EmptyMutation, EmptySubscription>>,
     req: HttpRequest,
@@ -58,10 +113,11 @@ async fn index(
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
+    dotenvy::dotenv().ok();
     /* Build Schema */
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(Env::new())
+        .data(reqwest::Client::new())
         .enable_federation()
         .finish();
 

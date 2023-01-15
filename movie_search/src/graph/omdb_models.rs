@@ -1,8 +1,8 @@
 use super::{
+    // external crates:
+    serde,
     // traits:
     FormatUrl,
-    // external crates:
-    serde
 };
 
 use getset::{Getters, Setters};
@@ -91,7 +91,6 @@ pub struct OMDbMovie {
 
     box_office: Option<String>,
     production: Option<String>,
-
     // api specific information
     // response: String,
 }
@@ -128,7 +127,6 @@ pub struct OMDbMovieBuilder {
 
     box_office: Option<String>,
     production: Option<String>,
-
     // api specific information
     // response: String,
 }
@@ -163,10 +161,10 @@ impl OMDbMovieBuilder {
 }
 
 impl FormatUrl for OMDbSearchResult {
-    fn fmt_omdb_url(&self) -> String {
+    fn fmt_omdb_url(&self, key: &String) -> String {
         format!(
             "https://www.omdbapi.com/?apikey={key}&i={id}",
-            key = self.get_omdb_key(),
+            key = key,
             id = self.imdb_id,
         )
     }
