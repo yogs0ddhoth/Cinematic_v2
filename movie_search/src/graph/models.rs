@@ -398,6 +398,18 @@ impl SearchMovieInput {
         }
         Ok(true)
     }
+
+    pub fn fmt_paginated_urls(&self, key: &String) -> Vec<String> {
+        let mut urls: Vec<String> = Vec::new();
+        for page in 1..=self.pages {
+            urls.push(format!(
+                "{url}&page={page}",
+                url = self.fmt_omdb_url(key),
+                page = page
+            ))
+        }
+        return urls;
+    }
 }
 
 #[derive(Debug, InputObject)]
