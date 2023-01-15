@@ -1,7 +1,7 @@
 mod models;
 use models::*;
 mod omdb_models;
-mod resolver;
+mod resolvers;
 
 use async_graphql::{Context, InputObject, Object, SimpleObject};
 use async_trait::async_trait;
@@ -24,6 +24,11 @@ trait Resolvers {
     async fn search_movies(&self, ctx: &Context<'_>) -> Vec<Movie>;
 }
 
+#[async_trait]
+trait EntityResolvers {
+    async fn find_movie_trailers_by_title(title: String) -> MovieTrailers;
+}
+
 /// graphql query object
 pub struct Query;
 #[Object]
@@ -44,6 +49,6 @@ impl Query {
         &self,
         #[graphql(key)] title: String,
     ) -> MovieTrailers {
-        MovieTrailers::new(title)
+        MovieTrailers::find_movie_trailers_by_title(title).await
     }
 }

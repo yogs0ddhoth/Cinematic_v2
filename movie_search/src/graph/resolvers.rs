@@ -12,7 +12,7 @@ use super::{
     omdb_models::*,
     reqwest,
     Context,
-    Resolvers,
+    Resolvers, EntityResolvers,
 };
 
 #[async_trait]
@@ -24,16 +24,7 @@ impl Resolvers for SearchMovieInput {
         let mut id_urls = Vec::new();
         {
             // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
-            let mut search_urls = Vec::new();
-            for i in 1..self.pages + 1 {
-                // for pagination
-                // push urls for each page (see omdb api) to search_urls
-                search_urls.push(format!(
-                    "{url}&page={num}",
-                    url = self.fmt_omdb_url(key),
-                    num = i
-                ));
-            }
+            let search_urls = self.fmt_paginated_urls(key);
             // concurrently send requests for each of the urls
             client
                 .send_many_get_requests::<OMDbSearchData>(search_urls)
@@ -86,5 +77,13 @@ impl Resolvers for SearchMovieInput {
         }
         println!("Done! Sending response...");
         movies.into_iter().map(|movie| Movie::from(movie)).collect()
+    }
+}
+
+
+#[async_trait]
+impl EntityResolvers for MovieTrailers {
+    async fn find_movie_trailers_by_title(title: String) -> MovieTrailers {
+        MovieTrailers::new(title)
     }
 }
