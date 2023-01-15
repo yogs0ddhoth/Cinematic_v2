@@ -1,9 +1,12 @@
-use super::{omdb_models::*, *};
+use crate::{*, graph::{*, omdb_models::*} };
 use dotenvy::dotenv;
 use tokio;
 
 #[test]
 fn fmt_omdb_url_works() {
+    dotenv().ok();
+    let env = Env::new();
+
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
@@ -16,8 +19,8 @@ fn fmt_omdb_url_works() {
     };
     let test_omdb_search_result = OMDbSearchResult::new("tt0076759".to_string());
 
-    let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
-    let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
+    let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url(env.omdb_key());
+    let test_search_movie_url = test_search_movie_input.fmt_omdb_url(env.omdb_key());
 
     assert_eq!(
         "https://www.omdbapi.com/?apikey=NO_KEY&s=Star%20Wars&y=",
@@ -32,7 +35,8 @@ fn fmt_omdb_url_works() {
 #[tokio::test]
 async fn get_requests_work() {
     dotenv().ok();
-
+    let env = Env::new();
+    
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
@@ -43,10 +47,10 @@ async fn get_requests_work() {
         genres: None,
         writers: None,
     };
-    let test_search_movie_url = test_search_movie_input.fmt_omdb_url();
+    let test_search_movie_url = test_search_movie_input.fmt_omdb_url(env.omdb_key());
 
     let test_omdb_search_result = OMDbSearchResult::new("tt0076759".to_string());
-    let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url();
+    let test_omdb_search_url = test_omdb_search_result.fmt_omdb_url(env.omdb_key());
 
     let client = reqwest::Client::new();
 
@@ -78,6 +82,7 @@ async fn get_requests_work() {
 #[tokio::test]
 async fn many_get_requests_work() {
     dotenv().ok();
+    let env = Env::new();
 
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
@@ -111,14 +116,8 @@ async fn many_get_requests_work() {
     let mut id_urls = Vec::new();
     {
         // Search OMDB for all movies that match search_movie_input, and push the information to id_urls
-        let mut search_urls = Vec::new();
-        for i in 1..test_search_movie_input.pages + 1 {
-            search_urls.push(format!(
-                "{url}&page={num}",
-                url = test_search_movie_input.fmt_omdb_url(),
-                num = i
-            ));
-        }
+        let search_urls = test_search_movie_input.fmt_paginated_urls(env.omdb_key());
+
         assert!(search_urls.len() == 3);
 
         // concurrently send requests for each of the urls
@@ -132,7 +131,7 @@ async fn many_get_requests_work() {
                     Ok(data) => match data.search() {
                         Some(result_page) => {
                             for result in result_page {
-                                id_urls.push(result.fmt_omdb_url())
+                                id_urls.push(result.fmt_omdb_url(env.omdb_key()))
                             }
                         }
                         None => match data.error() {

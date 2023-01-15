@@ -10,8 +10,8 @@ use serde;
 
 use crate::auth::JwtGuard;
 
-// #[cfg(test)]
-// mod tests;
+#[cfg(test)]
+mod tests;
 
 /// trait for formatting urls
 pub trait FormatUrl {
