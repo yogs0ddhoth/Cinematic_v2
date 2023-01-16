@@ -29,8 +29,8 @@ export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
         if (graphQLErrors) {
           graphQLErrors.forEach(({ message, extensions }) => {
             if (extensions?.['code'] === 'UNAUTHENTICATED') {
-              console.log(message);
               localStorage.removeItem('token');
+              window.location.assign('/login');
             }
           });
         }
