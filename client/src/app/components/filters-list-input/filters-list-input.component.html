@@ -1,5 +1,5 @@
 <mat-form-field class="example-chip-list" appearance="fill">
-  <mat-label>{{name}}</mat-label>
+  <mat-label>{{name}}s</mat-label>
   <mat-chip-grid #chipGrid aria-label="Fruit selection">
     <mat-chip-row *ngFor="let filter of filters" (removed)="remove(filter)">
       {{filter}}
@@ -8,7 +8,7 @@
       </button>
     </mat-chip-row>
   </mat-chip-grid>
-  <input placeholder="Filter by {{name}}" #filterInput [formControl]="filterCtrl"
+  <input placeholder="Add a {{name}}" #filterInput [formControl]="filterCtrl"
     [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
     (matChipInputTokenEnd)="add($event)"/>
