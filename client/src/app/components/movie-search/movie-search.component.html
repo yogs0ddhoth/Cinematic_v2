@@ -16,7 +16,7 @@
   </button>
 
   <mat-expansion-panel (opened)="panelOpenState = true" 
-                       (clsoed)="panelOpenState = false">
+                       (closed)="panelOpenState = false">
 
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -24,13 +24,8 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <mat-form-field appearance="fill">
-      <mat-label>Genres</mat-label>
-      <input matInput 
-             type="text" 
-             formControlName="genre" 
-             placeholder="Filter by Genres">
-    </mat-form-field>
+    <app-filters-list-input [name]="'Genre'" [allFilters]="genres" (inputChange)="genresChange($event)"></app-filters-list-input>
+
     <mat-form-field appearance="fill">
       <mat-label>Year</mat-label>
       <input matInput 
@@ -39,8 +34,8 @@
              placeholder="Filter by Release Year">
     </mat-form-field>
 
+    <!-- TODO: implement autocomplete with known directors list -->
     <mat-form-field appearance="fill">
-      <!-- implement autocomplete with known directors list -->
       <mat-label>Director</mat-label>
       <input matInput 
              type="text" 
@@ -48,7 +43,7 @@
              placeholder="Filter By Director">
     </mat-form-field>
 
-    <div formGroupName="contentRatingInput">
+    <div formGroupName="contentRatings">
       <mat-checkbox type="checkbox" 
                     formControlName="g" 
                     value="G">
