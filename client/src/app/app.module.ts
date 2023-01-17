@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -28,6 +29,7 @@ import MovieDisplayComponent from './components/movie-display/movie-display.comp
 import MovieSearchComponent from './components/movie-search/movie-search.component';
 import LoginComponent from './components/login/login.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FiltersListInputComponent } from './components/filters-list-input/filters-list-input.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MovieDisplayComponent,
     MovieSearchComponent,
     LoginComponent,
+    FiltersListInputComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -54,6 +57,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatExpansionModule,
     MatFormFieldModule,
     MatGridListModule,
+    MatIconModule,
     MatInputModule,
     
     ModalModule.forRoot(),
