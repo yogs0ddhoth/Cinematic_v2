@@ -9,7 +9,7 @@ import { SearchMovieInput, SearchMoviesGQL, SearchMoviesQuery, SearchRatingInput
   styleUrls: ['./movie-search.component.css']
 })
 export default class MovieSearchComponent implements OnInit {
-  isCollapsed = true;
+  panelOpenState = false;
 
   movies?: Observable<SearchMoviesQuery['searchMovies']>;
 
@@ -20,8 +20,7 @@ export default class MovieSearchComponent implements OnInit {
     private readonly searchMovies: SearchMoviesGQL
   ) { 
     this.searchForm = this.fb.group({
-      contentRatings: this.fb.array([]),
-      contentRatingInput: this.fb.group({
+      contentRatings: this.fb.group({
         g: false,
         pg: false,
         pg13: false,
@@ -46,25 +45,14 @@ export default class MovieSearchComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  get contentRatings() {
-    return this.searchForm.get('contentRatings') as FormArray;
-  }
-  get genres() {
-    return this.searchForm.get('genres') as FormArray;
-  }
-
-  addContentRatings() {
-    ['g', 'pg', 'pg13', 'r', 'nc17'].forEach((key) => {
-      const rating = this.searchForm.get('contentRatingInput')?.get(key)?.value;
-      if (rating) {
-        this.contentRatings.push(new FormControl(key));
-      }
-    });
+  getContentRatings(): string[] {
+    return ['g', 'pg', 'pg13', 'r', 'nc17'].map(
+      (key) => this.searchForm.get('contentRatingInput')?.get(key)?.value
+    );
   }
 
   #getSearchInput(): SearchMovieInput {
-    this.addContentRatings();
-    const contentRating = this.searchForm.get('contentRatings')?.value;
+    const contentRating = this.getContentRatings();
     const director = this.searchForm.get('director')?.value;
     const genres = this.searchForm.get('genres')?.value;
     const title = this.searchForm.get('title')?.value;
@@ -73,7 +61,7 @@ export default class MovieSearchComponent implements OnInit {
     const writers = this.searchForm.get('writers')?.value;
 
     const searchInput: SearchMovieInput = {
-      contentRating: contentRating ? contentRating : [],
+      contentRating,
       director: director ? director : '',
       genres: genres ? genres : [],
       ratings: ratings ? ratings : [],
