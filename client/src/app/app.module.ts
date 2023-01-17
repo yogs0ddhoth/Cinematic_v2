@@ -17,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 
@@ -28,8 +29,9 @@ import BannerComponent from './components/banner/banner.component';
 import MovieDisplayComponent from './components/movie-display/movie-display.component';
 import MovieSearchComponent from './components/movie-search/movie-search.component';
 import LoginComponent from './components/login/login.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FiltersListInputComponent } from './components/filters-list-input/filters-list-input.component';
+import { FilterRangeInputComponent } from './components/filter-range-input/filter-range-input.component';
 
 @NgModule({
   declarations: [
@@ -41,11 +43,13 @@ import { FiltersListInputComponent } from './components/filters-list-input/filte
     MovieSearchComponent,
     LoginComponent,
     FiltersListInputComponent,
+    FilterRangeInputComponent,
   ],
   imports: [
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
     GraphQLModule,
     HttpClientModule,
 
@@ -59,6 +63,7 @@ import { FiltersListInputComponent } from './components/filters-list-input/filte
     MatGridListModule,
     MatIconModule,
     MatInputModule,
+    MatSliderModule,
     
     ModalModule.forRoot(),
     ReactiveFormsModule,

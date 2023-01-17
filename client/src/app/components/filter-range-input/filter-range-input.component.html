@@ -1,0 +1,8 @@
+<div>
+  <label>{{source}}</label>
+  <label>{{value}}/{{max}}</label>
+</div>
+<mat-slider [disabled]="disabled" [min]="min" [max]="max" [step]="step">
+  <input matSliderThumb [(ngModel)]="value">
+</mat-slider>
+<mat-checkbox [(ngModel)]="disabled">Disabled</mat-checkbox>
