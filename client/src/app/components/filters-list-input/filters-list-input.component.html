@@ -1,22 +1,20 @@
-<form>
-  <mat-form-field class="example-chip-list" appearance="fill">
-    <mat-label>{{name}}</mat-label>
-    <mat-chip-grid #chipGrid aria-label="Fruit selection">
-      <mat-chip-row *ngFor="let filter of filters" (removed)="remove(filter)">
-        {{filter}}
-        <button matChipRemove [attr.aria-label]="'remove ' + filter">
-          <mat-icon>cancel</mat-icon>
-        </button>
-      </mat-chip-row>
-    </mat-chip-grid>
-    <input placeholder="New {{name}}..." #filterInput [formControl]="filterCtrl"
-      [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
-      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-      (matChipInputTokenEnd)="add($event)"/>
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-      <mat-option *ngFor="let filter of filteredFilters | async" [value]="filter">
-        {{filter}}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
-  </form>
+<mat-form-field class="example-chip-list" appearance="fill">
+  <mat-label>{{name}}</mat-label>
+  <mat-chip-grid #chipGrid aria-label="Fruit selection">
+    <mat-chip-row *ngFor="let filter of filters" (removed)="remove(filter)">
+      {{filter}}
+      <button matChipRemove [attr.aria-label]="'remove ' + filter">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+  </mat-chip-grid>
+  <input placeholder="Filter by {{name}}" #filterInput [formControl]="filterCtrl"
+    [matChipInputFor]="chipGrid" [matAutocomplete]="auto"
+    [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+    (matChipInputTokenEnd)="add($event)"/>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let filter of filteredFilters | async" [value]="filter">
+      {{filter}}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
