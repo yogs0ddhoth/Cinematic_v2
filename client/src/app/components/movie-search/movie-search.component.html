@@ -24,7 +24,9 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <app-filters-list-input [name]="'Genre'" [allFilters]="genres" (inputChange)="genresChange($event)"></app-filters-list-input>
+    <app-filters-list-input [name]="'Genre'" [allFilters]="genres" (inputChange)="updateGenres($event)"></app-filters-list-input>
+
+    <app-filters-list-input [name]="'Content Rating'" [allFilters]="contentRatings" (inputChange)="updateContentRatings($event)"></app-filters-list-input>
 
     <mat-form-field appearance="fill">
       <mat-label>Year</mat-label>
@@ -34,7 +36,6 @@
              placeholder="Filter by Release Year">
     </mat-form-field>
 
-    <!-- TODO: implement autocomplete with known directors list -->
     <mat-form-field appearance="fill">
       <mat-label>Director</mat-label>
       <input matInput 
@@ -43,33 +44,7 @@
              placeholder="Filter By Director">
     </mat-form-field>
 
-    <div formGroupName="contentRatings">
-      <mat-checkbox type="checkbox" 
-                    formControlName="g" 
-                    value="G">
-        G
-      </mat-checkbox>
-      <mat-checkbox type="checkbox" 
-                    formControlName="pg" 
-                    value="PG">
-        PG
-      </mat-checkbox>
-      <mat-checkbox type="checkbox" 
-                    formControlName="pg13" 
-                    value="PG-13">
-        PG-13
-      </mat-checkbox>
-      <mat-checkbox type="checkbox" 
-                    formControlName="r" 
-                    value="R">
-        R
-      </mat-checkbox>
-      <mat-checkbox type="checkbox" 
-                    formControlName="nc17" 
-                    value="NC-17">
-        NC-17
-      </mat-checkbox>
-    </div>
+    <app-filters-list-input [name]="'Writer'" [allFilters]="writers" (inputChange)="updateWriters($event)"></app-filters-list-input>
   </mat-expansion-panel>
 </form>
 

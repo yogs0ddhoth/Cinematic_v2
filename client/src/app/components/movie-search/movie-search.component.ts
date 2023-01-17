@@ -12,6 +12,9 @@ import { SearchMovieInput, SearchMoviesGQL, SearchMoviesQuery } from 'src/app/co
 export default class MovieSearchComponent implements OnInit {
   panelOpenState = false;
 
+  contentRatings: string[] = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
+  contentRatingsInput: string[] = [];
+
   // TODO: get genres from server
   genres: string[] = [
     {name: 'Action'}, {name: 'Adventure'}, {name: 'Animation'}, {name: 'Biography'}, {name: 'Comedy'}, {name: 'Crime'}, {name: 'Documentary'}, {name: 'Drama'}, {name: 'Family'}, {name: 'Fantasy'}, {name: 'Film-Noir'}, {name: 'History'}, {name: 'Horror'}, {name: 'Music'}, {name: 'Musical'}, {name: 'Mystery'}, {name: 'Romance'}, {name: 'Sci-Fi'}, {name: 'Sport'}, {name: 'Thriller'}, {name: 'War'}, {name: 'Western'}
@@ -19,19 +22,16 @@ export default class MovieSearchComponent implements OnInit {
   genreInput: string[]  = [];
   movies?: Observable<SearchMoviesQuery['searchMovies']>;
 
+  // TODO: get writers from server
+  writers: string[] = [];
+  writersInput: string[] = [];
+
   searchForm: FormGroup;
   constructor(
     private readonly fb: FormBuilder,
     private readonly searchMovies: SearchMoviesGQL
   ) { 
     this.searchForm = this.fb.group({
-      contentRatings: this.fb.group({
-        g: false,
-        pg: false,
-        pg13: false,
-        r: false,
-        nc17: false,
-      }),
       director: [''],
       // ratings: this.fb.array([
       //   this.fb.group({
@@ -41,16 +41,19 @@ export default class MovieSearchComponent implements OnInit {
       // ]),
       releaseYear: [''],
       title: [''],
-      // writers: this.fb.array([
-      //   this.fb.control('')
-      // ]),
     });
   }
 
   ngOnInit(): void { }
 
-  genresChange(genres: string[]): void {
+  updateContentRatings(contentRatings: string[]): void {
+    this.contentRatingsInput = contentRatings;
+  }
+  updateGenres(genres: string[]): void {
     this.genreInput = genres;
+  }
+  updateWriters(writers: string[]): void {
+    this.writersInput = writers;
   }
 
   // getContentRatings(): string[] {
@@ -59,22 +62,19 @@ export default class MovieSearchComponent implements OnInit {
   // }
 
   #getSearchInput(): SearchMovieInput {
-    // const contentRating = this.getContentRatings();
     const director = this.searchForm.get('director')?.value;
-    // const genres = this.getGenres();
     const title = this.searchForm.get('title')?.value;
     const ratings = this.searchForm.get('ratings')?.value;
     const releaseYear = this.searchForm.get('releaseYear')?.value;
-    const writers = this.searchForm.get('writers')?.value;
 
     const searchInput: SearchMovieInput = {
-      // contentRating,
+      contentRating: this.contentRatingsInput,
       director: director ? director : '',
       genres: this.genreInput,
       ratings: ratings ? ratings : [],
       title: title ? title : '',
       releaseYear: releaseYear ? releaseYear : '',
-      writers: writers ? writers : [],
+      writers: this.writersInput,
     };
     return searchInput;
   };
