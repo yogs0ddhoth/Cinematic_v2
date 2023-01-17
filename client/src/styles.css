@@ -2,9 +2,5 @@
   --banner: url("./assets/images/banner.jpg");
 }
 
-body {
-  font-family: 'Oswald', sans-serif;
-  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
-}
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
