@@ -1,4 +1,7 @@
-use crate::{*, graph::{*, omdb_models::*} };
+use crate::{
+    graph::{omdb_models::*, *},
+    *,
+};
 use dotenvy::dotenv;
 use tokio;
 
@@ -36,7 +39,7 @@ fn fmt_omdb_url_works() {
 async fn get_requests_work() {
     dotenv().ok();
     let env = Env::new();
-    
+
     let test_search_movie_input = SearchMovieInput {
         title: String::from("Star%20Wars"),
         release_year: String::new(),
@@ -246,7 +249,6 @@ async fn match_filters_works() {
                 .build(),
         ]))
         .set_production(Some("N/A".to_string()));
-        // .set_response("True".to_string());
 
     let omdb_movie = builder.build();
 
@@ -303,13 +305,11 @@ fn from_works() {
                 .build(),
         ]))
         .set_production(Some("N/A".to_string()));
-        // .set_response("True".to_string());
 
     let test_omdb_movie = builder.build();
 
     let test_movie = Movie::from(test_omdb_movie);
 
-    // assert!(test_movie.get_released().unwrap() > 0);
     assert_eq!(3, test_movie.get_writers().unwrap());
     assert_eq!(3, test_movie.get_actors().unwrap());
     assert_eq!(3, test_movie.get_genres().unwrap());
