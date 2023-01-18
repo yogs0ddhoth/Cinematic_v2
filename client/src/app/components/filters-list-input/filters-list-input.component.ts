@@ -16,10 +16,10 @@ export class FiltersListInputComponent {
   @Input() name!: string;
   filterCtrl = new FormControl('');
   filteredFilters: Observable<string[]>;
-  filters: string[] = [];
+  @Input() filters: string[] = [];
   @Input() allFilters!: string[];
 
-  @Output() inputChange = new EventEmitter<string[]>();
+  @Output() filtersChange = new EventEmitter<string[]>();
 
   @ViewChild('filterInput')
   filterInput!: ElementRef<HTMLInputElement>;
@@ -37,7 +37,7 @@ export class FiltersListInputComponent {
     // Add filter to the list
     if (value) {
       this.filters.push(value);
-      this.inputChange.emit(this.filters);
+      this.filtersChange.emit(this.filters);
     }
 
     // Clear the input value
@@ -51,13 +51,13 @@ export class FiltersListInputComponent {
 
     if (index >= 0) {
       this.filters.splice(index, 1);
-      this.inputChange.emit(this.filters);
+      this.filtersChange.emit(this.filters);
     }
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
     this.filters.push(event.option.viewValue);
-    this.inputChange.emit(this.filters);
+    this.filtersChange.emit(this.filters);
     this.filterInput.nativeElement.value = '';
     this.filterCtrl.setValue(null);
   }

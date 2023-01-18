@@ -24,9 +24,15 @@
       </mat-panel-title>
     </mat-expansion-panel-header>
 
-    <app-filters-list-input [name]="'Genre'" [allFilters]="genres" (inputChange)="updateGenres($event)"></app-filters-list-input>
+    <app-filters-list-input [name]="'Genre'" 
+                            [allFilters]="genres" 
+                            [(filters)]="genresInput">
+    </app-filters-list-input>
 
-    <app-filters-list-input [name]="'Content Rating'" [allFilters]="contentRatings" (inputChange)="updateContentRatings($event)"></app-filters-list-input>
+    <app-filters-list-input [name]="'Content Rating'" 
+                            [allFilters]="contentRatings" 
+                            [(filters)]="contentRatingsInput">
+    </app-filters-list-input>
 
     <mat-form-field appearance="fill">
       <mat-label>Year</mat-label>
@@ -44,7 +50,19 @@
              placeholder="Filter By Director">
     </mat-form-field>
 
-    <app-filters-list-input [name]="'Writer'" [allFilters]="writers" (inputChange)="updateWriters($event)"></app-filters-list-input>
+    <app-filters-list-input [name]="'Writer'" 
+                            [allFilters]="writers" 
+                            [(filters)]="writersInput">
+    </app-filters-list-input>
+
+    <div *ngFor="let rating of ratingsInput; index as i">
+      <app-filter-range-input [source]="rating.source"
+                              [max]="rating.max" 
+                              [step]="rating.step" 
+                              [(score)]="ratingsInput[i].score"
+                              [(disabled)]="ratingsInput[i].disabled">
+      </app-filter-range-input>
+    </div>
   </mat-expansion-panel>
 </form>
 

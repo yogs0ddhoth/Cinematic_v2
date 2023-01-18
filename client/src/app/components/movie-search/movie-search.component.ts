@@ -2,7 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { SearchMovieInput, SearchMoviesGQL, SearchMoviesQuery } from 'src/app/core/graph/generated';
+import { RatingInput, SearchMovieInput, SearchMoviesGQL, SearchMoviesQuery, SearchRatingInput } from 'src/app/core/graph/generated';
+
+interface RatingInputCtrl {
+  disabled: boolean;
+  source: string;
+  score: number;
+  max: number;
+  step: number;
+}
 
 @Component({
   selector: 'app-movie-search',
@@ -19,8 +27,31 @@ export default class MovieSearchComponent implements OnInit {
   genres: string[] = [
     {name: 'Action'}, {name: 'Adventure'}, {name: 'Animation'}, {name: 'Biography'}, {name: 'Comedy'}, {name: 'Crime'}, {name: 'Documentary'}, {name: 'Drama'}, {name: 'Family'}, {name: 'Fantasy'}, {name: 'Film-Noir'}, {name: 'History'}, {name: 'Horror'}, {name: 'Music'}, {name: 'Musical'}, {name: 'Mystery'}, {name: 'Romance'}, {name: 'Sci-Fi'}, {name: 'Sport'}, {name: 'Thriller'}, {name: 'War'}, {name: 'Western'}
   ].map(genre => genre.name);
-  genreInput: string[]  = [];
+  genresInput: string[]  = [];
   movies?: Observable<SearchMoviesQuery['searchMovies']>;
+
+  ratingsInput: RatingInputCtrl[] = [
+    { 
+      disabled: true, 
+      source: 'Internet Movie Database', 
+      score: 0, 
+      max: 10, 
+      step: 0.1 
+    },
+    { 
+      disabled: true, 
+      source: 'Rotten Tomatoes', 
+      score: 0, 
+      max: 100, 
+      step: 1 
+    },
+    { disabled: true, 
+      source: 'Metacritic', 
+      score: 0, 
+      max: 100, 
+      step: 1 
+    },
+  ];
 
   // TODO: get writers from server
   writers: string[] = [];
@@ -33,12 +64,6 @@ export default class MovieSearchComponent implements OnInit {
   ) { 
     this.searchForm = this.fb.group({
       director: [''],
-      // ratings: this.fb.array([
-      //   this.fb.group({
-      //     score: 0.0,
-      //     source: [''],
-      //   }),
-      // ]),
       releaseYear: [''],
       title: [''],
     });
@@ -46,32 +71,29 @@ export default class MovieSearchComponent implements OnInit {
 
   ngOnInit(): void { }
 
-  updateContentRatings(contentRatings: string[]): void {
-    this.contentRatingsInput = contentRatings;
+  getRatingInputs(): SearchRatingInput[] {
+    const ratings: SearchRatingInput[] = [];
+    this.ratingsInput.forEach(rating => {
+      if (!rating.disabled) {
+        ratings.push({
+          source: rating.source,
+          score: rating.score,
+        });
+      }
+    });
+    return ratings;
   }
-  updateGenres(genres: string[]): void {
-    this.genreInput = genres;
-  }
-  updateWriters(writers: string[]): void {
-    this.writersInput = writers;
-  }
-
-  // getContentRatings(): string[] {
-  //   const contentRatings = this.searchForm.get('contentRatings')!.getRawValue();
-  //   return contentRatings.keys().filter((key: string) => contentRatings.get(key)?.value);
-  // }
 
   #getSearchInput(): SearchMovieInput {
     const director = this.searchForm.get('director')?.value;
     const title = this.searchForm.get('title')?.value;
-    const ratings = this.searchForm.get('ratings')?.value;
     const releaseYear = this.searchForm.get('releaseYear')?.value;
 
     const searchInput: SearchMovieInput = {
       contentRating: this.contentRatingsInput,
       director: director ? director : '',
-      genres: this.genreInput,
-      ratings: ratings ? ratings : [],
+      genres: this.genresInput,
+      ratings: this.getRatingInputs(),
       title: title ? title : '',
       releaseYear: releaseYear ? releaseYear : '',
       writers: this.writersInput,
