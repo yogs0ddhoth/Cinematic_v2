@@ -28,6 +28,7 @@ export default class MovieSearchComponent implements OnInit {
     {name: 'Action'}, {name: 'Adventure'}, {name: 'Animation'}, {name: 'Biography'}, {name: 'Comedy'}, {name: 'Crime'}, {name: 'Documentary'}, {name: 'Drama'}, {name: 'Family'}, {name: 'Fantasy'}, {name: 'Film-Noir'}, {name: 'History'}, {name: 'Horror'}, {name: 'Music'}, {name: 'Musical'}, {name: 'Mystery'}, {name: 'Romance'}, {name: 'Sci-Fi'}, {name: 'Sport'}, {name: 'Thriller'}, {name: 'War'}, {name: 'Western'}
   ].map(genre => genre.name);
   genresInput: string[]  = [];
+  
   movies?: Observable<SearchMoviesQuery['searchMovies']>;
 
   ratingsInput: RatingInputCtrl[] = [
@@ -73,11 +74,15 @@ export default class MovieSearchComponent implements OnInit {
 
   getRatingInputs(): SearchRatingInput[] {
     const ratings: SearchRatingInput[] = [];
-    this.ratingsInput.forEach(rating => {
-      if (!rating.disabled) {
+    this.ratingsInput.forEach(({disabled, source, score}) => {
+      // Handle case where score is coerced to string by Angular Material
+      if (typeof score !== 'number') {
+        score = parseFloat(score);
+      }
+      if (!disabled) {
         ratings.push({
-          source: rating.source,
-          score: rating.score,
+          source,
+          score,
         });
       }
     });
@@ -90,13 +95,13 @@ export default class MovieSearchComponent implements OnInit {
     const releaseYear = this.searchForm.get('releaseYear')?.value;
 
     const searchInput: SearchMovieInput = {
-      contentRating: this.contentRatingsInput,
-      director: director ? director : '',
-      genres: this.genresInput,
-      ratings: this.getRatingInputs(),
+      contentRating: this.contentRatingsInput.length ? this.contentRatingsInput : null,
+      director: director ? director : null,
+      genres: this.genresInput.length ? this.genresInput : null,
+      ratings: this.getRatingInputs().length ? this.getRatingInputs() : null,
       title: title ? title : '',
       releaseYear: releaseYear ? releaseYear : '',
-      writers: this.writersInput,
+      writers: this.writersInput.length ? this.writersInput : null,
     };
     return searchInput;
   };
@@ -108,8 +113,7 @@ export default class MovieSearchComponent implements OnInit {
       .pipe(map(result => result.data.searchMovies));
   }
 
-  logForm(): void {
-    console.log(this.#getSearchInput());
+  logMovies(): void {
+    this.movies?.subscribe(movies => console.log(movies));
   }
-
 }
