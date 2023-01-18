@@ -1,18 +1,15 @@
 use crate::{graph::FormatUrl, Env, Request};
 
 use super::{
-    // traits:
-    // FormatUrl, Resolver,
     // external crates:
     async_trait,
-    // std lib
-    // ParseFloatError,
     // local modules:
     models::*,
     omdb_models::*,
     reqwest,
     Context,
-    Resolvers, EntityResolvers,
+    EntityResolvers,
+    Resolvers,
 };
 
 #[async_trait]
@@ -79,7 +76,6 @@ impl Resolvers for SearchMovieInput {
         movies.into_iter().map(|movie| Movie::from(movie)).collect()
     }
 }
-
 
 #[async_trait]
 impl EntityResolvers for MovieTrailers {
