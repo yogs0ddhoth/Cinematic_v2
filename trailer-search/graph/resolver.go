@@ -33,8 +33,12 @@ func (r *Resolver) getMovieTrailers(title string) (*model.MovieTrailers, error) 
 	call := service.Search.List([]string{"snippet"}).Type("video").Q(q).MaxResults(MaxResults)
 
 	response, err := call.Do()
-	// TODO: Implement a proper defer, panic, recover
+
 	if err != nil {
+		error := err.Error()
+		if strings.Contains(error, "403") {
+			return &model.MovieTrailers{Title: title, Trailers: nil}, nil
+		}
 		return nil, err
 	}
 
