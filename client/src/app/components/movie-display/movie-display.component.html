@@ -1,29 +1,5 @@
-<button type="button" class="btn btn-primary" (click)="openModal(template)">Display Movie - Will be card</button>
+<h1 mat-dialog-title>{{data.title}}</h1>
+<mat-dialog-content>
+  <p>{{data.plot}}</p> 
+</mat-dialog-content>
 
-<ng-template #template>
-  <div class="modal-header">
-    <h4 class="modal-title">{{movie.title}}(movie title)</h4>
-    <button 
-      type="button" 
-      class="btn-close close pull-right"
-      (click)="modalRef?.hide()"
-    ></button>
-  </div>
-
-  <div class="modal-body">
-    <!-- movie.image will require further processing -->
-    <img 
-      [src]="movie.image" 
-      alt="{{movie.title}}Poster"
-    />
-
-  </div>
-
-  <div class="modal-footer">
-    <button 
-      type="button" 
-      class="btn btn-secondary" 
-      (click)="modalRef?.hide()"
-    >Close</button>
-  </div>
-</ng-template>
