@@ -1,5 +1,71 @@
 <h1 mat-dialog-title>{{data.title}}</h1>
+<p>{{data.year}}</p>
+<p>{{data.contentRating}}</p>
+<p>{{data.runtime}}</p>
 <mat-dialog-content>
-  <p>{{data.plot}}</p> 
+  <img src="{{data.image}}" alt="{{data.title}} poster">
+
+  <div *ngFor="let genre of data.genres">
+    <button mat-fab extended>
+      {{genre}}
+    </button>
+  </div>
+
+  <p>{{data.plot}}</p>
+
+  <h3>Director</h3>
+  <p>{{data.director?.name}}</p>
+
+  <h3>Writers</h3>
+  <div *ngFor="let writer of data.writers">
+    <p>{{writer.name}}</p>
+  </div>
+
+  <h3>Actors</h3>
+  <div *ngFor="let actor of data.actors">
+    <p>{{actor.name}}</p>
+  </div>
+
+  <h3>Ratings</h3>
+  <div *ngFor="let rating of data.ratings">
+    <p>{{rating.source}}: {{rating.score}}</p>
+    <div *ngIf="rating.source === 'Internet Movie Database'">
+      <p>{{data.imdbVotes}}</p>
+    </div>
+  </div>
+
+  <div *ngIf="data.awards">
+    <h3>Awards</h3>
+    <p>{{data.awards}}</p>
+  </div>
+
+  <div *ngIf="data.boxOffice || 
+              data.country || 
+              data.language || 
+              data.production || 
+              data.released">
+
+    <h3>Additional Information</h3>
+
+    <div *ngIf="data.released">
+      <p>{{data.released}}</p>
+    </div>
+    <div *ngIf="data.country">
+      <p>{{data.country}}</p>
+    </div>
+    <div *ngIf="data.language">
+      <p>{{data.language}}</p>
+    </div>
+    
+    <div *ngIf="data.boxOffice">
+      <p>{{data.boxOffice}}</p>
+    </div>
+
+    <div *ngIf="data.production">
+      <p>{{data.production}}</p>
+    </div>
+
+  </div>
+
 </mat-dialog-content>
 
