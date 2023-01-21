@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+
 
 import { GraphQLModule } from './core/graph/graphql.module';
 
@@ -31,10 +33,11 @@ import BannerComponent from './components/banner/banner.component';
 import MovieDisplayComponent from './components/movie-display/movie-display.component';
 import MovieSearchComponent from './components/movie-search/movie-search.component';
 import LoginComponent from './components/login/login.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
 import { FiltersListInputComponent } from './components/filters-list-input/filters-list-input.component';
 import { FilterRangeInputComponent } from './components/filter-range-input/filter-range-input.component';
 import { MovieDisplayCardComponent } from './components/movie-display-card/movie-display-card.component';
+import { MovieTrailerPlayerComponent } from './components/movie-trailer-player/movie-trailer-player.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +51,7 @@ import { MovieDisplayCardComponent } from './components/movie-display-card/movie
     FiltersListInputComponent,
     FilterRangeInputComponent,
     MovieDisplayCardComponent,
+    MovieTrailerPlayerComponent,
   ],
   imports: [
     AppRoutingModule,
