@@ -4,10 +4,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AppRoutingModule } from './app-routing.module';
-
-
-import { GraphQLModule } from './core/graph/graphql.module';
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,10 +19,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 
-import { ModalModule } from 'ngx-bootstrap/modal';
-
-// import { ApolloTestComponent } from './apollo-test/apollo-test.component';
-// import { ImdbTestComponent } from './imdb-test/imdb-test.component';
+import { AppRoutingModule } from './app-routing.module';
+import { GraphQLModule } from './core/graph/graphql.module';
 
 import AppComponent from './app.component';
 import BannerComponent from './components/banner/banner.component';
@@ -42,8 +36,6 @@ import { MovieTrailerPlayerComponent } from './components/movie-trailer-player/m
 @NgModule({
   declarations: [
     AppComponent,
-    // ApolloTestComponent,
-    // ImdbTestComponent,
     BannerComponent,
     MovieDisplayComponent,
     MovieSearchComponent,
@@ -74,9 +66,6 @@ import { MovieTrailerPlayerComponent } from './components/movie-trailer-player/m
     MatIconModule,
     MatInputModule,
     MatSliderModule,
-    
-    ModalModule.forRoot(),
-    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
