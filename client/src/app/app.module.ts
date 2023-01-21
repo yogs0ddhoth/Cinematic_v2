@@ -8,10 +8,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { GraphQLModule } from './core/graph/graphql.module';
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatCommonModule } from '@angular/material/core';
-import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -32,6 +34,7 @@ import LoginComponent from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FiltersListInputComponent } from './components/filters-list-input/filters-list-input.component';
 import { FilterRangeInputComponent } from './components/filter-range-input/filter-range-input.component';
+import { MovieDisplayCardComponent } from './components/movie-display-card/movie-display-card.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +47,7 @@ import { FilterRangeInputComponent } from './components/filter-range-input/filte
     LoginComponent,
     FiltersListInputComponent,
     FilterRangeInputComponent,
+    MovieDisplayCardComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -54,9 +58,11 @@ import { FilterRangeInputComponent } from './components/filter-range-input/filte
     HttpClientModule,
 
     MatAutocompleteModule,
+    MatCardModule,
     MatChipsModule,
     MatCheckboxModule,
     MatCommonModule,
+    MatDialogModule,
     MatButtonModule,
     MatExpansionModule,
     MatFormFieldModule,
