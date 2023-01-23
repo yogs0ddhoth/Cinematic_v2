@@ -10,8 +10,7 @@
 
   <button mat-raised-button 
           class="btn btn-dark" 
-          type="button" 
-          (click)="logForm()">
+          type="submit">
     Search
   </button>
 
@@ -67,5 +66,5 @@
 </form>
 
 <div *ngFor="let movie of movies | async">
-  <app-movie-display *ngIf="movie" [movie]="movie"></app-movie-display>
+  <app-movie-display-card *ngIf="movie" [movie]="movie"></app-movie-display-card>
 </div>
