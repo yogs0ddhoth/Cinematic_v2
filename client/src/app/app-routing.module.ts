@@ -6,6 +6,7 @@ import MovieSearchComponent from './components/movie-search/movie-search.compone
 const routes: Routes = [
   { path: '', component: MovieSearchComponent },
   { path: 'login', component: LoginComponent },
+  { path: '**', redirectTo: '' },
 ];
 
 @NgModule({
