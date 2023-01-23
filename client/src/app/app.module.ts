@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { YouTubePlayerModule } from '@angular/youtube-player'
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
@@ -52,6 +53,8 @@ import { MovieTrailerPlayerComponent } from './components/movie-trailer-player/m
     FormsModule,
     GraphQLModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    YouTubePlayerModule,
 
     MatAutocompleteModule,
     MatCardModule,
