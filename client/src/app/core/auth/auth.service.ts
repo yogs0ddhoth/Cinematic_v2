@@ -10,10 +10,11 @@ export class AuthService {
   login(login: LoginQueryVariables) {
     return this.loginGQL.fetch(login).forEach(({data, error}) => {
       if (error) {
-        // TODO: Throw error of some kind
-        return;
+        throw error;
       }
       this.#loginUser(data.login.access_token);
+
+      window.location.assign('/');
     });
   }
 
