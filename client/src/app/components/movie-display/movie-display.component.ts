@@ -10,7 +10,7 @@ import { Movie } from 'src/app/core/graph/generated';
 })
 export default class MovieDisplayComponent implements OnInit {
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: Movie) {}
+  constructor(@Inject(MAT_DIALOG_DATA) public movie: Movie) {}
 
   ngOnInit(): void { }
 }

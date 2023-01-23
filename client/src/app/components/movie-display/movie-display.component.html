@@ -1,70 +1,74 @@
-<h1 mat-dialog-title>{{data.title}}</h1>
-<p>{{data.year}}</p>
-<p>{{data.contentRating}}</p>
-<p>{{data.runtime}}</p>
+<h1 mat-dialog-title>{{movie.title}}</h1>
+<p>{{movie.year}}</p>
+<p>{{movie.contentRating}}</p>
+<p>{{movie.runtime}}</p>
 <mat-dialog-content>
-  <img src="{{data.image}}" alt="{{data.title}} poster">
+  <img src="{{movie.image}}" alt="{{movie.title}} poster">
 
-  <div *ngFor="let genre of data.genres">
+  <div *ngFor="let genre of movie.genres">
     <button mat-fab extended>
-      {{genre}}
+      {{genre.name}}
     </button>
   </div>
 
-  <p>{{data.plot}}</p>
+  <p>{{movie.plot}}</p>
 
   <h3>Director</h3>
-  <p>{{data.director?.name}}</p>
+  <p>{{movie.director?.name}}</p>
 
   <h3>Writers</h3>
-  <div *ngFor="let writer of data.writers">
+  <div *ngFor="let writer of movie.writers">
     <p>{{writer.name}}</p>
   </div>
 
   <h3>Actors</h3>
-  <div *ngFor="let actor of data.actors">
+  <div *ngFor="let actor of movie.actors">
     <p>{{actor.name}}</p>
   </div>
 
   <h3>Ratings</h3>
-  <div *ngFor="let rating of data.ratings">
+  <div *ngFor="let rating of movie.ratings">
     <p>{{rating.source}}: {{rating.score}}</p>
     <div *ngIf="rating.source === 'Internet Movie Database'">
-      <p>{{data.imdbVotes}}</p>
+      <p>{{movie.imdbVotes}}</p>
     </div>
   </div>
 
-  <div *ngIf="data.awards">
+  <div *ngIf="movie.awards">
     <h3>Awards</h3>
-    <p>{{data.awards}}</p>
+    <p>{{movie.awards}}</p>
   </div>
 
-  <div *ngIf="data.boxOffice || 
-              data.country || 
-              data.language || 
-              data.production || 
-              data.released">
+  <div *ngIf="movie.boxOffice || 
+              movie.country || 
+              movie.language || 
+              movie.production || 
+              movie.released">
 
     <h3>Additional Information</h3>
 
-    <div *ngIf="data.released">
-      <p>{{data.released}}</p>
+    <div *ngIf="movie.released">
+      <p>{{movie.released}}</p>
     </div>
-    <div *ngIf="data.country">
-      <p>{{data.country}}</p>
+    <div *ngIf="movie.country">
+      <p>{{movie.country}}</p>
     </div>
-    <div *ngIf="data.language">
-      <p>{{data.language}}</p>
+    <div *ngIf="movie.language">
+      <p>{{movie.language}}</p>
     </div>
     
-    <div *ngIf="data.boxOffice">
-      <p>{{data.boxOffice}}</p>
+    <div *ngIf="movie.boxOffice">
+      <p>{{movie.boxOffice}}</p>
     </div>
 
-    <div *ngIf="data.production">
-      <p>{{data.production}}</p>
+    <div *ngIf="movie.production">
+      <p>{{movie.production}}</p>
     </div>
 
+  </div>
+
+  <div *ngFor="let trailer of movie.trailers?.trailers">
+    <app-movie-trailer-player [videoId]="trailer"></app-movie-trailer-player>
   </div>
 
 </mat-dialog-content>
