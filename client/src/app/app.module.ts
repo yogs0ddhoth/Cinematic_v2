@@ -4,6 +4,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects/src';
 import { YouTubePlayerModule } from '@angular/youtube-player'
 
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -69,6 +71,9 @@ import { MovieTrailerPlayerComponent } from './components/movie-trailer-player/m
     MatIconModule,
     MatInputModule,
     MatSliderModule,
+
+    StoreModule.forRoot({}),
+    EffectsModule.forRoot([]),
   ],
   providers: [],
   bootstrap: [AppComponent],
